@@ -1,0 +1,75 @@
+import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { dbPool } from '@/config/db';
+import { CreateRfqInput, RfqInquiryRow, RfqItemRow } from '@/types/rfq';
+
+export class RfqModel {
+  /**
+   * Create RFQ inquiry record and its requested items inside a transaction
+   */
+  static async createRfq(input: CreateRfqInput): Promise<{ rfq_id: number; status: string }> {
+    const connection = await dbPool.getConnection();
+    try {
+      await connection.beginTransaction();
+
+      // 1. Insert into rfq_inquiries
+      const insertInquirySql = `
+        INSERT INTO rfq_inquiries (
+          company_name, business_email, industry_segment, monthly_volume, detailed_requirements, status
+        ) VALUES (?, ?, ?, ?, ?, 'pending')
+      `;
+      const inquiryParams = [
+        input.company_name,
+        input.business_email,
+        input.industry_segment,
+        input.monthly_volume,
+        input.detailed_requirements,
+      ];
+
+      const [inquiryResult] = await connection.query<ResultSetHeader>(insertInquirySql, inquiryParams);
+      const rfqId = inquiryResult.insertId;
+
+      // 2. Insert items into rfq_items
+      const insertItemSql = `
+        INSERT INTO rfq_items (rfq_id, product_id, quantity, size_range)
+        VALUES (?, ?, ?, ?)
+      `;
+
+      for (const item of input.items) {
+        const itemParams = [
+          rfqId,
+          item.product_id,
+          item.quantity,
+          item.size_range || 'Assorted S/M/L/XL',
+        ];
+        await connection.query(insertItemSql, itemParams);
+      }
+
+      await connection.commit();
+      return { rfq_id: rfqId, status: 'pending' };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  /**
+   * Find RFQ inquiry by ID (for verification tests)
+   */
+  static async findRfqById(id: number): Promise<RfqInquiryRow | null> {
+    const sql = `SELECT * FROM rfq_inquiries WHERE id = ? LIMIT 1`;
+    const [rows] = await dbPool.query<RowDataPacket[]>(sql, [id]);
+    if (rows.length === 0) return null;
+    return rows[0] as RfqInquiryRow;
+  }
+
+  /**
+   * Find items for RFQ inquiry (for verification tests)
+   */
+  static async findRfqItems(rfqId: number): Promise<RfqItemRow[]> {
+    const sql = `SELECT * FROM rfq_items WHERE rfq_id = ? ORDER BY id ASC`;
+    const [rows] = await dbPool.query<RowDataPacket[]>(sql, [rfqId]);
+    return rows as RfqItemRow[];
+  }
+}
