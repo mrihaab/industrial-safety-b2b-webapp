@@ -63,7 +63,7 @@ export const ProductDetail: React.FC = () => {
           setProduct(response.data);
         }
       } catch (err: unknown) {
-        console.warn('API detail fetch error, using fallback product:', err);
+        console.warn('API detail fetch error:', err);
       } finally {
         setLoading(false);
       }
@@ -86,7 +86,7 @@ export const ProductDetail: React.FC = () => {
       quantity: validQty,
       sizeRange: selectedSize,
       price: product.price,
-      imageUrl: product.primaryImage || product.images[0],
+      imageUrl: product.primaryImage || (product.images && product.images[0]) || '/uploads/placeholder.jpg',
     });
     setAddedToast(true);
     setTimeout(() => setAddedToast(false), 3000);
@@ -99,6 +99,10 @@ export const ProductDetail: React.FC = () => {
       </div>
     );
   }
+
+  const galleryImages = (product.images && product.images.length > 0)
+    ? product.images
+    : [product.primaryImage || '/uploads/placeholder.jpg'];
 
   return (
     <div className="space-y-12">
@@ -117,25 +121,27 @@ export const ProductDetail: React.FC = () => {
               {product.statusTag || 'Safety-System-Active'}
             </Badge>
             <img
-              src={product.images[activeImageIndex] || product.primaryImage}
+              src={galleryImages[activeImageIndex] || product.primaryImage || '/uploads/placeholder.jpg'}
               alt={product.title}
               className="object-contain h-full w-full max-h-[480px] transition-all duration-300"
             />
           </div>
 
-          <div className="grid grid-cols-4 gap-4">
-            {product.images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveImageIndex(idx)}
-                className={`aspect-square bg-surface-container-high border rounded-sm overflow-hidden p-2 transition-all ${
-                  activeImageIndex === idx ? 'border-primary-container ring-1 ring-primary' : 'border-outline-variant hover:border-primary/50'
-                }`}
-              >
-                <img src={img} alt={`Thumbnail ${idx + 1}`} className="object-contain h-full w-full" />
-              </button>
-            ))}
-          </div>
+          {galleryImages.length > 1 && (
+            <div className="grid grid-cols-4 gap-4">
+              {galleryImages.map((img, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setActiveImageIndex(idx)}
+                  className={`aspect-square bg-surface-container-high border rounded-sm overflow-hidden p-2 transition-all ${
+                    activeImageIndex === idx ? 'border-primary-container ring-1 ring-primary' : 'border-outline-variant hover:border-primary/50'
+                  }`}
+                >
+                  <img src={img} alt={`Thumbnail ${idx + 1}`} className="object-contain h-full w-full" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="lg:col-span-5 space-y-6">
@@ -164,7 +170,7 @@ export const ProductDetail: React.FC = () => {
               </span>
               <span className="text-xs text-on-surface-variant ml-1">/ unit</span>
             </div>
-            <Badge variant="success">{product.stockStatus}</Badge>
+            <Badge variant="success">{product.stockStatus || 'IN STOCK'}</Badge>
           </div>
 
           <p className="font-body-lg text-on-surface-variant leading-relaxed">
@@ -241,90 +247,38 @@ export const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      <section className="bg-surface-container industrial-border p-8 rounded-sm space-y-6">
-        <h3 className="font-label-caps text-label-caps text-primary tracking-widest uppercase font-bold">
-          Technical Specifications Matrix
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {product.specs.map((spec, idx) => (
-            <div key={idx} className="flex justify-between items-center p-4 bg-surface-container-high border border-outline-variant rounded-xs">
-              <span className="font-label-caps text-xs text-on-surface-variant uppercase">{spec.key}</span>
-              <span className="font-body-lg text-sm text-on-surface font-semibold">{spec.value}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {product.specs && product.specs.length > 0 && (
+        <section className="bg-surface-container industrial-border p-8 rounded-sm space-y-6">
+          <h3 className="font-label-caps text-label-caps text-primary tracking-widest uppercase font-bold">
+            Technical Specifications Matrix
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {product.specs.map((spec, idx) => (
+              <div key={idx} className="flex justify-between items-center p-4 bg-surface-container-high border border-outline-variant rounded-xs">
+                <span className="font-label-caps text-xs text-on-surface-variant uppercase">{spec.key}</span>
+                <span className="font-body-lg text-sm text-on-surface font-semibold">{spec.value}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      <section className="space-y-6">
-        <h3 className="font-label-caps text-label-caps text-primary tracking-widest uppercase font-bold">
-          Engineering Highlights
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {product.features.map((feat, idx) => (
-            <div key={idx} className="bg-surface-container industrial-border p-6 rounded-sm space-y-3">
-              <span className="material-symbols-outlined text-primary text-3xl">{feat.icon}</span>
-              <h4 className="font-title-md text-lg text-on-surface font-bold">{feat.title}</h4>
-              <p className="font-body-sm text-on-surface-variant">{feat.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-6 pt-8 border-t border-outline-variant">
-        <h3 className="font-headline-lg text-2xl text-on-surface font-bold">
-          Related Safety Equipment
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <ProductCard
-            product={{
-              id: 2,
-              slug: 'titanshield-assembly-gloves',
-              sku: 'GSH-AG-002',
-              title: 'TitanShield Precision Assembly Gloves',
-              seriesName: 'PRECISION SERIES',
-              price: 32.50,
-              moq: 100,
-              stockStatus: 'IN STOCK',
-              statusTag: 'Safety-System-Active',
-              ratingScore: 4.8,
-              reviewCount: 94,
-              primaryImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80',
-            }}
-          />
-          <ProductCard
-            product={{
-              id: 3,
-              slug: 'vulcan-welding-gloves',
-              sku: 'GSH-WG-003',
-              title: 'Vulcan Heat-Resistant Heavy Welding Gloves',
-              seriesName: 'THERMAL ARMOR',
-              price: 58.00,
-              moq: 50,
-              stockStatus: 'IN STOCK',
-              statusTag: 'Safety-System-Active',
-              ratingScore: 5.0,
-              reviewCount: 67,
-              primaryImage: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80',
-            }}
-          />
-          <ProductCard
-            product={{
-              id: 4,
-              slug: 'pro-vis-safety-vest-class2',
-              sku: 'GSH-SV-004',
-              title: 'Pro-Vis Class 2 High-Visibility Safety Vest',
-              seriesName: 'REFLECTIVE SERIES',
-              price: 24.00,
-              moq: 50,
-              stockStatus: 'IN STOCK',
-              statusTag: 'Safety-System-Active',
-              ratingScore: 4.7,
-              reviewCount: 210,
-              primaryImage: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=600&q=80',
-            }}
-          />
-        </div>
-      </section>
+      {product.features && product.features.length > 0 && (
+        <section className="space-y-6">
+          <h3 className="font-label-caps text-label-caps text-primary tracking-widest uppercase font-bold">
+            Engineering Highlights
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {product.features.map((feat, idx) => (
+              <div key={idx} className="bg-surface-container industrial-border p-6 rounded-sm space-y-3">
+                <span className="material-symbols-outlined text-primary text-3xl">{feat.icon || 'shield'}</span>
+                <h4 className="font-title-md text-lg text-on-surface font-bold">{feat.title}</h4>
+                <p className="font-body-sm text-on-surface-variant">{feat.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 };

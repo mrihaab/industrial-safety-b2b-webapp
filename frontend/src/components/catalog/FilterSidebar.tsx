@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@/components/ui/Button';
+import React, { useEffect, useState } from 'react';
+import { CategoryService, CategoryTreeDto } from '@/services/categoryService';
 
 interface FilterSidebarProps {
   selectedCategory: string;
@@ -16,6 +16,23 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onSelectStockFilter,
   onReset,
 }) => {
+  const [categories, setCategories] = useState<CategoryTreeDto[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await CategoryService.getCategories();
+        if (response.success && response.data && response.data.length > 0) {
+          setCategories(response.data);
+        }
+      } catch (err: unknown) {
+        console.warn('API error fetching category tree for sidebar:', err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
     <aside className="w-full lg:w-64 bg-surface-container industrial-border p-6 rounded-sm space-y-8 h-fit">
       <div className="flex items-center justify-between border-b border-outline-variant pb-4">
@@ -27,7 +44,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </button>
       </div>
 
-      {/* Category Tree Hierarchy */}
+      {/* Dynamic Database Categories */}
       <div className="space-y-4">
         <h4 className="font-title-md text-sm text-on-surface font-bold uppercase tracking-wider">
           Categories
@@ -41,40 +58,47 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           >
             All Categories
           </button>
-          
-          <div className="space-y-1 pl-2">
-            <span className="font-label-caps text-xs text-primary font-semibold block uppercase tracking-wider py-1">
-              Working Gloves
-            </span>
-            {['working-gloves', 'assembly-gloves', 'welding-gloves', 'driving-gloves', 'cut-resistant-gloves'].map(slug => (
-              <button
-                key={slug}
-                onClick={() => onSelectCategory(slug)}
-                className={`w-full text-left py-1 px-3 rounded-xs text-xs transition-colors capitalize ${
-                  selectedCategory === slug ? 'bg-primary/20 text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                {slug.replace('-', ' ')}
-              </button>
-            ))}
-          </div>
 
-          <div className="space-y-1 pl-2 pt-2">
-            <span className="font-label-caps text-xs text-primary font-semibold block uppercase tracking-wider py-1">
-              Sports & Workwear
-            </span>
-            {['sports-gloves', 'workwear-safety-wear', 'safety-vests'].map(slug => (
+          {categories.length > 0 ? (
+            categories.map(cat => (
+              <div key={cat.id} className="space-y-1 pl-2 pt-1">
+                <button
+                  onClick={() => onSelectCategory(cat.slug)}
+                  className={`w-full text-left py-1 px-3 rounded-xs text-xs transition-colors capitalize font-semibold ${
+                    selectedCategory === cat.slug ? 'bg-primary/20 text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  {cat.name}
+                </button>
+                {cat.children && cat.children.length > 0 && (
+                  <div className="pl-3 space-y-1 border-l border-outline-variant/40 ml-2">
+                    {cat.children.map((sub: CategoryTreeDto) => (
+                      <button
+                        key={sub.id}
+                        onClick={() => onSelectCategory(sub.slug)}
+                        className={`w-full text-left py-0.5 px-2 rounded-xs text-[11px] transition-colors capitalize ${
+                          selectedCategory === sub.slug ? 'text-primary font-bold' : 'text-on-surface-variant/80 hover:text-on-surface'
+                        }`}
+                      >
+                        {sub.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="space-y-1 pl-2">
               <button
-                key={slug}
-                onClick={() => onSelectCategory(slug)}
+                onClick={() => onSelectCategory('working-gloves')}
                 className={`w-full text-left py-1 px-3 rounded-xs text-xs transition-colors capitalize ${
-                  selectedCategory === slug ? 'bg-primary/20 text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'
+                  selectedCategory === 'working-gloves' ? 'bg-primary/20 text-primary font-bold' : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                {slug.replace('-', ' ')}
+                Working Gloves
               </button>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
