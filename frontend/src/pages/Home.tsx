@@ -13,10 +13,10 @@ export const Home: React.FC = () => {
       <section className="relative min-h-[80vh] flex items-center overflow-hidden industrial-grid border-b border-outline-variant -mt-stack-lg -mx-gutter px-gutter rounded-b-lg">
         <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/85 to-transparent z-10" />
         
-        {/* Background Industrial Image */}
+        {/* Background Industrial 4K Photography */}
         <img
-          src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1600&q=80"
-          alt="Industrial Safety Workspace"
+          src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80"
+          alt="Industrial Safety Manufacturing Workspace"
           className="absolute right-0 top-0 h-full w-full lg:w-2/3 object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 opacity-60 lg:opacity-100"
         />
 
