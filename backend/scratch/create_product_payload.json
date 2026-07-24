@@ -1,0 +1,10 @@
+{
+  "category_id": 1,
+  "sku": "HTTP-TEST-001",
+  "title": "HTTP Tested Welding Suit",
+  "slug": "http-tested-welding-suit",
+  "series_name": "THERMAL ARMOR",
+  "price": 89.99,
+  "moq": 50,
+  "description": "High temperature heavy welding suit tested via HTTP curl."
+}
