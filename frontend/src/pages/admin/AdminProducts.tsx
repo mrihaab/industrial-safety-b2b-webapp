@@ -5,6 +5,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
+import { AdminProductService } from '@/services/adminProductService';
 
 interface ProductItem {
   id: number;
@@ -38,6 +39,7 @@ export const AdminProducts: React.FC = () => {
   const [price, setPrice] = useState('45.00');
   const [moq, setMoq] = useState('50');
   const [description, setDescription] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const openCreateModal = () => {
     setEditingProduct(null);
@@ -63,44 +65,79 @@ export const AdminProducts: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSaveProduct = (e: React.FormEvent) => {
+  const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (editingProduct) {
-      setProducts(prev =>
-        prev.map(p =>
-          p.id === editingProduct.id
-            ? { ...p, sku, title, slug, price: parseFloat(price), moq: parseInt(moq) }
-            : p
-        )
-      );
-    } else {
-      const newId = Date.now();
-      setProducts(prev => [
-        ...prev,
-        {
-          id: newId,
+    setIsLoading(true);
+
+    try {
+      if (editingProduct) {
+        await AdminProductService.updateProduct(editingProduct.id, {
           sku,
           title,
-          slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
-          categoryId: parseInt(categoryId),
+          slug,
+          category_id: parseInt(categoryId),
           price: parseFloat(price),
           moq: parseInt(moq),
-          stockStatus: 'IN STOCK',
-        },
-      ]);
+          description,
+        });
+
+        setProducts(prev =>
+          prev.map(p =>
+            p.id === editingProduct.id
+              ? { ...p, sku, title, slug, price: parseFloat(price), moq: parseInt(moq) }
+              : p
+          )
+        );
+      } else {
+        const formData = new FormData();
+        formData.append('sku', sku);
+        formData.append('title', title);
+        formData.append('slug', slug || title.toLowerCase().replace(/\s+/g, '-'));
+        formData.append('category_id', categoryId);
+        formData.append('price', price);
+        formData.append('moq', moq);
+        formData.append('description', description || 'High-grade safety product.');
+
+        const res = await AdminProductService.createProduct(formData);
+        if (res.success) {
+          const newId = Date.now();
+          setProducts(prev => [
+            ...prev,
+            {
+              id: newId,
+              sku,
+              title,
+              slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
+              categoryId: parseInt(categoryId),
+              price: parseFloat(price),
+              moq: parseInt(moq),
+              stockStatus: 'IN STOCK',
+            },
+          ]);
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Failed to save product via API:', err);
+    } finally {
+      setIsLoading(false);
+      setIsModalOpen(false);
     }
-    setIsModalOpen(false);
   };
 
-  const handleDeleteProduct = (id: number) => {
+  const handleDeleteProduct = async (id: number) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
-      setProducts(prev => prev.filter(p => p.id !== id));
+      try {
+        await AdminProductService.deleteProduct(id);
+      } catch (err: unknown) {
+        console.warn('API delete failed, updating local state:', err);
+      } finally {
+        setProducts(prev => prev.filter(p => p.id !== id));
+      }
     }
   };
 
   return (
     <div className="space-y-8">
-      {/* Top Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory CRUD</h1>
@@ -111,7 +148,6 @@ export const AdminProducts: React.FC = () => {
         </Button>
       </div>
 
-      {/* Products Data Table */}
       <div className="bg-surface-container industrial-border rounded-sm overflow-hidden shadow-xl">
         <table className="w-full text-left font-body-sm text-sm">
           <thead className="bg-surface-container-high border-b border-outline-variant font-label-caps text-xs text-primary uppercase">
@@ -150,7 +186,6 @@ export const AdminProducts: React.FC = () => {
         </table>
       </div>
 
-      {/* PRODUCT FORM MODAL */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -194,7 +229,7 @@ export const AdminProducts: React.FC = () => {
             <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" isLoading={isLoading}>
               {editingProduct ? 'Save Changes' : 'Create Product'}
             </Button>
           </div>

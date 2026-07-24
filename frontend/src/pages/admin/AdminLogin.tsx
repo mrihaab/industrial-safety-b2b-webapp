@@ -4,6 +4,7 @@ import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/contexts/AuthContext';
+import { AuthService } from '@/services/authService';
 
 export const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState('admin@ghulamsafety.com');
@@ -14,7 +15,7 @@ export const AdminLogin: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       setError('Please enter both email and password.');
@@ -24,14 +25,20 @@ export const AdminLogin: React.FC = () => {
     setError('');
     setIsLoading(true);
 
-    // Mock UI Login Flow (backend already validated via POST /admin/auth/login)
-    setTimeout(() => {
+    try {
+      const response = await AuthService.login(email, password);
+      if (response.success && response.data) {
+        login(response.data.token, response.data.user);
+        navigate('/admin/dashboard');
+      } else {
+        setError(response.message || 'Invalid credentials.');
+      }
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed.';
+      setError(errorMessage);
+    } finally {
       setIsLoading(false);
-      const mockToken = 'mock_jwt_admin_token_2026';
-      const mockUser = { id: 1, username: 'admin', email, role: 'admin' };
-      login(mockToken, mockUser);
-      navigate('/admin/dashboard');
-    }, 1000);
+    }
   };
 
   return (

@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
 import { SectionHeader } from '@/components/layout/SectionHeader';
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
 import { SortBar } from '@/components/catalog/SortBar';
 import { ProductCard, ProductCardData } from '@/components/product/ProductCard';
 import { Pagination } from '@/components/ui/Pagination';
+import { Loader } from '@/components/ui/Loader';
+import { ProductService } from '@/services/productService';
 
-// Temporary Mock Products matching Product DTO specifications
-const MOCK_PRODUCTS: ProductCardData[] = [
+const FALLBACK_PRODUCTS: ProductCardData[] = [
   {
     id: 1,
     slug: 'gsh-elite-industrial-gloves',
@@ -64,52 +65,51 @@ const MOCK_PRODUCTS: ProductCardData[] = [
     reviewCount: 210,
     primaryImage: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=600&q=80',
   },
-  {
-    id: 5,
-    slug: 'ironstride-steel-toe-boots',
-    sku: 'GSH-FW-005',
-    title: 'IronStride Anti-Puncture Steel Toe Boots',
-    seriesName: 'FOOTWEAR ARMOR',
-    price: 68.00,
-    moq: 20,
-    stockStatus: 'LIMITED STOCK',
-    statusTag: 'Safety-System-Active',
-    ratingScore: 4.9,
-    reviewCount: 156,
-    primaryImage: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
-  },
-  {
-    id: 6,
-    slug: 'apex-sports-performance-gloves',
-    sku: 'GSH-SG-006',
-    title: 'Apex Tactical Performance Sports Gloves',
-    seriesName: 'ATHLETIC GEAR',
-    price: 39.00,
-    moq: 50,
-    stockStatus: 'IN STOCK',
-    statusTag: 'Safety-System-Active',
-    ratingScore: 4.6,
-    reviewCount: 82,
-    primaryImage: 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80',
-  },
 ];
 
 export const Catalog: React.FC = () => {
+  const [products, setProducts] = useState<ProductCardData[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [stockFilter, setStockFilter] = useState('all');
   const [sortBy, setSortBy] = useState('featured');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const breadcrumbItems = [{ label: 'PPE & Safety Catalog' }];
 
-  // Client-side filtering simulation
-  const filteredProducts = MOCK_PRODUCTS.filter(product => {
-    if (selectedCategory !== 'all' && !product.slug.includes(selectedCategory.split('-')[0])) return false;
-    if (stockFilter !== 'all' && product.stockStatus !== stockFilter) return false;
-    if (searchQuery && !product.title.toLowerCase().includes(searchQuery.toLowerCase()) && !product.sku.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const response = await ProductService.getProducts({
+          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          stock: stockFilter !== 'all' ? stockFilter : undefined,
+          sort: sortBy,
+          search: searchQuery || undefined,
+          page: currentPage,
+          limit: 12,
+        });
+
+        if (response.success && response.data && response.data.length > 0) {
+          setProducts(response.data);
+          if (response.meta) {
+            setTotalPages(response.meta.totalPages || 1);
+          }
+        } else {
+          setProducts(FALLBACK_PRODUCTS);
+        }
+      } catch (err: unknown) {
+        console.warn('API error during product catalog fetch, displaying fallback products:', err);
+        setProducts(FALLBACK_PRODUCTS);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedCategory, stockFilter, sortBy, searchQuery, currentPage]);
 
   const handleReset = () => {
     setSelectedCategory('all');
@@ -121,19 +121,15 @@ export const Catalog: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* Breadcrumbs */}
       <Breadcrumb items={breadcrumbItems} />
 
-      {/* Header Banner */}
       <SectionHeader
         badge="WHOLESALE CATALOG"
         title="Industrial PPE & Safety Equipment"
         subtitle="Explore ISO-certified safety gloves, workwear, high-visibility apparel, and industrial protective gear."
       />
 
-      {/* Catalog Layout Container */}
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* Left Filter Sidebar */}
         <FilterSidebar
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
@@ -142,20 +138,21 @@ export const Catalog: React.FC = () => {
           onReset={handleReset}
         />
 
-        {/* Right Main Grid */}
         <div className="flex-1 space-y-6">
-          {/* Top Sort & Search Bar */}
           <SortBar
-            totalItems={filteredProducts.length}
+            totalItems={products.length}
             sortBy={sortBy}
             onSortChange={setSortBy}
             onSearch={setSearchQuery}
           />
 
-          {/* Product Cards Grid */}
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="py-20 flex justify-center items-center">
+              <Loader size="lg" />
+            </div>
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProducts.map(product => (
+              {products.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
@@ -172,10 +169,9 @@ export const Catalog: React.FC = () => {
             </div>
           )}
 
-          {/* Pagination */}
           <Pagination
             currentPage={currentPage}
-            totalPages={2}
+            totalPages={totalPages}
             onPageChange={setCurrentPage}
           />
         </div>

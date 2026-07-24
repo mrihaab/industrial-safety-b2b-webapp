@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { Select } from '@/components/ui/Select';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useCart } from '@/contexts/CartContext';
+import { RfqService } from '@/services/rfqService';
 
 export const Rfq: React.FC = () => {
   const { cartItems, clearCart } = useCart();
@@ -16,7 +17,7 @@ export const Rfq: React.FC = () => {
   const [businessEmail, setBusinessEmail] = useState('');
   const [industrySegment, setIndustrySegment] = useState('Construction & Engineering');
   const [monthlyVolume, setMonthlyVolume] = useState('1,000 - 5,000 units');
-  const [selectedProductLine, setSelectedProductLine] = useState('GSH Elite Industrial Working Gloves');
+  const [selectedProductId, setSelectedProductId] = useState<number>(1);
   const [sizeRange, setSizeRange] = useState('L');
   const [quantity, setQuantity] = useState(50);
   const [detailedRequirements, setDetailedRequirements] = useState('');
@@ -27,7 +28,7 @@ export const Rfq: React.FC = () => {
 
   const breadcrumbItems = [{ label: 'Global RFQ & Logistics' }];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyName || !businessEmail) {
       setFormError('Please enter your Company Name and Business Email.');
@@ -41,27 +42,48 @@ export const Rfq: React.FC = () => {
     setFormError('');
     setIsLoading(true);
 
-    // Simulate mock UI submission
-    setTimeout(() => {
+    try {
+      const itemsToSubmit = cartItems.length > 0
+        ? cartItems.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            sizeRange: item.sizeRange,
+          }))
+        : [{ productId: selectedProductId, quantity, sizeRange }];
+
+      const response = await RfqService.submitRfq({
+        companyName,
+        businessEmail,
+        industrySegment,
+        monthlyVolume,
+        detailedRequirements,
+        items: itemsToSubmit,
+      });
+
+      if (response.success) {
+        setIsSubmitted(true);
+        clearCart();
+      } else {
+        setFormError(response.message || 'RFQ submission failed.');
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to connect to RFQ service.';
+      setFormError(msg);
+    } finally {
       setIsLoading(false);
-      setIsSubmitted(true);
-      clearCart();
-    }, 1200);
+    }
   };
 
   return (
     <div className="space-y-10">
-      {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbItems} />
 
-      {/* Header Banner */}
       <SectionHeader
         badge="ENTERPRISE PROCUREMENT"
         title="Global Logistics & Bulk RFQ"
         subtitle="Submit your high-volume safety equipment request for factory-direct quotes and maritime dispatch schedules."
       />
 
-      {/* Submitted Success Notice */}
       {isSubmitted ? (
         <div className="max-w-2xl mx-auto bg-surface-container industrial-border p-10 rounded-sm text-center space-y-6">
           <span className="material-symbols-outlined text-primary text-6xl animate-bounce">verified</span>
@@ -77,7 +99,6 @@ export const Rfq: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* LEFT COLUMN: RFQ FORM (7-Columns) */}
           <div className="lg:col-span-7 bg-surface-container industrial-border p-8 rounded-sm space-y-8">
             <div className="border-b border-outline-variant pb-4">
               <h3 className="font-headline-lg text-2xl text-on-surface font-bold">Wholesale Inquiry Form</h3>
@@ -91,7 +112,6 @@ export const Rfq: React.FC = () => {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Step 1: Company Details */}
               <div className="space-y-4">
                 <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
                   1. Company & Contact Details
@@ -141,7 +161,6 @@ export const Rfq: React.FC = () => {
                 </div>
               </div>
 
-              {/* Step 2: Product & Quantity Selection */}
               <div className="space-y-4 pt-4 border-t border-outline-variant">
                 <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
                   2. Product & Quantity Selection
@@ -149,14 +168,14 @@ export const Rfq: React.FC = () => {
 
                 <Select
                   label="Selected Product Line"
-                  value={selectedProductLine}
-                  onChange={e => setSelectedProductLine(e.target.value)}
+                  value={String(selectedProductId)}
+                  onChange={e => setSelectedProductId(Number(e.target.value))}
                   options={[
-                    { value: 'GSH Elite Industrial Working Gloves', label: 'GSH Elite Industrial Working Gloves' },
-                    { value: 'TitanShield Precision Assembly Gloves', label: 'TitanShield Precision Assembly Gloves' },
-                    { value: 'Vulcan Heat-Resistant Heavy Welding Gloves', label: 'Vulcan Heat-Resistant Heavy Welding Gloves' },
-                    { value: 'Pro-Vis Class 2 High-Visibility Safety Vest', label: 'Pro-Vis Class 2 High-Visibility Safety Vest' },
-                    { value: 'IronStride Anti-Puncture Steel Toe Boots', label: 'IronStride Anti-Puncture Steel Toe Boots' },
+                    { value: '1', label: 'GSH Elite Industrial Working Gloves' },
+                    { value: '2', label: 'TitanShield Precision Assembly Gloves' },
+                    { value: '3', label: 'Vulcan Heat-Resistant Heavy Welding Gloves' },
+                    { value: '4', label: 'Pro-Vis Class 2 High-Visibility Safety Vest' },
+                    { value: '5', label: 'IronStride Anti-Puncture Steel Toe Boots' },
                   ]}
                 />
 
@@ -186,7 +205,6 @@ export const Rfq: React.FC = () => {
                 </div>
               </div>
 
-              {/* Step 3: Detailed Technical Requirements */}
               <div className="space-y-4 pt-4 border-t border-outline-variant">
                 <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
                   3. Technical Specs & Private Labeling
@@ -200,7 +218,6 @@ export const Rfq: React.FC = () => {
                 />
               </div>
 
-              {/* Submit CTA */}
               <Button
                 type="submit"
                 variant="primary"
@@ -213,9 +230,7 @@ export const Rfq: React.FC = () => {
             </form>
           </div>
 
-          {/* RIGHT COLUMN: LOGISTICS INFORMATION & SUPPORT SECTION (5-Columns) */}
           <div className="lg:col-span-5 space-y-6">
-            {/* Cart Summary if items exist */}
             {cartItems.length > 0 && (
               <div className="bg-surface-container industrial-border p-6 rounded-sm space-y-4">
                 <div className="flex justify-between items-center border-b border-outline-variant pb-3">
@@ -238,7 +253,6 @@ export const Rfq: React.FC = () => {
               </div>
             )}
 
-            {/* Logistics Info Card */}
             <GlassCard className="space-y-4">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-3xl">flight_takeoff</span>
@@ -249,7 +263,6 @@ export const Rfq: React.FC = () => {
               </p>
             </GlassCard>
 
-            {/* Support Desk Card */}
             <GlassCard className="space-y-4 border-l-4 border-l-primary-container">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-primary text-3xl">support_agent</span>
