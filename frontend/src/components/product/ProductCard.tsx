@@ -47,16 +47,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           {statusBadge}
         </span>
 
-        {/* Product Image */}
-        <img
-          src={imageUrl}
-          alt={product.title}
-          onError={(e) => {
-            // Clean industrial glove fallback if uploaded image file path is unreachable
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
-          }}
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
-        />
+        {/* Product Image Link */}
+        <Link to={`/products/${product.slug}`} className="w-full h-full block">
+          <img
+            src={imageUrl}
+            alt={product.title}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+            }}
+            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+          />
+        </Link>
       </div>
 
       {/* Content Body */}
@@ -91,8 +92,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             </span>
           </div>
 
-          {/* Full Width Orange Add To Order Button */}
-          <Link to="/rfq" className="block w-full">
+          {/* Full Width Orange Button - Navigates directly to Product Detail Page */}
+          <Link to={`/products/${product.slug}`} className="block w-full">
             <button className="w-full bg-[#ff6b00] hover:bg-[#e05e00] text-black font-mono font-extrabold text-xs py-2.5 px-4 rounded-none flex items-center justify-center gap-2 uppercase tracking-widest transition-all orange-glow">
               <span className="material-symbols-outlined text-sm font-bold">add_shopping_cart</span>
               ADD TO ORDER
