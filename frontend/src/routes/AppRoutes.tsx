@@ -7,6 +7,7 @@ import About from '@/pages/About';
 import Catalog from '@/pages/Catalog';
 import ProductDetail from '@/pages/ProductDetail';
 import Rfq from '@/pages/Rfq';
+import Contact from '@/pages/Contact';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -18,7 +19,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="about" element={<About />} />
           <Route path="products" element={<Catalog />} />
           <Route path="products/:slug" element={<ProductDetail />} />
-          <Route path="contact" element={<div className="font-headline-lg text-primary">Contact Us Page Placeholder</div>} />
+          <Route path="contact" element={<Contact />} />
           <Route path="rfq" element={<Rfq />} />
         </Route>
 
