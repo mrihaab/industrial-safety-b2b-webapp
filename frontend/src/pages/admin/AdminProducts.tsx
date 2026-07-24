@@ -123,9 +123,18 @@ export const AdminProducts: React.FC = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    const fileList = Array.from(e.target.files);
-    setSelectedFiles(fileList);
-    setFileSizeCodes(fileList.map(() => 'GENERAL'));
+    const newFiles = Array.from(e.target.files);
+    // Append newly chosen files to existing files array so admin can select 3-4 images together or iteratively
+    const combinedFiles = [...selectedFiles, ...newFiles];
+    setSelectedFiles(combinedFiles);
+    setFileSizeCodes([...fileSizeCodes, ...newFiles.map(() => 'GENERAL')]);
+    // Reset input value so same files can be re-selected if needed
+    e.target.value = '';
+  };
+
+  const removeFile = (indexToRemove: number) => {
+    setSelectedFiles(selectedFiles.filter((_, idx) => idx !== indexToRemove));
+    setFileSizeCodes(fileSizeCodes.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleSizeCodeChange = (index: number, value: string) => {
@@ -214,7 +223,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Configure product catalog, check size availability, upload photos bound to available sizes, and manage inventory.</p>
+          <p className="font-body-sm text-on-surface-variant">Configure product catalog, check size availability, upload 3-4 photos bound to available sizes, and manage inventory.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -355,14 +364,21 @@ export const AdminProducts: React.FC = () => {
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 
-          {/* Multi-Image Upload & Strict Per-Size Association Section */}
+          {/* Multi-Image Upload & Accumulating Per-Size Photo Manager */}
           <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-4">
             <div className="space-y-1">
-              <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
-                📸 Upload Product Photos (3 to 4 Images)
-              </label>
+              <div className="flex justify-between items-center">
+                <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
+                  📸 Upload Product Photos ({selectedFiles.length} / 4 Selected)
+                </label>
+                {selectedFiles.length > 0 && (
+                  <span className="text-[11px] text-emerald-400 font-mono font-bold">
+                    ✓ {selectedFiles.length} Image(s) Attached
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-on-surface-variant">
-                Upload primary and size-specific product photos. The dropdown below will strictly show ONLY the sizes you checked in the Size Availability Checkboxes above!
+                Select 3 to 4 images together in the file dialog, or add them one-by-one. Each photo can be assigned to a specific size or set as General.
               </p>
               <input
                 type="file"
@@ -373,31 +389,50 @@ export const AdminProducts: React.FC = () => {
               />
             </div>
 
-            {/* List selected files with size assignment dropdowns restricted to checked sizes */}
+            {/* List selected files with live thumbnail preview, size assignment dropdown, and remove button */}
             {selectedFiles.length > 0 && (
               <div className="space-y-3 pt-2 border-t border-outline-variant/60">
                 <span className="text-xs font-bold text-on-surface block">
-                  Assign Photo to Available Size (Strictly Filtered by Checked Sizes):
+                  Attached Photos List ({selectedFiles.length} Images):
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {selectedFiles.map((file, idx) => (
-                    <div key={idx} className="bg-surface-container p-3 border border-outline-variant/60 rounded-xs flex items-center justify-between gap-3 text-xs">
-                      <div className="truncate">
-                        <span className="font-bold text-primary block truncate">{idx === 0 ? '★ Primary Image' : `Gallery Image ${idx + 1}`}</span>
-                        <span className="text-on-surface-variant text-[11px] truncate block">{file.name}</span>
+                    <div key={idx} className="bg-surface-container p-3 border border-outline-variant/60 rounded-xs flex items-center justify-between gap-3 text-xs shadow-sm">
+                      <div className="flex items-center gap-3 truncate">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`Preview ${idx + 1}`}
+                          className="w-12 h-12 object-cover rounded-xs border border-outline-variant shrink-0"
+                        />
+                        <div className="truncate">
+                          <span className="font-bold text-primary block truncate">
+                            {idx === 0 ? '★ Primary Photo' : `Photo ${idx + 1}`}
+                          </span>
+                          <span className="text-on-surface-variant text-[11px] truncate block">{file.name}</span>
+                        </div>
                       </div>
-                      <select
-                        value={fileSizeCodes[idx] || 'GENERAL'}
-                        onChange={e => handleSizeCodeChange(idx, e.target.value)}
-                        className="bg-surface-container-high border border-outline-variant rounded-xs px-2 py-1 text-xs text-on-surface focus:border-primary focus:outline-none"
-                      >
-                        <option value="GENERAL">General (All Sizes)</option>
-                        {ALL_SIZES_LIST.filter(item => checkedSizeCodes.includes(item.code)).map(item => (
-                          <option key={item.code} value={item.code}>
-                            {item.label}
-                          </option>
-                        ))}
-                      </select>
+
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <select
+                          value={fileSizeCodes[idx] || 'GENERAL'}
+                          onChange={e => handleSizeCodeChange(idx, e.target.value)}
+                          className="bg-surface-container-high border border-outline-variant rounded-xs px-2 py-1 text-xs text-on-surface focus:border-primary focus:outline-none"
+                        >
+                          <option value="GENERAL">General (All Sizes)</option>
+                          {ALL_SIZES_LIST.filter(item => checkedSizeCodes.includes(item.code)).map(item => (
+                            <option key={item.code} value={item.code}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(idx)}
+                          className="text-[10px] text-error hover:underline font-mono"
+                        >
+                          ✖ Remove
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
