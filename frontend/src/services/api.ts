@@ -10,6 +10,12 @@ export interface ApiResponse<T> {
     limit: number;
     totalPages: number;
   };
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 class ApiClient {

@@ -1,150 +1,284 @@
-import React, { useState } from 'react';
-import { Badge } from '@/components/ui/Badge';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { Modal } from '@/components/ui/Modal';
-
-interface InquiryItem {
-  id: number;
-  companyName: string;
-  businessEmail: string;
-  industrySegment: string;
-  monthlyVolume: string;
-  productLine: string;
-  quantity: number;
-  detailedRequirements: string;
-  status: 'PENDING' | 'CONTACTED' | 'CLOSED';
-  createdAt: string;
-}
-
-const MOCK_INQUIRIES: InquiryItem[] = [
-  {
-    id: 101,
-    companyName: 'Apex Construction LLC',
-    businessEmail: 'procurement@apex.com',
-    industrySegment: 'Construction & Engineering',
-    monthlyVolume: '1,000 - 5,000 units',
-    productLine: 'GSH Elite Industrial Working Gloves',
-    quantity: 500,
-    detailedRequirements: 'Requires custom high-visibility logo printing on cuff. Delivery targeted for Dubai Logistics Park within 14 days.',
-    status: 'PENDING',
-    createdAt: '2026-07-24 08:30',
-  },
-  {
-    id: 100,
-    companyName: 'Gulf Maritime Energy',
-    businessEmail: 'orders@gulfmaritime.ae',
-    industrySegment: 'Oil & Gas Sector',
-    monthlyVolume: '5,000+ units',
-    productLine: 'Pro-Vis Class 2 High-Visibility Safety Vest',
-    quantity: 1200,
-    detailedRequirements: 'Needs CE EN 388 Level 5 certification documentation attached to invoice.',
-    status: 'CONTACTED',
-    createdAt: '2026-07-23 14:15',
-  },
-];
+import { Loader } from '@/components/ui/Loader';
+import { Pagination } from '@/components/ui/Pagination';
+import { AdminRfqService, AdminRfqItem } from '@/services/adminRfqService';
 
 export const AdminInquiries: React.FC = () => {
-  const [inquiries, setInquiries] = useState<InquiryItem[]>(MOCK_INQUIRIES);
-  const [selectedInquiry, setSelectedInquiry] = useState<InquiryItem | null>(null);
+  const [inquiries, setInquiries] = useState<AdminRfqItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const handleStatusToggle = (id: number) => {
-    setInquiries(prev =>
-      prev.map(inq =>
-        inq.id === id
-          ? { ...inq, status: inq.status === 'PENDING' ? 'CONTACTED' : 'CLOSED' }
-          : inq
-      )
-    );
+  // Selected Detail Modal
+  const [selectedInquiry, setSelectedInquiry] = useState<AdminRfqItem | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
+
+  const fetchInquiries = async () => {
+    setLoading(true);
+    try {
+      const response = await AdminRfqService.getRfqs({
+        status: statusFilter !== 'all' ? statusFilter : undefined,
+        search: searchQuery || undefined,
+        page: currentPage,
+        limit: 10,
+      });
+
+      if (response.success && response.data) {
+        setInquiries(response.data);
+        if (response.pagination) {
+          setTotalPages(response.pagination.totalPages || 1);
+        }
+      }
+    } catch (err: unknown) {
+      console.warn('API error fetching RFQ inquiries:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInquiries();
+  }, [statusFilter, searchQuery, currentPage]);
+
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    setUpdatingId(id);
+    try {
+      const response = await AdminRfqService.updateStatus(id, newStatus);
+      if (response.success) {
+        setInquiries(prev =>
+          prev.map(inq => (inq.id === id ? { ...inq, status: newStatus as any } : inq))
+        );
+        if (selectedInquiry && selectedInquiry.id === id) {
+          setSelectedInquiry(prev => (prev ? { ...prev, status: newStatus as any } : null));
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Failed to update status:', err);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const openDetailModal = async (inq: AdminRfqItem) => {
+    setSelectedInquiry(inq);
+    setIsDetailOpen(true);
+    try {
+      const fullRes = await AdminRfqService.getRfqById(inq.id);
+      if (fullRes.success && fullRes.data) {
+        setSelectedInquiry(fullRes.data);
+      }
+    } catch (err: unknown) {
+      console.warn('Error fetching RFQ items:', err);
+    }
   };
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="border-b border-outline-variant pb-6">
-        <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">RFQ Inquiries Management</h1>
-        <p className="font-body-sm text-on-surface-variant">Review submitted enterprise wholesale quotes and customer contact details.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
+        <div>
+          <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">RFQ Inquiries & Quotes</h1>
+          <p className="font-body-sm text-on-surface-variant">Review enterprise procurement requests, product quantities, and update quote dispatch statuses.</p>
+        </div>
       </div>
 
-      {/* RFQ Inquiries Table */}
-      <div className="bg-surface-container industrial-border rounded-sm overflow-hidden shadow-xl">
-        <table className="w-full text-left font-body-sm text-sm">
-          <thead className="bg-surface-container-high border-b border-outline-variant font-label-caps text-xs text-primary uppercase">
-            <tr>
-              <th className="py-4 px-6">ID</th>
-              <th className="py-4 px-6">Company Name</th>
-              <th className="py-4 px-6">Email</th>
-              <th className="py-4 px-6">Product</th>
-              <th className="py-4 px-6">Qty</th>
-              <th className="py-4 px-6">Status</th>
-              <th className="py-4 px-6 text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-outline-variant/40">
-            {inquiries.map(inq => (
-              <tr key={inq.id} className="hover:bg-surface-container-high transition-colors">
-                <td className="py-4 px-6 font-mono text-xs font-bold text-on-surface">#{inq.id}</td>
-                <td className="py-4 px-6 font-bold text-on-surface">{inq.companyName}</td>
-                <td className="py-4 px-6 font-mono text-xs">{inq.businessEmail}</td>
-                <td className="py-4 px-6 max-w-xs truncate">{inq.productLine}</td>
-                <td className="py-4 px-6 font-bold">{inq.quantity} units</td>
-                <td className="py-4 px-6">
-                  <Badge variant={inq.status === 'PENDING' ? 'led' : inq.status === 'CONTACTED' ? 'success' : 'neutral'}>
-                    {inq.status}
-                  </Badge>
-                </td>
-                <td className="py-4 px-6 text-right space-x-2">
-                  <Button variant="outline" size="sm" onClick={() => setSelectedInquiry(inq)}>
-                    View Details
-                  </Button>
-                  <Button variant="primary" size="sm" onClick={() => handleStatusToggle(inq.id)}>
-                    {inq.status === 'PENDING' ? 'Mark Contacted' : 'Close Quote'}
-                  </Button>
-                </td>
+      {/* Filter & Search Bar */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-surface-container industrial-border p-4 rounded-sm">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          {['all', 'pending', 'approved', 'completed', 'rejected'].map(st => (
+            <button
+              key={st}
+              onClick={() => {
+                setStatusFilter(st);
+                setCurrentPage(1);
+              }}
+              className={`font-label-caps text-xs px-3 py-1.5 rounded-xs transition-all uppercase ${
+                statusFilter === st
+                  ? 'bg-primary-container text-on-primary-container font-bold orange-glow'
+                  : 'bg-surface-container-high text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              {st}
+            </button>
+          ))}
+        </div>
+
+        <input
+          type="text"
+          placeholder="Search by company or email..."
+          value={searchQuery}
+          onChange={e => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full sm:w-64 bg-surface-container-high border border-outline-variant rounded-xs px-3 py-1.5 text-xs text-on-surface focus:border-primary focus:outline-none"
+        />
+      </div>
+
+      {/* Data Table */}
+      {loading ? (
+        <div className="py-20 flex justify-center items-center">
+          <Loader size="lg" />
+        </div>
+      ) : (
+        <div className="bg-surface-container industrial-border rounded-sm overflow-x-auto shadow-xl">
+          <table className="w-full text-left font-body-sm text-sm">
+            <thead className="bg-surface-container-high border-b border-outline-variant font-label-caps text-xs text-primary uppercase">
+              <tr>
+                <th className="py-4 px-6">ID</th>
+                <th className="py-4 px-6">Company / Contact</th>
+                <th className="py-4 px-6">Segment</th>
+                <th className="py-4 px-6">Volume Est.</th>
+                <th className="py-4 px-6">Submitted Date</th>
+                <th className="py-4 px-6">Status</th>
+                <th className="py-4 px-6 text-right">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="divide-y divide-outline-variant/40">
+              {inquiries.length > 0 ? (
+                inquiries.map(inq => (
+                  <tr key={inq.id} className="hover:bg-surface-container-high transition-colors">
+                    <td className="py-4 px-6 font-mono text-xs font-bold text-on-surface">#{inq.id}</td>
+                    <td className="py-4 px-6">
+                      <span className="font-bold block text-on-surface">{inq.company_name}</span>
+                      <span className="text-xs text-on-surface-variant font-mono">{inq.business_email}</span>
+                    </td>
+                    <td className="py-4 px-6 text-on-surface-variant">{inq.industry_segment}</td>
+                    <td className="py-4 px-6 font-mono text-xs text-primary">{inq.monthly_volume}</td>
+                    <td className="py-4 px-6 font-mono text-xs text-on-surface-variant">
+                      {new Date(inq.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="py-4 px-6">
+                      <select
+                        value={inq.status}
+                        disabled={updatingId === inq.id}
+                        onChange={e => handleStatusChange(inq.id, e.target.value)}
+                        className={`text-xs font-label-caps font-bold rounded-xs px-2 py-1 border transition-all ${
+                          inq.status === 'pending'
+                            ? 'bg-warning/10 text-warning border-warning/40'
+                            : inq.status === 'approved' || inq.status === 'completed'
+                            ? 'bg-success/10 text-success border-success/40'
+                            : 'bg-error/10 text-error border-error/40'
+                        }`}
+                      >
+                        <option value="pending">PENDING</option>
+                        <option value="approved">APPROVED</option>
+                        <option value="completed">COMPLETED</option>
+                        <option value="rejected">REJECTED</option>
+                      </select>
+                    </td>
+                    <td className="py-4 px-6 text-right whitespace-nowrap">
+                      <Button variant="outline" size="sm" onClick={() => openDetailModal(inq)}>
+                        Inspect RFQ
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-on-surface-variant">
+                    No RFQ inquiries found for the selected criteria.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* INQUIRY DETAIL MODAL */}
-      <Modal
-        isOpen={Boolean(selectedInquiry)}
-        onClose={() => setSelectedInquiry(null)}
-        title={`Inquiry #${selectedInquiry?.id} - ${selectedInquiry?.companyName}`}
-      >
-        {selectedInquiry && (
-          <div className="space-y-4 text-sm font-body-lg">
-            <div className="grid grid-cols-2 gap-4 bg-surface-container-high p-4 rounded-xs border border-outline-variant">
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
+      {/* Inquiry Detail Modal */}
+      {selectedInquiry && (
+        <Modal
+          isOpen={isDetailOpen}
+          onClose={() => setIsDetailOpen(false)}
+          title={`RFQ Inquiry #${selectedInquiry.id} — ${selectedInquiry.company_name}`}
+          className="max-w-2xl"
+        >
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 gap-4 bg-surface-container-high p-4 rounded-xs text-xs">
               <div>
-                <span className="font-label-caps text-xs text-on-surface-variant block">Business Email</span>
-                <span className="font-mono text-primary font-bold">{selectedInquiry.businessEmail}</span>
+                <span className="text-on-surface-variant block uppercase font-label-caps">Business Email</span>
+                <span className="font-mono font-bold text-on-surface">{selectedInquiry.business_email}</span>
               </div>
               <div>
-                <span className="font-label-caps text-xs text-on-surface-variant block">Industry Segment</span>
-                <span className="font-bold">{selectedInquiry.industrySegment}</span>
+                <span className="text-on-surface-variant block uppercase font-label-caps">Industry Segment</span>
+                <span className="font-bold text-on-surface">{selectedInquiry.industry_segment}</span>
+              </div>
+              <div>
+                <span className="text-on-surface-variant block uppercase font-label-caps">Estimated Monthly Volume</span>
+                <span className="font-mono text-primary font-bold">{selectedInquiry.monthly_volume}</span>
+              </div>
+              <div>
+                <span className="text-on-surface-variant block uppercase font-label-caps">Current Status</span>
+                <Badge variant={selectedInquiry.status === 'pending' ? 'warning' : 'success'}>
+                  {selectedInquiry.status.toUpperCase()}
+                </Badge>
               </div>
             </div>
 
             <div className="space-y-2">
-              <span className="font-label-caps text-xs text-on-surface-variant uppercase">Requested Order</span>
-              <p className="font-bold text-on-surface">{selectedInquiry.productLine} ({selectedInquiry.quantity} units)</p>
+              <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
+                Requested Products & Volumes
+              </h4>
+              <div className="bg-surface-container industrial-border rounded-xs overflow-hidden">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-surface-container-high border-b border-outline-variant text-primary font-label-caps">
+                    <tr>
+                      <th className="p-3">Product Name</th>
+                      <th className="p-3">SKU</th>
+                      <th className="p-3">Size</th>
+                      <th className="p-3 text-right">Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-outline-variant/40">
+                    {selectedInquiry.items && selectedInquiry.items.length > 0 ? (
+                      selectedInquiry.items.map((item, idx) => (
+                        <tr key={idx}>
+                          <td className="p-3 font-bold text-on-surface">{item.product_title || `Product #${item.product_id}`}</td>
+                          <td className="p-3 font-mono text-on-surface-variant">{item.sku || 'N/A'}</td>
+                          <td className="p-3">{item.size_range}</td>
+                          <td className="p-3 text-right font-mono font-bold text-primary">{item.quantity} units</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="p-4 text-center text-on-surface-variant">Default RFQ Line Item (Bulk Custom Order)</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
 
             <div className="space-y-2">
-              <span className="font-label-caps text-xs text-on-surface-variant uppercase">Technical Specs & Requirements</span>
-              <p className="p-4 bg-surface-container-high border border-outline-variant rounded-xs italic text-on-surface-variant">
-                "{selectedInquiry.detailedRequirements}"
+              <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
+                Custom Requirements & Notes
+              </h4>
+              <p className="p-3 bg-surface-container-high border border-outline-variant rounded-xs text-xs text-on-surface leading-relaxed">
+                {selectedInquiry.detailed_requirements || 'No custom notes provided.'}
               </p>
             </div>
 
-            <div className="pt-4 flex justify-end">
-              <Button variant="outline" onClick={() => setSelectedInquiry(null)}>
+            <div className="pt-4 flex justify-end gap-3 border-t border-outline-variant">
+              <Button variant="outline" onClick={() => setIsDetailOpen(false)}>
                 Close Window
               </Button>
             </div>
           </div>
-        )}
-      </Modal>
+        </Modal>
+      )}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
@@ -11,12 +11,12 @@ export const AdminLayout: React.FC = () => {
   const location = useLocation();
 
   if (!isAuthenticated) {
-    return <Link to="/admin/login" replace />;
+    return <Navigate to="/admin/login" replace />;
   }
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login');
+    navigate('/', { replace: true });
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -59,6 +59,17 @@ export const AdminLayout: React.FC = () => {
             </Link>
 
             <Link
+              to="/admin/categories"
+              className={cn(
+                'flex items-center gap-3 px-4 py-2.5 rounded-sm transition-colors',
+                isActive('/admin/categories') ? 'bg-primary-container text-on-primary-container font-bold' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-variant'
+              )}
+            >
+              <span className="material-symbols-outlined text-lg">category</span>
+              <span>Categories</span>
+            </Link>
+
+            <Link
               to="/admin/inquiries"
               className={cn(
                 'flex items-center gap-3 px-4 py-2.5 rounded-sm transition-colors',
@@ -72,7 +83,10 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Logout Button */}
-        <div className="pt-6 border-t border-outline-variant">
+        <div className="pt-6 border-t border-outline-variant space-y-3">
+          <Link to="/" className="block text-center font-label-caps text-xs text-primary hover:underline">
+            ← Back to Public Portal
+          </Link>
           <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
             Sign Out Admin
           </Button>
@@ -86,3 +100,5 @@ export const AdminLayout: React.FC = () => {
     </div>
   );
 };
+
+export default AdminLayout;

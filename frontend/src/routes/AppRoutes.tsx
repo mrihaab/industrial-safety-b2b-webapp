@@ -11,6 +11,7 @@ import Contact from '@/pages/Contact';
 import AdminLogin from '@/pages/admin/AdminLogin';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminProducts from '@/pages/admin/AdminProducts';
+import AdminCategories from '@/pages/admin/AdminCategories';
 import AdminInquiries from '@/pages/admin/AdminInquiries';
 
 export const AppRoutes: React.FC = () => {
@@ -35,6 +36,7 @@ export const AppRoutes: React.FC = () => {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="products" element={<AdminProducts />} />
+          <Route path="categories" element={<AdminCategories />} />
           <Route path="inquiries" element={<AdminInquiries />} />
         </Route>
       </Routes>
