@@ -26,6 +26,7 @@ export const AdminProducts: React.FC = () => {
   const [price, setPrice] = useState('45.00');
   const [moq, setMoq] = useState('50');
   const [stockStatus, setStockStatus] = useState('IN STOCK');
+  const [sizeOptions, setSizeOptions] = useState('Assorted S/M/L/XL');
   const [description, setDescription] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
@@ -69,6 +70,7 @@ export const AdminProducts: React.FC = () => {
     setPrice('45.00');
     setMoq('50');
     setStockStatus('IN STOCK');
+    setSizeOptions('Assorted S/M/L/XL');
     setDescription('');
     setVideoUrl('');
     setSelectedFiles(null);
@@ -87,6 +89,7 @@ export const AdminProducts: React.FC = () => {
     setPrice(String(product.price));
     setMoq(String(product.moq));
     setStockStatus(product.stockStatus || 'IN STOCK');
+    setSizeOptions('Assorted S/M/L/XL');
     setDescription(product.description || 'Product specification & engineering notes.');
     setVideoUrl('');
     setSelectedFiles(null);
@@ -117,6 +120,7 @@ export const AdminProducts: React.FC = () => {
       formData.append('price', price);
       formData.append('moq', moq);
       formData.append('stock_status', stockStatus);
+      formData.append('size_options', sizeOptions);
       formData.append('description', description || title);
 
       if (videoUrl) {
@@ -161,7 +165,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Create, update, and manage product SKUs, gallery photos, demo videos, and stock levels.</p>
+          <p className="font-body-sm text-on-surface-variant">Create, update, and manage product SKUs, size availability, gallery photos, demo videos, and stock levels.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -276,6 +280,19 @@ export const AdminProducts: React.FC = () => {
               ]}
             />
           </div>
+
+          <Select
+            label="Available Size Configuration *"
+            value={sizeOptions}
+            onChange={e => setSizeOptions(e.target.value)}
+            options={[
+              { value: 'Assorted S/M/L/XL', label: 'Assorted S/M/L/XL' },
+              { value: 'Large Only', label: 'Large Only' },
+              { value: 'Medium Only', label: 'Medium Only' },
+              { value: 'Small Only', label: 'Small Only' },
+              { value: 'XL Only', label: 'XL Only' },
+            ]}
+          />
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 

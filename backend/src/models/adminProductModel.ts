@@ -12,6 +12,7 @@ export interface AdminCreateProductInput {
   stock_status?: string;
   status_tag?: string;
   description: string;
+  size_options?: string;
   rating_score?: number;
   review_count?: number;
   is_featured?: boolean;
@@ -27,8 +28,8 @@ export class AdminProductModel {
   static async insertProduct(input: AdminCreateProductInput): Promise<number> {
     const sql = `
       INSERT INTO products (
-        category_id, sku, title, slug, series_name, price, moq, stock_status, status_tag, description, rating_score, review_count, is_featured
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        category_id, sku, title, slug, series_name, price, moq, stock_status, status_tag, description, size_options, rating_score, review_count, is_featured
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const params = [
       input.category_id,
@@ -41,6 +42,7 @@ export class AdminProductModel {
       input.stock_status || 'IN STOCK',
       input.status_tag || 'Safety-System-Active',
       input.description,
+      input.size_options || 'Assorted S/M/L/XL',
       input.rating_score || 5.0,
       input.review_count || 0,
       input.is_featured ? 1 : 0,
@@ -67,6 +69,7 @@ export class AdminProductModel {
     if (input.stock_status !== undefined) { fields.push('stock_status = ?'); params.push(input.stock_status); }
     if (input.status_tag !== undefined) { fields.push('status_tag = ?'); params.push(input.status_tag); }
     if (input.description !== undefined) { fields.push('description = ?'); params.push(input.description); }
+    if (input.size_options !== undefined) { fields.push('size_options = ?'); params.push(input.size_options); }
     if (input.rating_score !== undefined) { fields.push('rating_score = ?'); params.push(input.rating_score); }
     if (input.review_count !== undefined) { fields.push('review_count = ?'); params.push(input.review_count); }
     if (input.is_featured !== undefined) { fields.push('is_featured = ?'); params.push(input.is_featured ? 1 : 0); }

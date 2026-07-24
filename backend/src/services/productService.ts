@@ -27,7 +27,7 @@ export class ProductService {
         ]);
 
         const primaryImage = images.find(img => img.is_primary) || images[0];
-        const imageUrl = primaryImage ? primaryImage.image_url : '/uploads/placeholder.jpg';
+        const imageUrl = primaryImage ? primaryImage.image_url : '/uploads/gsh-glove-1.jpg';
 
         const certifications = specs
           .filter(spec => 
@@ -73,7 +73,7 @@ export class ProductService {
   }
 
   /**
-   * Get product details by slug with gallery, specs, and features
+   * Get product details by slug with gallery, specs, size options, and features
    */
   static async getProductBySlug(slug: string): Promise<ProductDetailDto | null> {
     const product = await ProductModel.findProductBySlug(slug);
@@ -92,14 +92,16 @@ export class ProductService {
       title: product.title,
       slug: product.slug,
       sku: product.sku,
-      seriesName: product.series_name || 'Heavy Duty Series',
+      seriesName: product.series_name || 'HEAVY DUTY SERIES',
       price: Number(product.price),
       moq: product.moq || 50,
       stockStatus: product.stock_status || 'IN STOCK',
       statusTag: product.status_tag || 'Safety-System-Active',
       ratingScore: Number(product.rating_score) || 5.0,
       reviewCount: product.review_count || 0,
-      primaryImage: primaryImage ? primaryImage.image_url : '/uploads/placeholder.jpg',
+      size_options: product.size_options || 'Assorted S/M/L/XL',
+      sizeOptions: product.size_options || 'Assorted S/M/L/XL',
+      primaryImage: primaryImage ? primaryImage.image_url : '/uploads/gsh-glove-1.jpg',
       description: product.description,
       images: images.map(img => img.image_url),
       gallery: images.map(img => ({

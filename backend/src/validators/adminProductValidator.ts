@@ -11,12 +11,13 @@ export const createAdminProductSchema = z.object({
   stock_status: z.string().trim().optional().default('IN STOCK'),
   status_tag: z.string().trim().optional().default('Safety-System-Active'),
   description: z.string().min(5, 'Description is required').trim(),
+  size_options: z.string().trim().optional().default('Assorted S/M/L/XL'),
   rating_score: z.coerce.number().min(0).max(5).optional().default(5.0),
   review_count: z.coerce.number().int().nonnegative().optional().default(0),
   is_featured: z.coerce.boolean().optional().default(false),
   video_url: z.string().trim().optional(),
-  specs: z.string().optional(), // Parsed from JSON string if sent as formdata
-  features: z.string().optional(), // Parsed from JSON string if sent as formdata
+  specs: z.string().optional(),
+  features: z.string().optional(),
 });
 
 export const updateAdminProductSchema = createAdminProductSchema.partial();

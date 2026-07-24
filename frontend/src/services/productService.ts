@@ -4,6 +4,8 @@ import { ProductCardData } from '@/components/product/ProductCard';
 export interface ProductDetailDto extends ProductCardData {
   description: string;
   images: string[];
+  size_options?: string;
+  sizeOptions?: string;
   gallery?: Array<{
     url: string;
     is_primary?: boolean;

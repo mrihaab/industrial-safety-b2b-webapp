@@ -10,6 +10,7 @@ export interface ProductRow {
   stock_status: string;
   status_tag: string;
   description: string;
+  size_options?: string;
   rating_score: number;
   review_count: number;
   is_featured: boolean;
@@ -70,12 +71,14 @@ export interface ProductDetailDto {
   id: number;
   title: string;
   slug: string;
+  sku: string;
   series_name: string;
   price: number;
   moq: number;
   stock_status: string;
   status_tag: string;
   description: string;
+  size_options?: string;
   rating_score: number;
   review_count: number;
   gallery: Array<{
