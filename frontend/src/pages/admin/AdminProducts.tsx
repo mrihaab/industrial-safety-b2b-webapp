@@ -11,6 +11,14 @@ import { AdminProductService } from '@/services/adminProductService';
 import { AdminCategoryService, AdminCategoryItem } from '@/services/adminCategoryService';
 import { ProductCardData } from '@/components/product/ProductCard';
 
+const ALL_SIZES_LIST = [
+  { label: 'Small (S)', code: 'S' },
+  { label: 'Medium (M)', code: 'M' },
+  { label: 'Large (L)', code: 'L' },
+  { label: 'Extra Large (XL)', code: 'XL' },
+  { label: 'Double XL (XXL)', code: 'XXL' },
+];
+
 export const AdminProducts: React.FC = () => {
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [categories, setCategories] = useState<AdminCategoryItem[]>([]);
@@ -26,9 +34,11 @@ export const AdminProducts: React.FC = () => {
   const [price, setPrice] = useState('45.00');
   const [moq, setMoq] = useState('50');
   const [stockStatus, setStockStatus] = useState('IN STOCK');
-  const [sizeOptions, setSizeOptions] = useState('Assorted S/M/L/XL');
   const [description, setDescription] = useState('');
-  
+
+  // Interactive Size Availability Checkboxes
+  const [checkedSizeCodes, setCheckedSizeCodes] = useState<string[]>(['S', 'M', 'L', 'XL']);
+
   // Media Files & Per-Size Mapping State
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [fileSizeCodes, setFileSizeCodes] = useState<string[]>([]);
@@ -64,6 +74,18 @@ export const AdminProducts: React.FC = () => {
     fetchData();
   }, []);
 
+  const toggleSizeCheckbox = (code: string) => {
+    if (checkedSizeCodes.includes(code)) {
+      if (checkedSizeCodes.length === 1) {
+        alert('At least one size must remain selected.');
+        return;
+      }
+      setCheckedSizeCodes(checkedSizeCodes.filter(c => c !== code));
+    } else {
+      setCheckedSizeCodes([...checkedSizeCodes, code]);
+    }
+  };
+
   const openCreateModal = () => {
     setEditingProduct(null);
     setSku('');
@@ -72,7 +94,7 @@ export const AdminProducts: React.FC = () => {
     setPrice('45.00');
     setMoq('50');
     setStockStatus('IN STOCK');
-    setSizeOptions('Assorted S/M/L/XL');
+    setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
     setDescription('');
     setSelectedFiles([]);
     setFileSizeCodes([]);
@@ -91,7 +113,7 @@ export const AdminProducts: React.FC = () => {
     setPrice(String(product.price));
     setMoq(String(product.moq));
     setStockStatus(product.stockStatus || 'IN STOCK');
-    setSizeOptions('Assorted S/M/L/XL');
+    setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
     setDescription(product.description || 'Product specification & engineering notes.');
     setSelectedFiles([]);
     setFileSizeCodes([]);
@@ -103,7 +125,6 @@ export const AdminProducts: React.FC = () => {
     if (!e.target.files) return;
     const fileList = Array.from(e.target.files);
     setSelectedFiles(fileList);
-    // Initialize default size code for each file as 'GENERAL'
     setFileSizeCodes(fileList.map(() => 'GENERAL'));
   };
 
@@ -136,7 +157,14 @@ export const AdminProducts: React.FC = () => {
       formData.append('price', price);
       formData.append('moq', moq);
       formData.append('stock_status', stockStatus);
-      formData.append('size_options', sizeOptions);
+
+      // Generate human readable size options string from checked checkboxes
+      const activeSizeLabels = ALL_SIZES_LIST
+        .filter(item => checkedSizeCodes.includes(item.code))
+        .map(item => item.label);
+      const sizeOptionsString = activeSizeLabels.join(', ');
+      formData.append('size_options', sizeOptionsString || 'Assorted S/M/L/XL');
+
       formData.append('description', description || title);
 
       // Append size mappings for each uploaded file index
@@ -186,7 +214,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Manage product catalog, multi-image gallery photos per size, available size configurations, and stock levels.</p>
+          <p className="font-body-sm text-on-surface-variant">Configure product catalog, check size availability, upload photos bound to available sizes, and manage inventory.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -302,29 +330,39 @@ export const AdminProducts: React.FC = () => {
             />
           </div>
 
-          <Select
-            label="Available Size Configuration *"
-            value={sizeOptions}
-            onChange={e => setSizeOptions(e.target.value)}
-            options={[
-              { value: 'Assorted S/M/L/XL', label: 'Assorted S/M/L/XL' },
-              { value: 'Large Only', label: 'Large Only' },
-              { value: 'Medium Only', label: 'Medium Only' },
-              { value: 'Small Only', label: 'Small Only' },
-              { value: 'XL Only', label: 'XL Only' },
-            ]}
-          />
+          {/* Interactive Size Availability Checkboxes */}
+          <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-3">
+            <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
+              ☑️ Size Availability Checkboxes (Select Available Product Sizes)
+            </label>
+            <p className="text-[11px] text-on-surface-variant">
+              Check all sizes currently in stock for this product. Uploaded photos below can ONLY be assigned to sizes that are checked here!
+            </p>
+            <div className="flex flex-wrap gap-4 pt-1">
+              {ALL_SIZES_LIST.map(item => (
+                <label key={item.code} className="flex items-center gap-2 cursor-pointer text-xs font-mono text-on-surface bg-surface-container px-3 py-2 border border-outline-variant/60 rounded-xs hover:border-primary/50">
+                  <input
+                    type="checkbox"
+                    checked={checkedSizeCodes.includes(item.code)}
+                    onChange={() => toggleSizeCheckbox(item.code)}
+                    className="accent-primary w-4 h-4 cursor-pointer"
+                  />
+                  <span>{item.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 
-          {/* Multi-Image Upload & Per-Size Association Section */}
+          {/* Multi-Image Upload & Strict Per-Size Association Section */}
           <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-4">
             <div className="space-y-1">
               <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
-                📸 Upload Product Photos (Select 3 to 4 Images)
+                📸 Upload Product Photos (3 to 4 Images)
               </label>
               <p className="text-[11px] text-on-surface-variant">
-                Upload primary product photos and optional size-specific photos. When a user selects a size on the product page, the corresponding size photo will automatically be displayed!
+                Upload primary and size-specific product photos. The dropdown below will strictly show ONLY the sizes you checked in the Size Availability Checkboxes above!
               </p>
               <input
                 type="file"
@@ -335,11 +373,11 @@ export const AdminProducts: React.FC = () => {
               />
             </div>
 
-            {/* List selected files with size assignment dropdowns */}
+            {/* List selected files with size assignment dropdowns restricted to checked sizes */}
             {selectedFiles.length > 0 && (
               <div className="space-y-3 pt-2 border-t border-outline-variant/60">
                 <span className="text-xs font-bold text-on-surface block">
-                  Assign Photo to Size Category (Optional):
+                  Assign Photo to Available Size (Strictly Filtered by Checked Sizes):
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {selectedFiles.map((file, idx) => (
@@ -354,11 +392,11 @@ export const AdminProducts: React.FC = () => {
                         className="bg-surface-container-high border border-outline-variant rounded-xs px-2 py-1 text-xs text-on-surface focus:border-primary focus:outline-none"
                       >
                         <option value="GENERAL">General (All Sizes)</option>
-                        <option value="S">Small (S)</option>
-                        <option value="M">Medium (M)</option>
-                        <option value="L">Large (L)</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
+                        {ALL_SIZES_LIST.filter(item => checkedSizeCodes.includes(item.code)).map(item => (
+                          <option key={item.code} value={item.code}>
+                            {item.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   ))}

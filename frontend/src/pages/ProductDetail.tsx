@@ -27,8 +27,8 @@ const FALLBACK_PRODUCT: ProductDetailDto = {
   description: 'Designed for high-precision industrial environments. The GSH Elite features reinforced synthetic fiber construction with Grade-A abrasion resistance and impact-shielding knuckles. Engineered for the most demanding logistics and manufacturing workflows.',
   ratingScore: 5.0,
   reviewCount: 124,
-  size_options: 'Assorted S/M/L/XL',
-  sizeOptions: 'Assorted S/M/L/XL',
+  size_options: 'Small (S), Medium (M), Large (L), Extra Large (XL)',
+  sizeOptions: 'Small (S), Medium (M), Large (L), Extra Large (XL)',
   primaryImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
   images: [
     'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
@@ -36,9 +36,9 @@ const FALLBACK_PRODUCT: ProductDetailDto = {
     'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80',
   ],
   gallery: [
-    { url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80', is_primary: true, is_video: false },
-    { url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80', is_primary: false, is_video: false },
-    { url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80', is_primary: false, is_video: false },
+    { url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80', is_primary: true, size_code: 'S' },
+    { url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80', is_primary: false, size_code: 'M' },
+    { url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80', is_primary: false, size_code: 'L' },
   ],
   specs: [
     { key: 'IMPACT PROTECTION', value: 'Level 3 (EN 388)' },
@@ -60,7 +60,7 @@ export const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<ProductDetailDto>(FALLBACK_PRODUCT);
   const [loading, setLoading] = useState(true);
   const [activeMediaIndex, setActiveMediaIndex] = useState(0);
-  const [selectedSizeRange, setSelectedSizeRange] = useState('Assorted S/M/L/XL');
+  const [selectedSizeRange, setSelectedSizeRange] = useState('Small (S)');
   const [quantity, setQuantity] = useState(100);
   const [addedToast, setAddedToast] = useState(false);
 
@@ -72,8 +72,9 @@ export const ProductDetail: React.FC = () => {
         const response = await ProductService.getProductBySlug(slug);
         if (response.success && response.data) {
           setProduct(response.data);
-          const defaultSize = response.data.size_options || response.data.sizeOptions || 'Assorted S/M/L/XL';
-          setSelectedSizeRange(defaultSize);
+          const rawOptions = response.data.size_options || response.data.sizeOptions || 'Small (S), Medium (M), Large (L)';
+          const firstOpt = rawOptions.split(',')[0].trim();
+          setSelectedSizeRange(firstOpt);
         }
       } catch (err: unknown) {
         console.warn('API detail fetch error:', err);
@@ -109,13 +110,12 @@ export const ProductDetail: React.FC = () => {
   const handleSelectSize = (size: string) => {
     setSelectedSizeRange(size);
 
-    // Extract size code letter (e.g. "Large Only" -> "L", "Medium Only" -> "M", "S" -> "S")
     let targetCode = size.toUpperCase();
-    if (size.includes('Large')) targetCode = 'L';
-    if (size.includes('Medium')) targetCode = 'M';
-    if (size.includes('Small')) targetCode = 'S';
-    if (size.includes('XL')) targetCode = 'XL';
-    if (size.includes('XXL')) targetCode = 'XXL';
+    if (size.includes('(S)') || size.includes('Small')) targetCode = 'S';
+    if (size.includes('(M)') || size.includes('Medium')) targetCode = 'M';
+    if (size.includes('(L)') || size.includes('Large')) targetCode = 'L';
+    if (size.includes('(XL)') || size.includes('Extra Large') || size.includes('XL Only')) targetCode = 'XL';
+    if (size.includes('(XXL)') || size.includes('Double XL') || size.includes('XXL Only')) targetCode = 'XXL';
 
     const matchingIdx = galleryItems.findIndex(item => item.sizeCode && item.sizeCode.toUpperCase() === targetCode);
     if (matchingIdx !== -1) {
@@ -147,9 +147,10 @@ export const ProductDetail: React.FC = () => {
   }
 
   const currentMedia = galleryItems[activeMediaIndex] || galleryItems[0];
-  const sizeOptionsList = (product.size_options || product.sizeOptions || 'Assorted S/M/L/XL')
+  const sizeOptionsList = (product.size_options || product.sizeOptions || 'Small (S), Medium (M), Large (L), Extra Large (XL)')
     .split(',')
-    .map(s => s.trim());
+    .map(s => s.trim())
+    .filter(Boolean);
 
   return (
     <div className="space-y-16">
@@ -313,10 +314,6 @@ export const ProductDetail: React.FC = () => {
                       {opt}
                     </option>
                   ))}
-                  <option value="Large Only">Large Only</option>
-                  <option value="Medium Only">Medium Only</option>
-                  <option value="Small Only">Small Only</option>
-                  <option value="XL Only">XL Only</option>
                 </select>
               </div>
             </div>
