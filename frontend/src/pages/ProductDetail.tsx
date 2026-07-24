@@ -5,13 +5,12 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Input } from '@/components/ui/Input';
 import { Loader } from '@/components/ui/Loader';
-import { ProductCard } from '@/components/product/ProductCard';
 import { useCart } from '@/contexts/CartContext';
 import { formatPrice } from '@/utils/formatters';
 import { ProductService, ProductDetailDto } from '@/services/productService';
 
 const getImageUrl = (url?: string) => {
-  if (!url) return 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
+  if (!url) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
     return url;
   }
@@ -32,11 +31,16 @@ const FALLBACK_PRODUCT: ProductDetailDto = {
   description: 'Tier-1 cut-resistant industrial gloves engineered with Kevlar weave and Nitri-Flex impact armor. Built for energy sector, heavy construction, and metal fabrication workers.',
   ratingScore: 4.9,
   reviewCount: 128,
-  primaryImage: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80',
+  primaryImage: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
   images: [
-    'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80',
     'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80',
+  ],
+  gallery: [
+    { url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80', is_primary: true, is_video: false },
+    { url: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80', is_primary: false, is_video: false },
+    { url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80', is_primary: false, is_video: false },
   ],
   specs: [
     { key: 'Cut Level', value: 'ANSI Cut Level 5 / EN 388 4X43E' },
@@ -57,7 +61,7 @@ export const ProductDetail: React.FC = () => {
 
   const [product, setProduct] = useState<ProductDetailDto>(FALLBACK_PRODUCT);
   const [loading, setLoading] = useState(true);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [activeMediaIndex, setActiveMediaIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState('L');
   const [quantity, setQuantity] = useState(50);
   const [addedToast, setAddedToast] = useState(false);
@@ -109,11 +113,21 @@ export const ProductDetail: React.FC = () => {
     );
   }
 
-  const rawImages = (product.images && product.images.length > 0)
-    ? product.images
-    : [product.primaryImage || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80'];
+  // Combine gallery items from API (Photos + Video)
+  const rawGallery: Array<{ url: string; is_primary?: boolean; is_video?: boolean }> =
+    (product.gallery && product.gallery.length > 0)
+      ? product.gallery
+      : (product.images && product.images.length > 0)
+        ? product.images.map((img, idx) => ({ url: img, is_primary: idx === 0, is_video: false }))
+        : [{ url: product.primaryImage || '', is_primary: true, is_video: false }];
 
-  const galleryImages = rawImages.map(img => getImageUrl(img));
+  const galleryItems = rawGallery.map((item: { url: string; is_primary?: boolean; is_video?: boolean }) => ({
+    url: getImageUrl(item.url),
+    isPrimary: Boolean(item.is_primary),
+    isVideo: Boolean(item.is_video) || item.url.includes('.mp4') || item.url.includes('.webm'),
+  }));
+
+  const currentMedia = galleryItems[activeMediaIndex] || galleryItems[0];
 
   return (
     <div className="space-y-12">
@@ -126,55 +140,78 @@ export const ProductDetail: React.FC = () => {
       <Breadcrumb items={breadcrumbItems} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        {/* Left Column: Main Media Frame & Thumbnail List */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="relative aspect-4/3 bg-surface-container-high industrial-border rounded-sm overflow-hidden flex items-center justify-center p-6">
-            <Badge variant="led" className="absolute top-4 left-4 z-10">
-              {product.statusTag || 'Safety-System-Active'}
-            </Badge>
-            <img
-              src={galleryImages[activeImageIndex] || galleryImages[0]}
-              alt={product.title}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
-              }}
-              className="object-contain h-full w-full max-h-[480px] transition-all duration-300"
-            />
+          <div className="relative aspect-4/3 bg-[#0a1f33] border border-[#ff6b00]/30 rounded-xs overflow-hidden flex items-center justify-center p-4 shadow-2xl">
+            <span className="absolute top-3 left-3 z-10 bg-[#ff6b00] text-black font-mono font-extrabold text-[10px] px-3 py-1 tracking-wider uppercase">
+              {product.statusTag || 'SAFETY-SYSTEM-ACTIVE'}
+            </span>
+
+            {currentMedia.isVideo ? (
+              <video
+                src={currentMedia.url}
+                controls
+                autoPlay
+                muted
+                className="w-full h-full object-contain rounded-xs"
+              />
+            ) : (
+              <img
+                src={currentMedia.url}
+                alt={product.title}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
+                }}
+                className="object-cover h-full w-full rounded-xs transition-all duration-300"
+              />
+            )}
           </div>
 
-          {galleryImages.length > 1 && (
-            <div className="grid grid-cols-4 gap-4">
-              {galleryImages.map((img, idx) => (
+          {/* Thumbnails list below main display (Photos + Video) */}
+          {galleryItems.length > 1 && (
+            <div className="grid grid-cols-4 sm:grid-cols-5 gap-3">
+              {galleryItems.map((item: { url: string; isPrimary: boolean; isVideo: boolean }, idx: number) => (
                 <button
                   key={idx}
-                  onClick={() => setActiveImageIndex(idx)}
-                  className={`aspect-square bg-surface-container-high border rounded-sm overflow-hidden p-2 transition-all ${
-                    activeImageIndex === idx ? 'border-primary-container ring-1 ring-primary' : 'border-outline-variant hover:border-primary/50'
+                  onClick={() => setActiveMediaIndex(idx)}
+                  className={`relative aspect-square bg-[#0a1f33] border rounded-xs overflow-hidden p-1 transition-all ${
+                    activeMediaIndex === idx
+                      ? 'border-[#ff6b00] ring-2 ring-[#ff6b00]/50'
+                      : 'border-outline-variant hover:border-[#ff6b00]/50'
                   }`}
                 >
-                  <img
-                    src={img}
-                    alt={`Thumbnail ${idx + 1}`}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
-                    }}
-                    className="object-contain h-full w-full"
-                  />
+                  {item.isVideo ? (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-black/60 text-[#ff6b00]">
+                      <span className="material-symbols-outlined text-2xl font-bold">play_circle</span>
+                      <span className="font-mono text-[9px] uppercase font-bold tracking-widest text-white">VIDEO</span>
+                    </div>
+                  ) : (
+                    <img
+                      src={item.url}
+                      alt={`Thumbnail ${idx + 1}`}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
+                      }}
+                      className="object-cover h-full w-full rounded-xs"
+                    />
+                  )}
                 </button>
               ))}
             </div>
           )}
         </div>
 
+        {/* Right Column: Order Configuration & Details */}
         <div className="lg:col-span-5 space-y-6">
           <div className="space-y-2">
-            <span className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
+            <span className="font-label-caps text-xs text-[#ff6b00] font-extrabold uppercase tracking-widest">
               {product.seriesName}
             </span>
-            <h1 className="font-display-lg text-3xl font-extrabold text-on-surface leading-tight">
+            <h1 className="font-display-lg text-3xl font-extrabold text-[#d4e4fa] leading-tight">
               {product.title}
             </h1>
             <div className="flex items-center justify-between text-sm text-on-surface-variant pt-1">
-              <span className="font-mono text-xs">SKU: {product.sku}</span>
+              <span className="font-mono text-xs text-[#ff6b00] font-bold">SKU: {product.sku}</span>
               <div className="flex items-center gap-1 text-[#FFD700]">
                 <span>★</span>
                 <span className="font-bold text-on-surface">{product.ratingScore}</span>
@@ -183,10 +220,10 @@ export const ProductDetail: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-baseline justify-between py-4 border-y border-outline-variant">
+          <div className="flex items-baseline justify-between py-4 border-y border-outline-variant/60">
             <div>
               <span className="font-body-sm text-xs text-on-surface-variant block">Wholesale Price</span>
-              <span className="font-label-caps text-3xl font-extrabold text-primary">
+              <span className="font-mono text-3xl font-extrabold text-[#ff6b00]">
                 {formatPrice(product.price)}
               </span>
               <span className="text-xs text-on-surface-variant ml-1">/ unit</span>
@@ -194,12 +231,12 @@ export const ProductDetail: React.FC = () => {
             <Badge variant="success">{product.stockStatus || 'IN STOCK'}</Badge>
           </div>
 
-          <p className="font-body-lg text-on-surface-variant leading-relaxed">
+          <p className="font-body-lg text-on-surface-variant/90 leading-relaxed text-sm">
             {product.description}
           </p>
 
-          <div className="bg-surface-container industrial-border p-6 rounded-sm space-y-6">
-            <h3 className="font-label-caps text-label-caps text-primary tracking-widest uppercase font-bold">
+          <div className="bg-[#051424] border border-[#ff6b00]/30 p-6 rounded-xs space-y-6 shadow-xl">
+            <h3 className="font-label-caps text-label-caps text-[#ff6b00] tracking-widest uppercase font-extrabold">
               Bulk Order Configuration
             </h3>
 
@@ -212,10 +249,10 @@ export const ProductDetail: React.FC = () => {
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`w-11 h-10 font-label-caps text-xs rounded-xs border transition-all ${
+                    className={`w-11 h-10 font-label-caps text-xs rounded-none border transition-all ${
                       selectedSize === size
-                        ? 'bg-primary-container text-on-primary-container border-primary font-bold orange-glow'
-                        : 'bg-surface-container-high border-outline-variant text-on-surface hover:border-primary/50'
+                        ? 'bg-[#ff6b00] text-black border-[#ff6b00] font-extrabold orange-glow'
+                        : 'bg-surface-container-high border-outline-variant text-on-surface hover:border-[#ff6b00]/50'
                     }`}
                   >
                     {size}
@@ -229,7 +266,7 @@ export const ProductDetail: React.FC = () => {
                 <label className="font-label-caps text-xs text-on-surface-variant uppercase">
                   Order Quantity:
                 </label>
-                <span className="font-label-caps text-xs text-primary font-semibold">
+                <span className="font-label-caps text-xs text-[#ff6b00] font-semibold">
                   MOQ: {product.moq} Units
                 </span>
               </div>
@@ -242,24 +279,29 @@ export const ProductDetail: React.FC = () => {
               />
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-outline-variant">
+            <div className="flex justify-between items-center pt-2 border-t border-outline-variant/60">
               <span className="font-body-sm text-on-surface-variant">Estimated Subtotal:</span>
-              <span className="font-label-caps text-2xl font-bold text-on-surface">
+              <span className="font-mono text-2xl font-extrabold text-[#ff6b00]">
                 {formatPrice(product.price * Math.max(50, quantity))}
               </span>
             </div>
 
             <div className="space-y-3 pt-2">
-              <Button variant="primary" size="lg" className="w-full" onClick={handleAddToCart}>
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-[#ff6b00] hover:bg-[#e05e00] text-black font-mono font-extrabold text-xs py-3.5 px-4 rounded-none flex items-center justify-center gap-2 uppercase tracking-widest transition-all orange-glow"
+              >
+                <span className="material-symbols-outlined text-base">add_shopping_cart</span>
                 ADD TO BULK QUOTE CART
-              </Button>
+              </button>
+
               <a
                 href={`https://wa.me/97145550192?text=${encodeURIComponent(`Inquiry for ${product.title} (SKU: ${product.sku}), Quantity: ${quantity}`)}`}
                 target="_blank"
                 rel="noreferrer"
                 className="block w-full"
               >
-                <Button variant="outline" size="md" className="w-full">
+                <Button variant="outline" size="md" className="w-full font-mono text-xs">
                   Instant WhatsApp Quote
                 </Button>
               </a>
@@ -269,8 +311,8 @@ export const ProductDetail: React.FC = () => {
       </div>
 
       {product.specs && product.specs.length > 0 && (
-        <section className="bg-surface-container industrial-border p-8 rounded-sm space-y-6">
-          <h3 className="font-label-caps text-label-caps text-primary tracking-widest uppercase font-bold">
+        <section className="bg-[#051424] border border-[#ff6b00]/30 p-8 rounded-xs space-y-6">
+          <h3 className="font-label-caps text-label-caps text-[#ff6b00] tracking-widest uppercase font-extrabold">
             Technical Specifications Matrix
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -286,13 +328,13 @@ export const ProductDetail: React.FC = () => {
 
       {product.features && product.features.length > 0 && (
         <section className="space-y-6">
-          <h3 className="font-label-caps text-label-caps text-primary tracking-widest uppercase font-bold">
+          <h3 className="font-label-caps text-label-caps text-[#ff6b00] tracking-widest uppercase font-bold">
             Engineering Highlights
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {product.features.map((feat, idx) => (
-              <div key={idx} className="bg-surface-container industrial-border p-6 rounded-sm space-y-3">
-                <span className="material-symbols-outlined text-primary text-3xl">{feat.icon || 'shield'}</span>
+              <div key={idx} className="bg-[#051424] border border-[#ff6b00]/30 p-6 rounded-xs space-y-3">
+                <span className="material-symbols-outlined text-[#ff6b00] text-3xl">{feat.icon || 'shield'}</span>
                 <h4 className="font-title-md text-lg text-on-surface font-bold">{feat.title}</h4>
                 <p className="font-body-sm text-on-surface-variant">{feat.description}</p>
               </div>

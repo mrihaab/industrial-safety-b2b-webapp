@@ -1,4 +1,4 @@
-import { ResultSetHeader, RowDataPacket } from 'mysql2/promise';
+import { ResultSetHeader } from 'mysql2/promise';
 import { dbPool } from '@/config/db';
 
 export interface AdminCreateProductInput {
@@ -15,6 +15,7 @@ export interface AdminCreateProductInput {
   rating_score?: number;
   review_count?: number;
   is_featured?: boolean;
+  video_url?: string;
 }
 
 export interface AdminUpdateProductInput extends Partial<AdminCreateProductInput> {}
@@ -102,7 +103,7 @@ export class AdminProductModel {
   }
 
   /**
-   * Insert product media images
+   * Insert product media images / video
    */
   static async insertProductImage(productId: number, imageUrl: string, isPrimary: boolean, isVideo: boolean): Promise<number> {
     const sql = `

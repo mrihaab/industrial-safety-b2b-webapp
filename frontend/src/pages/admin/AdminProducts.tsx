@@ -27,6 +27,7 @@ export const AdminProducts: React.FC = () => {
   const [moq, setMoq] = useState('50');
   const [stockStatus, setStockStatus] = useState('IN STOCK');
   const [description, setDescription] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -69,6 +70,7 @@ export const AdminProducts: React.FC = () => {
     setMoq('50');
     setStockStatus('IN STOCK');
     setDescription('');
+    setVideoUrl('');
     setSelectedFiles(null);
     setErrorMsg('');
     if (categories.length > 0) {
@@ -86,6 +88,7 @@ export const AdminProducts: React.FC = () => {
     setMoq(String(product.moq));
     setStockStatus(product.stockStatus || 'IN STOCK');
     setDescription(product.description || 'Product specification & engineering notes.');
+    setVideoUrl('');
     setSelectedFiles(null);
     setErrorMsg('');
     setIsModalOpen(true);
@@ -116,7 +119,11 @@ export const AdminProducts: React.FC = () => {
       formData.append('stock_status', stockStatus);
       formData.append('description', description || title);
 
-      // Append selected files if uploaded by admin
+      if (videoUrl) {
+        formData.append('video_url', videoUrl);
+      }
+
+      // Append selected image/video files if uploaded by admin
       if (selectedFiles && selectedFiles.length > 0) {
         for (let i = 0; i < selectedFiles.length; i++) {
           formData.append('images', selectedFiles[i]);
@@ -154,7 +161,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Create, update, and manage product SKUs, stock levels, and category assignments.</p>
+          <p className="font-body-sm text-on-surface-variant">Create, update, and manage product SKUs, gallery photos, demo videos, and stock levels.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -272,22 +279,31 @@ export const AdminProducts: React.FC = () => {
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 
-          <div className="space-y-1">
-            <label className="font-label-caps text-xs text-on-surface-variant uppercase">
-              Upload Product Images (Multer Upload)
-            </label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={e => setSelectedFiles(e.target.files)}
-              className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container-high file:text-primary hover:file:bg-surface-variant cursor-pointer"
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="font-label-caps text-xs text-on-surface-variant uppercase">
+                Upload Gallery Photos & Video File (Multer)
+              </label>
+              <input
+                type="file"
+                multiple
+                accept="image/*,video/*"
+                onChange={e => setSelectedFiles(e.target.files)}
+                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container-high file:text-primary hover:file:bg-surface-variant cursor-pointer"
+              />
+              {selectedFiles && selectedFiles.length > 0 && (
+                <span className="text-[11px] text-emerald-400 font-mono block pt-1">
+                  ✓ {selectedFiles.length} media file(s) selected for upload
+                </span>
+              )}
+            </div>
+
+            <Input
+              label="Product Demo Video URL (Optional MP4 / Embed)"
+              value={videoUrl}
+              onChange={e => setVideoUrl(e.target.value)}
+              placeholder="e.g. /uploads/glove-demo.mp4 or https://..."
             />
-            {selectedFiles && selectedFiles.length > 0 && (
-              <span className="text-[11px] text-emerald-400 font-mono block pt-1">
-                ✓ {selectedFiles.length} file(s) selected for upload
-              </span>
-            )}
           </div>
 
           <div className="pt-4 flex justify-end gap-3 border-t border-outline-variant">

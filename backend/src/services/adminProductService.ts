@@ -6,7 +6,7 @@ import { dbPool } from '@/config/db';
 
 export class AdminProductService {
   /**
-   * Create new product with optional uploaded files, specs, and features
+   * Create new product with optional uploaded files, video URL, specs, and features
    */
   static async createProduct(
     input: AdminCreateProductInput,
@@ -26,8 +26,13 @@ export class AdminProductService {
         await AdminProductModel.insertProductImage(productId, imageUrl, isPrimary, isVideo);
       }
     } else {
-      // Default placeholder primary image
+      // Default primary image
       await AdminProductModel.insertProductImage(productId, '/uploads/gsh-glove-1.jpg', true, false);
+    }
+
+    // Save optional video URL / media link
+    if (input.video_url) {
+      await AdminProductModel.insertProductImage(productId, input.video_url, false, true);
     }
 
     // Save specs if provided
@@ -66,7 +71,7 @@ export class AdminProductService {
   }
 
   /**
-   * Update product by ID and process optional uploaded files
+   * Update product by ID and process optional uploaded files / video URL
    */
   static async updateProduct(
     id: number,
@@ -84,6 +89,10 @@ export class AdminProductService {
         const isVideo = file.mimetype.includes('video');
         await AdminProductModel.insertProductImage(id, imageUrl, isPrimary, isVideo);
       }
+    }
+
+    if (input.video_url) {
+      await AdminProductModel.insertProductImage(id, input.video_url, false, true);
     }
 
     const [rows] = await Promise.all([ProductModel.findProducts({ limit: 1000 })]);
