@@ -10,7 +10,7 @@ import {
 
 export class ProductModel {
   /**
-   * Find paginated products list with filters
+   * Find paginated products list with category, stock, search, & spec filters
    */
   static async findProducts(query: ProductListQuery): Promise<ProductRow[]> {
     const page = query.page || 1;
@@ -31,9 +31,14 @@ export class ProductModel {
       params.push(searchPattern, searchPattern, searchPattern);
     }
 
-    if (query.category) {
-      sql += ` AND c.slug = ?`;
-      params.push(query.category);
+    if (query.category && query.category !== 'all') {
+      sql += ` AND (c.slug = ? OR c.parent_id = (SELECT id FROM categories WHERE slug = ? LIMIT 1))`;
+      params.push(query.category, query.category);
+    }
+
+    if (query.stock && query.stock !== 'all') {
+      sql += ` AND p.stock_status = ?`;
+      params.push(query.stock);
     }
 
     if (query.protection_level) {
@@ -94,9 +99,14 @@ export class ProductModel {
       params.push(searchPattern, searchPattern, searchPattern);
     }
 
-    if (query.category) {
-      sql += ` AND c.slug = ?`;
-      params.push(query.category);
+    if (query.category && query.category !== 'all') {
+      sql += ` AND (c.slug = ? OR c.parent_id = (SELECT id FROM categories WHERE slug = ? LIMIT 1))`;
+      params.push(query.category, query.category);
+    }
+
+    if (query.stock && query.stock !== 'all') {
+      sql += ` AND p.stock_status = ?`;
+      params.push(query.stock);
     }
 
     if (query.protection_level) {

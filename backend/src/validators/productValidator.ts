@@ -6,10 +6,11 @@ export const productListQuerySchema = z.object({
   limit: z.string().optional().transform(val => (val ? Math.min(100, Math.max(1, parseInt(val, 10))) : 12)),
   search: z.string().trim().optional(),
   category: z.string().trim().optional(),
+  stock: z.string().trim().optional(),
   protection_level: z.string().trim().optional(),
   material: z.string().trim().optional(),
   certification: z.string().trim().optional(),
-  sort: z.enum(['performance', 'newest', 'price_high_low']).optional().default('performance'),
+  sort: z.string().optional().default('featured'),
 });
 
 // Zod validation schema for GET /api/v1/products/:slug route params

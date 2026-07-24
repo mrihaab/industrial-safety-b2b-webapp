@@ -47,10 +47,11 @@ export interface ProductListQuery {
   limit?: number;
   search?: string;
   category?: string;
+  stock?: string;
   protection_level?: string;
   material?: string;
   certification?: string;
-  sort?: 'performance' | 'newest' | 'price_high_low' | string;
+  sort?: string;
 }
 
 export interface ProductListItemDto {
