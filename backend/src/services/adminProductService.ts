@@ -2,6 +2,7 @@ import { AdminProductModel, AdminCreateProductInput, AdminUpdateProductInput } f
 import { ProductModel } from '@/models/productModel';
 import { ProductDetailDto } from '@/types/product';
 import { ProductService } from '@/services/productService';
+import { dbPool } from '@/config/db';
 
 export class AdminProductService {
   /**
@@ -26,7 +27,7 @@ export class AdminProductService {
       }
     } else {
       // Default placeholder primary image
-      await AdminProductModel.insertProductImage(productId, '/uploads/placeholder.jpg', true, false);
+      await AdminProductModel.insertProductImage(productId, '/uploads/gsh-glove-1.jpg', true, false);
     }
 
     // Save specs if provided
@@ -65,14 +66,25 @@ export class AdminProductService {
   }
 
   /**
-   * Update product by ID
+   * Update product by ID and process optional uploaded files
    */
   static async updateProduct(
     id: number,
-    input: AdminUpdateProductInput
+    input: AdminUpdateProductInput,
+    files?: Express.Multer.File[]
   ): Promise<ProductDetailDto | null> {
     const success = await AdminProductModel.updateProduct(id, input);
-    if (!success) return null;
+
+    if (files && files.length > 0) {
+      await dbPool.query('DELETE FROM product_images WHERE product_id = ?', [id]);
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const imageUrl = `/uploads/${file.filename}`;
+        const isPrimary = i === 0;
+        const isVideo = file.mimetype.includes('video');
+        await AdminProductModel.insertProductImage(id, imageUrl, isPrimary, isVideo);
+      }
+    }
 
     const [rows] = await Promise.all([ProductModel.findProducts({ limit: 1000 })]);
     const updatedRow = rows.find(r => r.id === id);

@@ -27,6 +27,7 @@ export const AdminProducts: React.FC = () => {
   const [moq, setMoq] = useState('50');
   const [stockStatus, setStockStatus] = useState('IN STOCK');
   const [description, setDescription] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -68,6 +69,7 @@ export const AdminProducts: React.FC = () => {
     setMoq('50');
     setStockStatus('IN STOCK');
     setDescription('');
+    setSelectedFiles(null);
     setErrorMsg('');
     if (categories.length > 0) {
       setCategoryId(String(categories[0].id));
@@ -83,7 +85,8 @@ export const AdminProducts: React.FC = () => {
     setPrice(String(product.price));
     setMoq(String(product.moq));
     setStockStatus(product.stockStatus || 'IN STOCK');
-    setDescription('Product specification & engineering notes.');
+    setDescription(product.description || 'Product specification & engineering notes.');
+    setSelectedFiles(null);
     setErrorMsg('');
     setIsModalOpen(true);
   };
@@ -103,30 +106,29 @@ export const AdminProducts: React.FC = () => {
     setErrorMsg('');
 
     try {
-      if (editingProduct) {
-        await AdminProductService.updateProduct(editingProduct.id, {
-          sku,
-          title,
-          slug: slug || title.toLowerCase().replace(/\s+/g, '-'),
-          category_id: parseInt(categoryId) || 1,
-          price: parseFloat(price),
-          moq: parseInt(moq),
-          stock_status: stockStatus,
-          description: description || title,
-        });
-      } else {
-        const formData = new FormData();
-        formData.append('sku', sku);
-        formData.append('title', title);
-        formData.append('slug', slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
-        formData.append('category_id', categoryId || '1');
-        formData.append('price', price);
-        formData.append('moq', moq);
-        formData.append('stock_status', stockStatus);
-        formData.append('description', description || title);
+      const formData = new FormData();
+      formData.append('sku', sku);
+      formData.append('title', title);
+      formData.append('slug', slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+      formData.append('category_id', categoryId || '1');
+      formData.append('price', price);
+      formData.append('moq', moq);
+      formData.append('stock_status', stockStatus);
+      formData.append('description', description || title);
 
+      // Append selected files if uploaded by admin
+      if (selectedFiles && selectedFiles.length > 0) {
+        for (let i = 0; i < selectedFiles.length; i++) {
+          formData.append('images', selectedFiles[i]);
+        }
+      }
+
+      if (editingProduct) {
+        await AdminProductService.updateProduct(editingProduct.id, formData);
+      } else {
         await AdminProductService.createProduct(formData);
       }
+
       fetchData();
       setIsModalOpen(false);
     } catch (err: unknown) {
@@ -272,9 +274,20 @@ export const AdminProducts: React.FC = () => {
 
           <div className="space-y-1">
             <label className="font-label-caps text-xs text-on-surface-variant uppercase">
-              Product Images (Multer File Upload)
+              Upload Product Images (Multer Upload)
             </label>
-            <input type="file" multiple className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container-high file:text-primary hover:file:bg-surface-variant" />
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={e => setSelectedFiles(e.target.files)}
+              className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container-high file:text-primary hover:file:bg-surface-variant cursor-pointer"
+            />
+            {selectedFiles && selectedFiles.length > 0 && (
+              <span className="text-[11px] text-emerald-400 font-mono block pt-1">
+                ✓ {selectedFiles.length} file(s) selected for upload
+              </span>
+            )}
           </div>
 
           <div className="pt-4 flex justify-end gap-3 border-t border-outline-variant">

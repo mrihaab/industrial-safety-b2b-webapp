@@ -13,8 +13,13 @@ router.post(
   AdminProductController.createProduct
 );
 
-// PUT /api/v1/admin/products/:id - Update Product (JWT Protected)
-router.put('/:id', authenticateAdmin, AdminProductController.updateProduct);
+// PUT /api/v1/admin/products/:id - Update Product (JWT Protected + Multer Upload)
+router.put(
+  '/:id',
+  authenticateAdmin,
+  uploadProductMedia.array('images', 5),
+  AdminProductController.updateProduct
+);
 
 // DELETE /api/v1/admin/products/:id - Delete Product (JWT Protected)
 router.delete('/:id', authenticateAdmin, AdminProductController.deleteProduct);

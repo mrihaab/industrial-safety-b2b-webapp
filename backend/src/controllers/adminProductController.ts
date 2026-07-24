@@ -9,7 +9,7 @@ import {
 export class AdminProductController {
   /**
    * POST /api/v1/admin/products
-   * Create new product with optional uploaded files
+   * Create new product with uploaded files
    */
   static async createProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -35,14 +35,15 @@ export class AdminProductController {
 
   /**
    * PUT /api/v1/admin/products/:id
-   * Update existing product details by ID
+   * Update existing product details & optional uploaded files
    */
   static async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = productIdParamSchema.parse(req.params);
       const parsedBody = updateAdminProductSchema.parse(req.body);
+      const files = req.files as Express.Multer.File[] | undefined;
 
-      const product = await AdminProductService.updateProduct(id, parsedBody);
+      const product = await AdminProductService.updateProduct(id, parsedBody, files);
 
       if (!product) {
         res.status(404).json({

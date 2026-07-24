@@ -25,7 +25,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const getImageUrl = (url?: string) => {
-    if (!url) return 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80';
+    if (!url) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
       return url;
     }
@@ -52,8 +52,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           src={imageUrl}
           alt={product.title}
           onError={(e) => {
-            // Fallback to high-res Unsplash image if local uploaded file doesn't exist
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=600&q=80';
+            // Clean industrial glove fallback if uploaded image file path is unreachable
+            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
           }}
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
         />
