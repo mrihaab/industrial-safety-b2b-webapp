@@ -10,6 +10,15 @@ import { useCart } from '@/contexts/CartContext';
 import { formatPrice } from '@/utils/formatters';
 import { ProductService, ProductDetailDto } from '@/services/productService';
 
+const getImageUrl = (url?: string) => {
+  if (!url) return 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const backendBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1').replace('/api/v1', '');
+  return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 const FALLBACK_PRODUCT: ProductDetailDto = {
   id: 1,
   slug: 'gsh-elite-industrial-gloves',
@@ -86,7 +95,7 @@ export const ProductDetail: React.FC = () => {
       quantity: validQty,
       sizeRange: selectedSize,
       price: product.price,
-      imageUrl: product.primaryImage || (product.images && product.images[0]) || '/uploads/placeholder.jpg',
+      imageUrl: getImageUrl(product.primaryImage || (product.images && product.images[0])),
     });
     setAddedToast(true);
     setTimeout(() => setAddedToast(false), 3000);
@@ -100,9 +109,11 @@ export const ProductDetail: React.FC = () => {
     );
   }
 
-  const galleryImages = (product.images && product.images.length > 0)
+  const rawImages = (product.images && product.images.length > 0)
     ? product.images
-    : [product.primaryImage || '/uploads/placeholder.jpg'];
+    : [product.primaryImage || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80'];
+
+  const galleryImages = rawImages.map(img => getImageUrl(img));
 
   return (
     <div className="space-y-12">
@@ -121,8 +132,11 @@ export const ProductDetail: React.FC = () => {
               {product.statusTag || 'Safety-System-Active'}
             </Badge>
             <img
-              src={galleryImages[activeImageIndex] || product.primaryImage || '/uploads/placeholder.jpg'}
+              src={galleryImages[activeImageIndex] || galleryImages[0]}
               alt={product.title}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
+              }}
               className="object-contain h-full w-full max-h-[480px] transition-all duration-300"
             />
           </div>
@@ -137,7 +151,14 @@ export const ProductDetail: React.FC = () => {
                     activeImageIndex === idx ? 'border-primary-container ring-1 ring-primary' : 'border-outline-variant hover:border-primary/50'
                   }`}
                 >
-                  <img src={img} alt={`Thumbnail ${idx + 1}`} className="object-contain h-full w-full" />
+                  <img
+                    src={img}
+                    alt={`Thumbnail ${idx + 1}`}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
+                    }}
+                    className="object-contain h-full w-full"
+                  />
                 </button>
               ))}
             </div>
