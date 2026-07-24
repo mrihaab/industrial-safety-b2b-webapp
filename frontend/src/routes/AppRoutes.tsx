@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import Home from '@/pages/Home';
@@ -8,6 +8,10 @@ import Catalog from '@/pages/Catalog';
 import ProductDetail from '@/pages/ProductDetail';
 import Rfq from '@/pages/Rfq';
 import Contact from '@/pages/Contact';
+import AdminLogin from '@/pages/admin/AdminLogin';
+import AdminDashboard from '@/pages/admin/AdminDashboard';
+import AdminProducts from '@/pages/admin/AdminProducts';
+import AdminInquiries from '@/pages/admin/AdminInquiries';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -24,13 +28,14 @@ export const AppRoutes: React.FC = () => {
         </Route>
 
         {/* Admin Login Route */}
-        <Route path="/admin/login" element={<div className="min-h-screen bg-background flex items-center justify-center font-headline-lg text-primary">Admin Login Placeholder</div>} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Protected Admin Routes */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<div className="font-headline-lg text-primary">Admin Dashboard Placeholder</div>} />
-          <Route path="products" element={<div className="font-headline-lg text-primary">Admin Products CRUD Placeholder</div>} />
-          <Route path="inquiries" element={<div className="font-headline-lg text-primary">Admin Inquiries Placeholder</div>} />
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="inquiries" element={<AdminInquiries />} />
         </Route>
       </Routes>
     </BrowserRouter>
