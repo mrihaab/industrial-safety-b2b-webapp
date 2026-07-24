@@ -5,6 +5,7 @@ import { AdminLayout } from '@/components/layout/AdminLayout';
 import Home from '@/pages/Home';
 import About from '@/pages/About';
 import Catalog from '@/pages/Catalog';
+import ProductDetail from '@/pages/ProductDetail';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -15,7 +16,7 @@ export const AppRoutes: React.FC = () => {
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="products" element={<Catalog />} />
-          <Route path="products/:slug" element={<div className="font-headline-lg text-primary">Product Detail Page Placeholder</div>} />
+          <Route path="products/:slug" element={<ProductDetail />} />
           <Route path="contact" element={<div className="font-headline-lg text-primary">Contact Us Page Placeholder</div>} />
           <Route path="rfq" element={<div className="font-headline-lg text-primary">Global RFQ Page Placeholder</div>} />
         </Route>
