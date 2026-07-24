@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { AdminLayout } from '@/components/layout/AdminLayout';
+import Home from '@/pages/Home';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ export const AppRoutes: React.FC = () => {
       <Routes>
         {/* Public Application Routes */}
         <Route path="/" element={<MainLayout />}>
-          <Route index element={<div className="font-headline-lg text-primary">Home Landing Page Placeholder</div>} />
+          <Route index element={<Home />} />
           <Route path="about" element={<div className="font-headline-lg text-primary">About Us Page Placeholder</div>} />
           <Route path="products" element={<div className="font-headline-lg text-primary">Product Catalog Page Placeholder</div>} />
           <Route path="products/:slug" element={<div className="font-headline-lg text-primary">Product Detail Page Placeholder</div>} />
