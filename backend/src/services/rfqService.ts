@@ -1,5 +1,6 @@
 import { RfqModel } from '@/models/rfqModel';
 import { CreateRfqInput, RfqResponseDto } from '@/types/rfq';
+import { MailService } from '@/services/mailService';
 
 export class RfqService {
   /**
@@ -22,7 +23,16 @@ export class RfqService {
       items: processedItems,
     };
 
+    // 1. Store in Database
     const result = await RfqModel.createRfq(processedInput);
+
+    // 2. Dispatch Non-blocking Email Notification (Module B.4 Integration)
+    MailService.sendRfqNotification({
+      rfqId: result.rfq_id,
+      rfqData: processedInput,
+    }).catch(err => {
+      console.error('[RFQ Service Mail Dispatch Warning]:', err);
+    });
 
     return {
       rfq_id: result.rfq_id,
