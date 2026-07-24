@@ -28,8 +28,10 @@ export const AdminProducts: React.FC = () => {
   const [stockStatus, setStockStatus] = useState('IN STOCK');
   const [sizeOptions, setSizeOptions] = useState('Assorted S/M/L/XL');
   const [description, setDescription] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
-  const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  
+  // Media Files & Per-Size Mapping State
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [fileSizeCodes, setFileSizeCodes] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -72,8 +74,8 @@ export const AdminProducts: React.FC = () => {
     setStockStatus('IN STOCK');
     setSizeOptions('Assorted S/M/L/XL');
     setDescription('');
-    setVideoUrl('');
-    setSelectedFiles(null);
+    setSelectedFiles([]);
+    setFileSizeCodes([]);
     setErrorMsg('');
     if (categories.length > 0) {
       setCategoryId(String(categories[0].id));
@@ -91,10 +93,24 @@ export const AdminProducts: React.FC = () => {
     setStockStatus(product.stockStatus || 'IN STOCK');
     setSizeOptions('Assorted S/M/L/XL');
     setDescription(product.description || 'Product specification & engineering notes.');
-    setVideoUrl('');
-    setSelectedFiles(null);
+    setSelectedFiles([]);
+    setFileSizeCodes([]);
     setErrorMsg('');
     setIsModalOpen(true);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const fileList = Array.from(e.target.files);
+    setSelectedFiles(fileList);
+    // Initialize default size code for each file as 'GENERAL'
+    setFileSizeCodes(fileList.map(() => 'GENERAL'));
+  };
+
+  const handleSizeCodeChange = (index: number, value: string) => {
+    const updated = [...fileSizeCodes];
+    updated[index] = value;
+    setFileSizeCodes(updated);
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -123,15 +139,20 @@ export const AdminProducts: React.FC = () => {
       formData.append('size_options', sizeOptions);
       formData.append('description', description || title);
 
-      if (videoUrl) {
-        formData.append('video_url', videoUrl);
-      }
-
-      // Append selected image/video files if uploaded by admin
-      if (selectedFiles && selectedFiles.length > 0) {
-        for (let i = 0; i < selectedFiles.length; i++) {
-          formData.append('images', selectedFiles[i]);
+      // Append size mappings for each uploaded file index
+      const mappingsObj: Record<number, string> = {};
+      fileSizeCodes.forEach((code, idx) => {
+        if (code && code !== 'GENERAL') {
+          mappingsObj[idx] = code;
         }
+      });
+      formData.append('size_mappings', JSON.stringify(mappingsObj));
+
+      // Append selected photo files
+      if (selectedFiles.length > 0) {
+        selectedFiles.forEach(file => {
+          formData.append('images', file);
+        });
       }
 
       if (editingProduct) {
@@ -165,7 +186,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Create, update, and manage product SKUs, size availability, gallery photos, demo videos, and stock levels.</p>
+          <p className="font-body-sm text-on-surface-variant">Manage product catalog, multi-image gallery photos per size, available size configurations, and stock levels.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -234,9 +255,9 @@ export const AdminProducts: React.FC = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={editingProduct ? 'Edit Product' : 'Create New Product'}
-        className="max-w-2xl"
+        className="max-w-3xl"
       >
-        <form onSubmit={handleSaveProduct} className="space-y-4">
+        <form onSubmit={handleSaveProduct} className="space-y-5">
           {errorMsg && (
             <div className="p-3 bg-error/10 border border-error/40 text-error rounded-xs text-xs">
               {errorMsg}
@@ -296,31 +317,54 @@ export const AdminProducts: React.FC = () => {
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Multi-Image Upload & Per-Size Association Section */}
+          <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-4">
             <div className="space-y-1">
-              <label className="font-label-caps text-xs text-on-surface-variant uppercase">
-                Upload Gallery Photos & Video File (Multer)
+              <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
+                📸 Upload Product Photos (Select 3 to 4 Images)
               </label>
+              <p className="text-[11px] text-on-surface-variant">
+                Upload primary product photos and optional size-specific photos. When a user selects a size on the product page, the corresponding size photo will automatically be displayed!
+              </p>
               <input
                 type="file"
                 multiple
-                accept="image/*,video/*"
-                onChange={e => setSelectedFiles(e.target.files)}
-                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container-high file:text-primary hover:file:bg-surface-variant cursor-pointer"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container file:text-primary hover:file:bg-surface-variant cursor-pointer pt-2"
               />
-              {selectedFiles && selectedFiles.length > 0 && (
-                <span className="text-[11px] text-emerald-400 font-mono block pt-1">
-                  ✓ {selectedFiles.length} media file(s) selected for upload
-                </span>
-              )}
             </div>
 
-            <Input
-              label="Product Demo Video URL (Optional MP4 / Embed)"
-              value={videoUrl}
-              onChange={e => setVideoUrl(e.target.value)}
-              placeholder="e.g. /uploads/glove-demo.mp4 or https://..."
-            />
+            {/* List selected files with size assignment dropdowns */}
+            {selectedFiles.length > 0 && (
+              <div className="space-y-3 pt-2 border-t border-outline-variant/60">
+                <span className="text-xs font-bold text-on-surface block">
+                  Assign Photo to Size Category (Optional):
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {selectedFiles.map((file, idx) => (
+                    <div key={idx} className="bg-surface-container p-3 border border-outline-variant/60 rounded-xs flex items-center justify-between gap-3 text-xs">
+                      <div className="truncate">
+                        <span className="font-bold text-primary block truncate">{idx === 0 ? '★ Primary Image' : `Gallery Image ${idx + 1}`}</span>
+                        <span className="text-on-surface-variant text-[11px] truncate block">{file.name}</span>
+                      </div>
+                      <select
+                        value={fileSizeCodes[idx] || 'GENERAL'}
+                        onChange={e => handleSizeCodeChange(idx, e.target.value)}
+                        className="bg-surface-container-high border border-outline-variant rounded-xs px-2 py-1 text-xs text-on-surface focus:border-primary focus:outline-none"
+                      >
+                        <option value="GENERAL">General (All Sizes)</option>
+                        <option value="S">Small (S)</option>
+                        <option value="M">Medium (M)</option>
+                        <option value="L">Large (L)</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="pt-4 flex justify-end gap-3 border-t border-outline-variant">

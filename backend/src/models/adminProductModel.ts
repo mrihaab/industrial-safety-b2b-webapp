@@ -16,7 +16,6 @@ export interface AdminCreateProductInput {
   rating_score?: number;
   review_count?: number;
   is_featured?: boolean;
-  video_url?: string;
 }
 
 export interface AdminUpdateProductInput extends Partial<AdminCreateProductInput> {}
@@ -106,14 +105,26 @@ export class AdminProductModel {
   }
 
   /**
-   * Insert product media images / video
+   * Insert product media image with optional size_code association
    */
-  static async insertProductImage(productId: number, imageUrl: string, isPrimary: boolean, isVideo: boolean): Promise<number> {
+  static async insertProductImage(
+    productId: number,
+    imageUrl: string,
+    isPrimary: boolean,
+    isVideo: boolean = false,
+    sizeCode: string | null = null
+  ): Promise<number> {
     const sql = `
-      INSERT INTO product_images (product_id, image_url, is_primary, is_video)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO product_images (product_id, image_url, is_primary, is_video, size_code)
+      VALUES (?, ?, ?, ?, ?)
     `;
-    const [result] = await dbPool.query<ResultSetHeader>(sql, [productId, imageUrl, isPrimary ? 1 : 0, isVideo ? 1 : 0]);
+    const [result] = await dbPool.query<ResultSetHeader>(sql, [
+      productId,
+      imageUrl,
+      isPrimary ? 1 : 0,
+      isVideo ? 1 : 0,
+      sizeCode || null,
+    ]);
     return result.insertId;
   }
 

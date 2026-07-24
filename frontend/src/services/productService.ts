@@ -10,6 +10,7 @@ export interface ProductDetailDto extends ProductCardData {
     url: string;
     is_primary?: boolean;
     is_video?: boolean;
+    size_code?: string;
   }>;
   specs: { key: string; value: string }[];
   features: { title: string; description: string; icon: string }[];

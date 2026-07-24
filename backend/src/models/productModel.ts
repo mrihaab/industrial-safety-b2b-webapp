@@ -154,11 +154,41 @@ export class ProductModel {
   }
 
   /**
-   * Find product gallery images
+   * Batch find images for multiple products to prevent N+1 queries
+   */
+  static async findImagesForProducts(productIds: number[]): Promise<ProductImageRow[]> {
+    if (!productIds || productIds.length === 0) return [];
+    const sql = `
+      SELECT id, product_id, image_url, is_primary, is_video, size_code
+      FROM product_images
+      WHERE product_id IN (?)
+      ORDER BY is_primary DESC, id ASC
+    `;
+    const [rows] = await dbPool.query<RowDataPacket[]>(sql, [productIds]);
+    return rows as ProductImageRow[];
+  }
+
+  /**
+   * Batch find specs for multiple products to prevent N+1 queries
+   */
+  static async findSpecsForProducts(productIds: number[]): Promise<ProductSpecRow[]> {
+    if (!productIds || productIds.length === 0) return [];
+    const sql = `
+      SELECT id, product_id, spec_key, spec_value
+      FROM product_specs
+      WHERE product_id IN (?)
+      ORDER BY id ASC
+    `;
+    const [rows] = await dbPool.query<RowDataPacket[]>(sql, [productIds]);
+    return rows as ProductSpecRow[];
+  }
+
+  /**
+   * Find product gallery images for single product
    */
   static async findProductImages(productId: number): Promise<ProductImageRow[]> {
     const sql = `
-      SELECT id, product_id, image_url, is_primary, is_video
+      SELECT id, product_id, image_url, is_primary, is_video, size_code
       FROM product_images
       WHERE product_id = ?
       ORDER BY is_primary DESC, id ASC
@@ -168,7 +198,7 @@ export class ProductModel {
   }
 
   /**
-   * Find product specifications
+   * Find product specifications for single product
    */
   static async findProductSpecs(productId: number): Promise<ProductSpecRow[]> {
     const sql = `
@@ -182,7 +212,7 @@ export class ProductModel {
   }
 
   /**
-   * Find product engineering features
+   * Find product engineering features for single product
    */
   static async findProductFeatures(productId: number): Promise<ProductFeatureRow[]> {
     const sql = `

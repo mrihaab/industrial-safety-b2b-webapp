@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Breadcrumb } from '@/components/layout/Breadcrumb';
-import { Button } from '@/components/ui/Button';
-import { Badge } from '@/components/ui/Badge';
-import { Input } from '@/components/ui/Input';
 import { Loader } from '@/components/ui/Loader';
 import { useCart } from '@/contexts/CartContext';
 import { ProductService, ProductDetailDto } from '@/services/productService';
@@ -94,6 +91,38 @@ export const ProductDetail: React.FC = () => {
     { label: product.title },
   ];
 
+  // Combine gallery items from API
+  const rawGallery: Array<{ url: string; is_primary?: boolean; size_code?: string }> =
+    (product.gallery && product.gallery.length > 0)
+      ? product.gallery
+      : (product.images && product.images.length > 0)
+        ? product.images.map((img, idx) => ({ url: img, is_primary: idx === 0 }))
+        : [{ url: product.primaryImage || '', is_primary: true }];
+
+  const galleryItems = rawGallery.map((item) => ({
+    url: getImageUrl(item.url),
+    isPrimary: Boolean(item.is_primary),
+    sizeCode: item.size_code,
+  }));
+
+  // Handle size selection change & auto-switch main image if size-specific photo exists
+  const handleSelectSize = (size: string) => {
+    setSelectedSizeRange(size);
+
+    // Extract size code letter (e.g. "Large Only" -> "L", "Medium Only" -> "M", "S" -> "S")
+    let targetCode = size.toUpperCase();
+    if (size.includes('Large')) targetCode = 'L';
+    if (size.includes('Medium')) targetCode = 'M';
+    if (size.includes('Small')) targetCode = 'S';
+    if (size.includes('XL')) targetCode = 'XL';
+    if (size.includes('XXL')) targetCode = 'XXL';
+
+    const matchingIdx = galleryItems.findIndex(item => item.sizeCode && item.sizeCode.toUpperCase() === targetCode);
+    if (matchingIdx !== -1) {
+      setActiveMediaIndex(matchingIdx);
+    }
+  };
+
   const handleAddToCart = () => {
     const validQty = Math.max(50, quantity);
     addToCart({
@@ -116,20 +145,6 @@ export const ProductDetail: React.FC = () => {
       </div>
     );
   }
-
-  // Combine gallery items from API (Photos + Video)
-  const rawGallery: Array<{ url: string; is_primary?: boolean; is_video?: boolean }> =
-    (product.gallery && product.gallery.length > 0)
-      ? product.gallery
-      : (product.images && product.images.length > 0)
-        ? product.images.map((img, idx) => ({ url: img, is_primary: idx === 0, is_video: false }))
-        : [{ url: product.primaryImage || '', is_primary: true, is_video: false }];
-
-  const galleryItems = rawGallery.map((item: { url: string; is_primary?: boolean; is_video?: boolean }) => ({
-    url: getImageUrl(item.url),
-    isPrimary: Boolean(item.is_primary),
-    isVideo: Boolean(item.is_video) || item.url.includes('.mp4') || item.url.includes('.webm'),
-  }));
 
   const currentMedia = galleryItems[activeMediaIndex] || galleryItems[0];
   const sizeOptionsList = (product.size_options || product.sizeOptions || 'Assorted S/M/L/XL')
@@ -155,30 +170,20 @@ export const ProductDetail: React.FC = () => {
               {product.statusTag || 'NEW ARRIVAL'}
             </span>
 
-            {currentMedia.isVideo ? (
-              <video
-                src={currentMedia.url}
-                controls
-                autoPlay
-                muted
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <img
-                src={currentMedia.url}
-                alt={product.title}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
-                }}
-                className="object-cover h-full w-full"
-              />
-            )}
+            <img
+              src={currentMedia.url}
+              alt={product.title}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
+              }}
+              className="object-cover h-full w-full"
+            />
           </div>
 
           {/* 4 Thumbnails list matching mockup */}
           {galleryItems.length > 0 && (
             <div className="grid grid-cols-4 gap-3">
-              {galleryItems.slice(0, 4).map((item: { url: string; isPrimary: boolean; isVideo: boolean }, idx: number) => (
+              {galleryItems.slice(0, 4).map((item, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => setActiveMediaIndex(idx)}
@@ -188,19 +193,18 @@ export const ProductDetail: React.FC = () => {
                       : 'border-outline-variant/60 hover:border-[#ff6b00]/50'
                   }`}
                 >
-                  {item.isVideo ? (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-black/60 text-[#ff6b00]">
-                      <span className="material-symbols-outlined text-3xl font-bold">play_circle</span>
-                    </div>
-                  ) : (
-                    <img
-                      src={item.url}
-                      alt={`Thumbnail ${idx + 1}`}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
-                      }}
-                      className="object-cover h-full w-full"
-                    />
+                  <img
+                    src={item.url}
+                    alt={`Thumbnail ${idx + 1}`}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
+                    }}
+                    className="object-cover h-full w-full"
+                  />
+                  {item.sizeCode && (
+                    <span className="absolute bottom-1 right-1 bg-black/80 text-[#ff6b00] font-mono text-[9px] px-1 font-bold rounded-xs">
+                      {item.sizeCode}
+                    </span>
                   )}
                 </button>
               ))}
@@ -301,7 +305,7 @@ export const ProductDetail: React.FC = () => {
                 </label>
                 <select
                   value={selectedSizeRange}
-                  onChange={e => setSelectedSizeRange(e.target.value)}
+                  onChange={e => handleSelectSize(e.target.value)}
                   className="w-full bg-[#051424] border border-outline-variant rounded-none px-3 py-2 text-sm text-on-surface font-mono focus:border-[#ff6b00] focus:outline-none"
                 >
                   {sizeOptionsList.map((opt, i) => (

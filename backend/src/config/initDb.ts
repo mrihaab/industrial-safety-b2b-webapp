@@ -1,10 +1,11 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const DDL_STATEMENTS = [
-  // 1. Table: users (Admin authentication)
+  // 1. Users Table
   `CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
       username VARCHAR(64) UNIQUE NOT NULL,
@@ -14,17 +15,19 @@ const DDL_STATEMENTS = [
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 
-  // 2. Table: categories
+  // 2. Categories Table
   `CREATE TABLE IF NOT EXISTS categories (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      parent_id INT DEFAULT NULL,
       name VARCHAR(128) NOT NULL,
       slug VARCHAR(128) UNIQUE NOT NULL,
-      tag_name VARCHAR(128) NOT NULL,
-      FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE CASCADE
+      description TEXT,
+      tag_name VARCHAR(64) DEFAULT 'Safety System Active',
+      parent_id INT DEFAULT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 
-  // 3. Table: products
+  // 3. Products Table
   `CREATE TABLE IF NOT EXISTS products (
       id INT AUTO_INCREMENT PRIMARY KEY,
       category_id INT NOT NULL,
@@ -37,6 +40,7 @@ const DDL_STATEMENTS = [
       stock_status VARCHAR(32) DEFAULT 'IN STOCK',
       status_tag VARCHAR(64) DEFAULT 'Safety-System-Active',
       description TEXT NOT NULL,
+      size_options VARCHAR(255) DEFAULT 'Assorted S/M/L/XL',
       rating_score DECIMAL(3, 2) DEFAULT 5.00,
       review_count INT DEFAULT 0,
       is_featured BOOLEAN DEFAULT FALSE,
@@ -44,17 +48,19 @@ const DDL_STATEMENTS = [
       FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 
-  // 4. Table: product_images
+  // 4. Product Images Table
   `CREATE TABLE IF NOT EXISTS product_images (
       id INT AUTO_INCREMENT PRIMARY KEY,
       product_id INT NOT NULL,
       image_url VARCHAR(512) NOT NULL,
       is_primary BOOLEAN DEFAULT FALSE,
       is_video BOOLEAN DEFAULT FALSE,
+      size_code VARCHAR(32) DEFAULT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 
-  // 5. Table: product_specs
+  // 5. Product Specs Table
   `CREATE TABLE IF NOT EXISTS product_specs (
       id INT AUTO_INCREMENT PRIMARY KEY,
       product_id INT NOT NULL,
@@ -63,42 +69,46 @@ const DDL_STATEMENTS = [
       FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 
-  // 6. Table: product_features
+  // 6. Product Features Table
   `CREATE TABLE IF NOT EXISTS product_features (
       id INT AUTO_INCREMENT PRIMARY KEY,
       product_id INT NOT NULL,
       title VARCHAR(128) NOT NULL,
       description TEXT NOT NULL,
-      icon_name VARCHAR(64) NOT NULL,
+      icon_name VARCHAR(64) DEFAULT 'shield',
       FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 
-  // 7. Table: rfq_inquiries
+  // 7. RFQ Inquiries Table
   `CREATE TABLE IF NOT EXISTS rfq_inquiries (
       id INT AUTO_INCREMENT PRIMARY KEY,
       company_name VARCHAR(128) NOT NULL,
-      business_email VARCHAR(128) NOT NULL,
-      industry_segment VARCHAR(64) NOT NULL,
-      monthly_volume VARCHAR(64) NOT NULL,
-      detailed_requirements TEXT NOT NULL,
+      contact_person VARCHAR(128) NOT NULL,
+      email VARCHAR(128) NOT NULL,
+      phone VARCHAR(64) NOT NULL,
+      industry VARCHAR(64),
+      estimated_monthly_volume VARCHAR(64),
+      notes TEXT,
       status VARCHAR(32) DEFAULT 'pending',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 
-  // 8. Table: rfq_items
+  // 8. RFQ Items Table
   `CREATE TABLE IF NOT EXISTS rfq_items (
       id INT AUTO_INCREMENT PRIMARY KEY,
       rfq_id INT NOT NULL,
-      product_id INT NOT NULL,
-      quantity INT NOT NULL CHECK (quantity > 0),
-      size_range VARCHAR(64) DEFAULT 'Assorted S/M/L/XL',
-      FOREIGN KEY (rfq_id) REFERENCES rfq_inquiries(id) ON DELETE CASCADE,
-      FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
+      product_id INT,
+      product_title VARCHAR(255) NOT NULL,
+      sku VARCHAR(64) NOT NULL,
+      quantity INT NOT NULL,
+      size_range VARCHAR(64),
+      target_price DECIMAL(10, 2),
+      FOREIGN KEY (rfq_id) REFERENCES rfq_inquiries(id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
 ];
 
-export async function initializeDatabase() {
-  const host = process.env.DB_HOST || '127.0.0.1';
+export async function initializeDatabase(): Promise<void> {
+  const host = process.env.DB_HOST || 'localhost';
   const port = Number(process.env.DB_PORT) || 3306;
   const user = process.env.DB_USER || 'root';
   const password = process.env.DB_PASS || '';
@@ -106,7 +116,6 @@ export async function initializeDatabase() {
 
   console.log(`[Database Init]: Connecting to MySQL Server at ${host}:${port}...`);
 
-  // Step 1: Connect without database to ensure DB creation
   const connection = await mysql.createConnection({
     host,
     port,
@@ -115,22 +124,32 @@ export async function initializeDatabase() {
   });
 
   try {
-    // Step 2: Create Database
     await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
     console.log(`[Database Init]: Database '${database}' verified/created successfully.`);
 
-    // Step 3: Switch to target Database
     await connection.changeUser({ database });
 
-    // Step 4: Execute DDL Statements
     for (let i = 0; i < DDL_STATEMENTS.length; i++) {
       await connection.query(DDL_STATEMENTS[i]);
     }
-    console.log(`[Database Init]: Executed ${DDL_STATEMENTS.length} DDL statements. All 8 tables created/verified.`);
 
-    // Step 5: Verify Created Tables
-    const [rows] = await connection.query('SHOW TABLES;');
-    console.log('[Database Init]: Active tables in database:', rows);
+    // Safety column migration for size_options in products
+    try {
+      await connection.query(`ALTER TABLE products ADD COLUMN size_options VARCHAR(255) DEFAULT 'Assorted S/M/L/XL';`);
+      console.log(`[Database Init]: Added missing 'size_options' column to products table.`);
+    } catch (migErr: any) {
+      // Ignore if already exists
+    }
+
+    // Safety column migration for size_code in product_images
+    try {
+      await connection.query(`ALTER TABLE product_images ADD COLUMN size_code VARCHAR(32) DEFAULT NULL;`);
+      console.log(`[Database Init]: Added missing 'size_code' column to product_images table.`);
+    } catch (migErr: any) {
+      // Ignore if already exists
+    }
+
+    console.log(`[Database Init]: Executed ${DDL_STATEMENTS.length} DDL statements. All 8 tables created/verified.`);
   } catch (error) {
     console.error('[Database Init Error]:', error);
     throw error;
@@ -139,15 +158,14 @@ export async function initializeDatabase() {
   }
 }
 
-// Execute if run directly via CLI script
 if (require.main === module) {
   initializeDatabase()
     .then(() => {
-      console.log('[Database Init]: Completed successfully.');
+      console.log('[Database Init Script]: Database initialization complete.');
       process.exit(0);
     })
     .catch(err => {
-      console.error('[Database Init Failed]:', err);
+      console.error('[Database Init Script]: Failed:', err);
       process.exit(1);
     });
 }

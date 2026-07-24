@@ -9,18 +9,20 @@ import {
 export class AdminProductController {
   /**
    * POST /api/v1/admin/products
-   * Create new product with uploaded files
+   * Create new product with uploaded files & size mappings
    */
   static async createProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const parsedBody = createAdminProductSchema.parse(req.body);
       const files = req.files as Express.Multer.File[] | undefined;
+      const sizeMappingsJson = req.body.size_mappings as string | undefined;
 
       const product = await AdminProductService.createProduct(
         parsedBody,
         files,
         parsedBody.specs,
-        parsedBody.features
+        parsedBody.features,
+        sizeMappingsJson
       );
 
       res.status(201).json({
@@ -35,15 +37,16 @@ export class AdminProductController {
 
   /**
    * PUT /api/v1/admin/products/:id
-   * Update existing product details & optional uploaded files
+   * Update existing product details & optional uploaded files with size mappings
    */
   static async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { id } = productIdParamSchema.parse(req.params);
       const parsedBody = updateAdminProductSchema.parse(req.body);
       const files = req.files as Express.Multer.File[] | undefined;
+      const sizeMappingsJson = req.body.size_mappings as string | undefined;
 
-      const product = await AdminProductService.updateProduct(id, parsedBody, files);
+      const product = await AdminProductService.updateProduct(id, parsedBody, files, sizeMappingsJson);
 
       if (!product) {
         res.status(404).json({

@@ -26,6 +26,7 @@ export interface ProductImageRow {
   image_url: string;
   is_primary: boolean;
   is_video: boolean;
+  size_code?: string;
 }
 
 export interface ProductSpecRow {
@@ -85,6 +86,7 @@ export interface ProductDetailDto {
     url: string;
     is_primary: boolean;
     is_video: boolean;
+    size_code?: string;
   }>;
   specs: Array<{
     key: string;

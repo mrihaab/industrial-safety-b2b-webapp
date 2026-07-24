@@ -2,12 +2,14 @@ import { ProductModel } from '@/models/productModel';
 import {
   ProductListQuery,
   ProductDetailDto,
+  ProductImageRow,
+  ProductSpecRow,
   PaginatedProductsResult,
 } from '@/types/product';
 
 export class ProductService {
   /**
-   * Get paginated products with formatted DTOs matching ProductCardData
+   * Get paginated products with formatted DTOs matching ProductCardData (N+1 Query Optimized)
    */
   static async getProducts(query: ProductListQuery): Promise<PaginatedProductsResult> {
     const page = query.page || 1;
@@ -18,48 +20,76 @@ export class ProductService {
       ProductModel.countProducts(query),
     ]);
 
-    // Build ProductListItemDto list
-    const products: any[] = await Promise.all(
-      productRows.map(async row => {
-        const [images, specs] = await Promise.all([
-          ProductModel.findProductImages(row.id),
-          ProductModel.findProductSpecs(row.id),
-        ]);
+    if (productRows.length === 0) {
+      return {
+        products: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 1,
+      };
+    }
 
-        const primaryImage = images.find(img => img.is_primary) || images[0];
-        const imageUrl = primaryImage ? primaryImage.image_url : '/uploads/gsh-glove-1.jpg';
+    // Batch retrieve images & specs for all fetched products in 2 queries total
+    const productIds = productRows.map(r => r.id);
+    const [allImages, allSpecs] = await Promise.all([
+      ProductModel.findImagesForProducts(productIds),
+      ProductModel.findSpecsForProducts(productIds),
+    ]);
 
-        const certifications = specs
-          .filter(spec => 
-            spec.spec_key.toLowerCase().includes('cert') || 
-            spec.spec_key.toLowerCase().includes('protection') ||
-            spec.spec_value.toLowerCase().includes('ansi') ||
-            spec.spec_value.toLowerCase().includes('ce') ||
-            spec.spec_value.toLowerCase().includes('iso')
-          )
-          .map(spec => spec.spec_value)
-          .slice(0, 3);
+    const imagesByProduct = new Map<number, ProductImageRow[]>();
+    for (const img of allImages) {
+      if (!imagesByProduct.has(img.product_id)) {
+        imagesByProduct.set(img.product_id, []);
+      }
+      imagesByProduct.get(img.product_id)!.push(img);
+    }
 
-        return {
-          id: row.id,
-          sku: row.sku,
-          title: row.title,
-          slug: row.slug,
-          seriesName: row.series_name || 'HEAVY DUTY SERIES',
-          price: Number(row.price),
-          moq: row.moq || 50,
-          stockStatus: row.stock_status || 'IN STOCK',
-          statusTag: row.status_tag || 'Safety-System-Active',
-          ratingScore: Number(row.rating_score) || 4.9,
-          reviewCount: row.review_count || 12,
-          primaryImage: imageUrl,
-          image_url: imageUrl,
-          status_tag: row.status_tag || 'Safety-System-Active',
-          short_tag: row.tag_name || 'Industrial Safety',
-          certifications: certifications.length > 0 ? certifications : ['CE Certified'],
-        };
-      })
-    );
+    const specsByProduct = new Map<number, ProductSpecRow[]>();
+    for (const spec of allSpecs) {
+      if (!specsByProduct.has(spec.product_id)) {
+        specsByProduct.set(spec.product_id, []);
+      }
+      specsByProduct.get(spec.product_id)!.push(spec);
+    }
+
+    const products: any[] = productRows.map(row => {
+      const images = imagesByProduct.get(row.id) || [];
+      const specs = specsByProduct.get(row.id) || [];
+
+      const primaryImage = images.find(img => img.is_primary) || images[0];
+      const imageUrl = primaryImage ? primaryImage.image_url : '/uploads/gsh-glove-1.jpg';
+
+      const certifications = specs
+        .filter(spec => 
+          spec.spec_key.toLowerCase().includes('cert') || 
+          spec.spec_key.toLowerCase().includes('protection') ||
+          spec.spec_value.toLowerCase().includes('ansi') ||
+          spec.spec_value.toLowerCase().includes('ce') ||
+          spec.spec_value.toLowerCase().includes('iso')
+        )
+        .map(spec => spec.spec_value)
+        .slice(0, 3);
+
+      return {
+        id: row.id,
+        sku: row.sku,
+        title: row.title,
+        slug: row.slug,
+        seriesName: row.series_name || 'HEAVY DUTY SERIES',
+        price: Number(row.price),
+        moq: row.moq || 50,
+        stockStatus: row.stock_status || 'IN STOCK',
+        statusTag: row.status_tag || 'Safety-System-Active',
+        ratingScore: Number(row.rating_score) || 4.9,
+        reviewCount: row.review_count || 12,
+        primaryImage: imageUrl,
+        image_url: imageUrl,
+        status_tag: row.status_tag || 'Safety-System-Active',
+        short_tag: row.tag_name || 'Industrial Safety',
+        certifications: certifications.length > 0 ? certifications : ['CE Certified'],
+      };
+    });
 
     const totalPages = Math.ceil(total / limit) || 1;
 
@@ -73,7 +103,7 @@ export class ProductService {
   }
 
   /**
-   * Get product details by slug with gallery, specs, size options, and features
+   * Get product details by slug with gallery, size_code per image, specs, size options, and features
    */
   static async getProductBySlug(slug: string): Promise<ProductDetailDto | null> {
     const product = await ProductModel.findProductBySlug(slug);
@@ -108,6 +138,7 @@ export class ProductService {
         url: img.image_url,
         is_primary: Boolean(img.is_primary),
         is_video: Boolean(img.is_video),
+        size_code: img.size_code || undefined,
       })),
       specs: specs.map(s => ({
         key: s.spec_key,
