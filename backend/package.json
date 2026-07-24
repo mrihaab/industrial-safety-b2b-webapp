@@ -15,7 +15,8 @@
     "test:categories": "ts-node -r tsconfig-paths/register src/config/testCategoriesApi.ts",
     "test:rfq": "ts-node -r tsconfig-paths/register src/config/testRfqApi.ts",
     "test:mail": "ts-node -r tsconfig-paths/register src/config/testMailService.ts",
-    "test:auth": "ts-node -r tsconfig-paths/register src/config/testAuthApi.ts"
+    "test:auth": "ts-node -r tsconfig-paths/register src/config/testAuthApi.ts",
+    "test:admin-products": "ts-node -r tsconfig-paths/register src/config/testAdminProductCrud.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

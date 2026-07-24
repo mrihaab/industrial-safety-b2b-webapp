@@ -6,6 +6,7 @@ import productRoutes from '@/routes/productRoutes';
 import categoryRoutes from '@/routes/categoryRoutes';
 import rfqRoutes from '@/routes/rfqRoutes';
 import authRoutes from '@/routes/authRoutes';
+import adminProductRoutes from '@/routes/adminProductRoutes';
 
 dotenv.config();
 
@@ -40,6 +41,9 @@ app.use('/api/v1/rfq', rfqRoutes);
 
 // Module B.5 Routes
 app.use('/api/v1/admin/auth', authRoutes);
+
+// Module B.6 Routes
+app.use('/api/v1/admin/products', adminProductRoutes);
 
 // Centralized Error Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
