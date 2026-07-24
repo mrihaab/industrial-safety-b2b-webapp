@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import Home from '@/pages/Home';
+import About from '@/pages/About';
 
 export const AppRoutes: React.FC = () => {
   return (
@@ -11,7 +12,7 @@ export const AppRoutes: React.FC = () => {
         {/* Public Application Routes */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<Home />} />
-          <Route path="about" element={<div className="font-headline-lg text-primary">About Us Page Placeholder</div>} />
+          <Route path="about" element={<About />} />
           <Route path="products" element={<div className="font-headline-lg text-primary">Product Catalog Page Placeholder</div>} />
           <Route path="products/:slug" element={<div className="font-headline-lg text-primary">Product Detail Page Placeholder</div>} />
           <Route path="contact" element={<div className="font-headline-lg text-primary">Contact Us Page Placeholder</div>} />
