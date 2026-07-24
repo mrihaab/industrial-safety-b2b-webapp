@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import productRoutes from '@/routes/productRoutes';
+import categoryRoutes from '@/routes/categoryRoutes';
 
 dotenv.config();
 
@@ -26,8 +27,11 @@ app.get('/api/v1/health', (req: Request, res: Response) => {
   });
 });
 
-// Module B.1 Routes Registration
+// Module B.1 Routes
 app.use('/api/v1/products', productRoutes);
+
+// Module B.2 Routes
+app.use('/api/v1/categories', categoryRoutes);
 
 // Centralized Error Handling Middleware
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {

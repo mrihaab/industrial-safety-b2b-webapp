@@ -11,7 +11,8 @@
     "db:init": "ts-node -r tsconfig-paths/register src/config/initDb.ts",
     "db:test": "ts-node -r tsconfig-paths/register src/config/testDb.ts",
     "db:seed": "ts-node -r tsconfig-paths/register src/config/seedDb.ts",
-    "test:products": "ts-node -r tsconfig-paths/register src/config/testProductsApi.ts"
+    "test:products": "ts-node -r tsconfig-paths/register src/config/testProductsApi.ts",
+    "test:categories": "ts-node -r tsconfig-paths/register src/config/testCategoriesApi.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
