@@ -1,13 +1,9 @@
 import React, { useState } from 'react';
-import { Breadcrumb } from '@/components/layout/Breadcrumb';
-import { SectionHeader } from '@/components/layout/SectionHeader';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Textarea } from '@/components/ui/Textarea';
-import { Select } from '@/components/ui/Select';
-import { GlassCard } from '@/components/ui/GlassCard';
 import { useCart } from '@/contexts/CartContext';
 import { RfqService } from '@/services/rfqService';
+
+const HERO_WAREHOUSE_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuBSJRBhWGq1FU2kQOXbieNl8wVcN1lglb20ymJwDq2ehh0OwMHHMDa6mFV6chzqCY4pFoSbzXJX2XO9vABWIINFYhTQLQdCohf_sA21KIh28DNbA13OCpoSmx-1h-a0gBWnAMDRP_2GpQwQYjd-rgeG282oPioJwhGTlEUTUjdrvsTfG5XgEizfyJEmqPSEZ1NqVAhfIcPZGPDYSJpMU7buk4_wApw78HxkwqZqe0pNLOfDb97_TsbRZ9e-3VD_F-OFYuh6J8z0nBY";
+const MAP_HUBS_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuCDVWkxOYfzHFzhGZyXa45bFhaHTDXWXNcdpwyYJaWCwVsdTgw-_gtPpEK3Qicff0NwBU0k3yvBWDka1lE5i4n6p2wegSLFsNsVNPzItW2-_NbmZbLEjHnMjrWSLltho6Z3s_-azASJxCvErTML-cnWfzCUPuzNNEkuo40r7UUi_5_MlLqHrZ6JyaTOmchVhlMnlANqNWM1DuA-BXKMh59OBZEDJJFscyPA2uiKR0i5_3hyDitVmBsE2SQzqwNjGeSYGDf9ZkwGrnw";
 
 export const Rfq: React.FC = () => {
   const { cartItems, clearCart } = useCart();
@@ -15,27 +11,18 @@ export const Rfq: React.FC = () => {
   // Form State
   const [companyName, setCompanyName] = useState('');
   const [businessEmail, setBusinessEmail] = useState('');
-  const [industrySegment, setIndustrySegment] = useState('Construction & Engineering');
-  const [monthlyVolume, setMonthlyVolume] = useState('1,000 - 5,000 units');
-  const [selectedProductId, setSelectedProductId] = useState<number>(1);
-  const [sizeRange, setSizeRange] = useState('L');
-  const [quantity, setQuantity] = useState(50);
+  const [industrySegment, setIndustrySegment] = useState('Oil & Gas');
+  const [monthlyVolume, setMonthlyVolume] = useState('$50k - $250k');
   const [detailedRequirements, setDetailedRequirements] = useState('');
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const breadcrumbItems = [{ label: 'Global RFQ & Logistics' }];
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyName || !businessEmail) {
-      setFormError('Please enter your Company Name and Business Email.');
-      return;
-    }
-    if (quantity < 50) {
-      setFormError('Minimum Order Quantity (MOQ) is 50 units.');
+      setFormError('Please fill in your Company Name and Business Email.');
       return;
     }
 
@@ -49,7 +36,7 @@ export const Rfq: React.FC = () => {
             quantity: item.quantity,
             sizeRange: item.sizeRange,
           }))
-        : [{ productId: selectedProductId, quantity, sizeRange }];
+        : [{ productId: 1, quantity: 100, sizeRange: 'L' }];
 
       const response = await RfqService.submitRfq({
         companyName,
@@ -64,7 +51,7 @@ export const Rfq: React.FC = () => {
         setIsSubmitted(true);
         clearCart();
       } else {
-        setFormError(response.message || 'RFQ submission failed.');
+        setFormError(response.message || 'RFQ submission failed. Please check details.');
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to connect to RFQ service.';
@@ -75,220 +62,302 @@ export const Rfq: React.FC = () => {
   };
 
   return (
-    <div className="space-y-10">
-      <Breadcrumb items={breadcrumbItems} />
+    <div className="w-full">
+      {/* 1. Hero Section matching HTML Mockup */}
+      <section className="mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <span className="font-label-caps text-label-caps text-primary uppercase tracking-widest mb-4 block">
+              International Logistics
+            </span>
+            <h1 className="font-display-lg text-display-lg text-on-surface mb-6">
+              Global Procurement, <br />
+              <span className="text-primary">Precision Engineered.</span>
+            </h1>
+            <p className="font-body-lg text-body-lg text-on-surface-variant mb-8 max-w-xl">
+              Ghulam Safety Hub streamlines industrial safety procurement for multinational corporations. Direct-from-factory pricing combined with ISO-certified logistics management.
+            </p>
+            <div className="flex gap-8">
+              <div className="flex flex-col border-l-2 border-primary pl-4">
+                <span className="font-headline-lg text-headline-lg font-bold">24h</span>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">Quote Turnaround</span>
+              </div>
+              <div className="flex flex-col border-l-2 border-primary pl-4">
+                <span className="font-headline-lg text-headline-lg font-bold">140+</span>
+                <span className="font-body-sm text-body-sm text-on-surface-variant">Global Hubs</span>
+              </div>
+            </div>
+          </div>
 
-      <SectionHeader
-        badge="ENTERPRISE PROCUREMENT"
-        title="Global Logistics & Bulk RFQ"
-        subtitle="Submit your high-volume safety equipment request for factory-direct quotes and maritime dispatch schedules."
-      />
-
-      {isSubmitted ? (
-        <div className="max-w-2xl mx-auto bg-surface-container industrial-border p-10 rounded-sm text-center space-y-6">
-          <span className="material-symbols-outlined text-primary text-6xl animate-bounce">verified</span>
-          <h2 className="font-headline-lg text-3xl text-on-surface font-extrabold">RFQ Submitted Successfully!</h2>
-          <p className="font-body-lg text-on-surface-variant max-w-md mx-auto">
-            Your inquiry has been assigned to our Key Account Engineering Desk. A formal quotation will be sent to <strong className="text-primary">{businessEmail}</strong> within 4 business hours.
-          </p>
-          <div className="pt-4 flex justify-center gap-4">
-            <Button variant="primary" onClick={() => setIsSubmitted(false)}>
-              Submit Another Inquiry
-            </Button>
+          <div className="relative h-[400px] rounded-lg overflow-hidden border border-outline-variant group">
+            <img
+              src={HERO_WAREHOUSE_IMG}
+              alt="A high-angle architectural shot of a massive, technologically advanced distribution warehouse for industrial safety gear."
+              className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80';
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent pointer-events-none" />
           </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          <div className="lg:col-span-7 bg-surface-container industrial-border p-8 rounded-sm space-y-8">
-            <div className="border-b border-outline-variant pb-4">
-              <h3 className="font-headline-lg text-2xl text-on-surface font-bold">Wholesale Inquiry Form</h3>
-              <p className="font-body-sm text-on-surface-variant">Fill in your enterprise details below for custom pricing.</p>
+      </section>
+
+      {/* 2. Bento Grid Benefits Section matching HTML Mockup */}
+      <section className="mb-20">
+        <h2 className="font-headline-lg text-headline-lg mb-8 font-extrabold">Factory Direct Benefits</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-auto md:h-[500px]">
+          {/* Bento Item 1 */}
+          <div className="md:col-span-2 md:row-span-2 bg-surface-container/70 backdrop-blur-md p-8 flex flex-col justify-end border border-outline-variant/60 rounded-sm">
+            <span className="material-symbols-outlined text-primary mb-4" style={{ fontSize: '48px' }}>
+              factory
+            </span>
+            <h3 className="font-title-md text-title-md font-bold mb-2">Eliminate Middlemen</h3>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Direct sourcing from our manufacturing lines in South Asia and Europe reduces procurement costs by up to 35% for bulk safety equipment orders.
+            </p>
+          </div>
+
+          {/* Bento Item 2 */}
+          <div className="md:col-span-2 bg-surface-container/70 backdrop-blur-md p-8 flex items-center gap-6 border border-outline-variant/60 rounded-sm">
+            <div className="p-4 bg-surface-container-highest rounded-lg">
+              <span className="material-symbols-outlined text-primary text-3xl">verified</span>
             </div>
+            <div>
+              <h3 className="font-title-md text-title-md font-bold mb-1">ISO 9001:2015 Certified</h3>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Every shipment undergoes triple-point inspection protocols before clearing the factory floor.
+              </p>
+            </div>
+          </div>
 
-            {formError && (
-              <div className="p-4 bg-error/10 border border-error/40 text-error rounded-xs font-body-sm">
-                {formError}
-              </div>
-            )}
+          {/* Bento Item 3 */}
+          <div className="bg-surface-container/70 backdrop-blur-md p-6 border border-outline-variant/60 rounded-sm flex flex-col justify-center">
+            <span className="material-symbols-outlined text-primary mb-3 text-3xl">speed</span>
+            <h3 className="font-body-lg font-bold mb-1">Rapid Transit</h3>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Priority air-freight lanes for critical safety outages.
+            </p>
+          </div>
 
+          {/* Bento Item 4 */}
+          <div className="bg-surface-container/70 backdrop-blur-md p-6 border border-outline-variant/60 rounded-sm flex flex-col justify-center">
+            <span className="material-symbols-outlined text-primary mb-3 text-3xl">inventory</span>
+            <h3 className="font-body-lg font-bold mb-1">Reserve Stock</h3>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Client-specific inventory holding for contract holders.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Form & Distribution Section matching HTML Mockup */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
+        {/* Professional Form */}
+        <div className="lg:col-span-7 bg-surface-container/70 backdrop-blur-md p-10 border border-outline-variant/60 rounded-sm">
+          <h2 className="font-headline-lg text-headline-lg mb-2 font-extrabold">Request Bulk Quote</h2>
+          <p className="font-body-sm text-body-sm text-on-surface-variant mb-10">
+            Our enterprise team responds within 24 business hours. Professional inquiries only.
+          </p>
+
+          {isSubmitted ? (
+            <div className="bg-surface-container-high border border-primary/40 p-8 rounded-sm text-center space-y-4">
+              <span className="material-symbols-outlined text-primary text-6xl animate-bounce">verified</span>
+              <h3 className="font-headline-lg text-2xl text-on-surface font-extrabold">RFQ Initialized Successfully!</h3>
+              <p className="font-body-sm text-on-surface-variant max-w-md mx-auto">
+                Your enterprise inquiry has been received. Our Dubai & European desk will send formal quotation documents to <strong className="text-primary">{businessEmail}</strong>.
+              </p>
+              <button
+                type="button"
+                onClick={() => setIsSubmitted(false)}
+                className="bg-primary-container text-on-primary-container px-6 py-2 font-bold text-sm orange-glow transition-all rounded-xs uppercase tracking-wider cursor-pointer"
+              >
+                Submit Another Request
+              </button>
+            </div>
+          ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-4">
-                <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
-                  1. Company & Contact Details
-                </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    label="Company Name *"
-                    placeholder="e.g. Apex Construction LLC"
+              {formError && (
+                <div className="p-4 bg-error/10 border border-error/40 text-error rounded-xs font-body-sm">
+                  {formError}
+                </div>
+              )}
+
+              {/* Cart Items Summary Banner (if items exist in Cart) */}
+              {cartItems.length > 0 && (
+                <div className="p-4 bg-surface-container-high border border-primary/40 rounded-xs mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider">
+                      📋 Selected Quote Cart Items ({cartItems.length}):
+                    </span>
+                    <span className="text-xs text-on-surface font-mono font-bold">
+                      {cartItems.reduce((acc, i) => acc + i.quantity, 0)} Units Total
+                    </span>
+                  </div>
+                  <div className="text-xs text-on-surface-variant space-y-1 max-h-24 overflow-y-auto">
+                    {cartItems.map((item, idx) => (
+                      <div key={idx} className="flex justify-between">
+                        <span>• {item.title} (Size: {item.sizeRange || 'L'})</span>
+                        <span className="font-mono">{item.quantity} units</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+                    Company Name
+                  </label>
+                  <input
+                    type="text"
+                    required
                     value={companyName}
                     onChange={e => setCompanyName(e.target.value)}
-                    required
+                    placeholder="Global Logistics Corp"
+                    className="bg-surface-container-lowest border border-outline-variant p-3 text-on-surface focus:outline-none focus:border-primary-fixed-dim rounded-xs font-body-sm"
                   />
-                  <Input
-                    label="Business Email *"
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+                    Business Email
+                  </label>
+                  <input
                     type="email"
-                    placeholder="procurement@apex.com"
+                    required
                     value={businessEmail}
                     onChange={e => setBusinessEmail(e.target.value)}
-                    required
+                    placeholder="procurement@corp.com"
+                    className="bg-surface-container-lowest border border-outline-variant p-3 text-on-surface focus:outline-none focus:border-primary-fixed-dim rounded-xs font-body-sm"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Select
-                    label="Industry Segment"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+                    Industry Segment
+                  </label>
+                  <select
                     value={industrySegment}
                     onChange={e => setIndustrySegment(e.target.value)}
-                    options={[
-                      { value: 'Construction & Engineering', label: 'Construction & Engineering' },
-                      { value: 'Oil & Gas Sector', label: 'Oil & Gas Sector' },
-                      { value: 'Manufacturing & Fab', label: 'Manufacturing & Fabrication' },
-                      { value: 'Maritime & Logistics', label: 'Maritime & Logistics' },
-                      { value: 'Mining & Energy', label: 'Mining & Heavy Energy' },
-                    ]}
-                  />
-                  <Select
-                    label="Monthly Volume Estimate"
+                    className="bg-surface-container-lowest border border-outline-variant p-3 text-on-surface focus:outline-none focus:border-primary-fixed-dim rounded-xs font-body-sm cursor-pointer"
+                  >
+                    <option value="Oil & Gas">Oil & Gas</option>
+                    <option value="Manufacturing">Manufacturing</option>
+                    <option value="Construction">Construction</option>
+                    <option value="Logistics">Logistics</option>
+                    <option value="Mining & Heavy Energy">Mining & Heavy Energy</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+                    Estimated Monthly Volume
+                  </label>
+                  <select
                     value={monthlyVolume}
                     onChange={e => setMonthlyVolume(e.target.value)}
-                    options={[
-                      { value: '50 - 500 units', label: '50 - 500 units' },
-                      { value: '500 - 1,000 units', label: '500 - 1,000 units' },
-                      { value: '1,000 - 5,000 units', label: '1,000 - 5,000 units' },
-                      { value: '5,000+ units', label: '5,000+ units (Container)' },
-                    ]}
-                  />
+                    className="bg-surface-container-lowest border border-outline-variant p-3 text-on-surface focus:outline-none focus:border-primary-fixed-dim rounded-xs font-body-sm cursor-pointer"
+                  >
+                    <option value="$10k - $50k">$10k - $50k</option>
+                    <option value="$50k - $250k">$50k - $250k</option>
+                    <option value="$250k+">$250k+ (Container Vessel)</option>
+                  </select>
                 </div>
               </div>
 
-              <div className="space-y-4 pt-4 border-t border-outline-variant">
-                <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
-                  2. Product & Quantity Selection
-                </h4>
-
-                <Select
-                  label="Selected Product Line"
-                  value={String(selectedProductId)}
-                  onChange={e => setSelectedProductId(Number(e.target.value))}
-                  options={[
-                    { value: '1', label: 'GSH Elite Industrial Working Gloves' },
-                    { value: '2', label: 'TitanShield Precision Assembly Gloves' },
-                    { value: '3', label: 'Vulcan Heat-Resistant Heavy Welding Gloves' },
-                    { value: '4', label: 'Pro-Vis Class 2 High-Visibility Safety Vest' },
-                    { value: '5', label: 'IronStride Anti-Puncture Steel Toe Boots' },
-                  ]}
-                />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Select
-                    label="Size Range"
-                    value={sizeRange}
-                    onChange={e => setSizeRange(e.target.value)}
-                    options={[
-                      { value: 'S', label: 'Small (S)' },
-                      { value: 'M', label: 'Medium (M)' },
-                      { value: 'L', label: 'Large (L)' },
-                      { value: 'XL', label: 'Extra Large (XL)' },
-                      { value: 'XXL', label: 'Double Extra Large (XXL)' },
-                      { value: 'Mixed', label: 'Mixed Assortment' },
-                    ]}
-                  />
-                  <Input
-                    label="Quantity (MOQ 50 Units) *"
-                    type="number"
-                    min={50}
-                    value={quantity}
-                    onChange={e => setQuantity(parseInt(e.target.value) || 50)}
-                    error={quantity < 50 ? 'MOQ is 50 units.' : undefined}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4 pt-4 border-t border-outline-variant">
-                <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
-                  3. Technical Specs & Private Labeling
-                </h4>
-                <Textarea
-                  label="Detailed Requirements / Custom Branding Notes"
-                  placeholder="Specify custom logo printing, packaging preferences, delivery deadlines, or target certification standards..."
+              <div className="flex flex-col gap-2">
+                <label className="font-label-caps text-label-caps uppercase text-on-surface-variant font-semibold">
+                  Detailed Requirements
+                </label>
+                <textarea
                   rows={4}
                   value={detailedRequirements}
                   onChange={e => setDetailedRequirements(e.target.value)}
+                  placeholder="List specific PPE standards (e.g. ANSI/ISEA 107-2020) and required SKU quantities..."
+                  className="bg-surface-container-lowest border border-outline-variant p-3 text-on-surface focus:outline-none focus:border-primary-fixed-dim rounded-xs font-body-sm"
                 />
               </div>
 
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full"
-                isLoading={isLoading}
-              >
-                SUBMIT GLOBAL RFQ INQUIRY
-              </Button>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-primary-container text-on-primary-container px-10 py-4 font-bold text-lg orange-glow transition-all hover:scale-[1.02] cursor-pointer disabled:opacity-50 uppercase tracking-wider rounded-xs"
+                >
+                  {isLoading ? 'INITIALIZING...' : 'Initialize RFQ'}
+                </button>
+                <div className="flex items-center gap-2 text-on-surface-variant text-body-sm">
+                  <span className="material-symbols-outlined text-green-400">encrypted</span>
+                  SSL Secure Transmission
+                </div>
+              </div>
             </form>
+          )}
+        </div>
+
+        {/* Hub Maps & Direct Support */}
+        <div className="lg:col-span-5 flex flex-col gap-8">
+          <div className="bg-surface-container border border-outline-variant overflow-hidden group rounded-sm">
+            <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
+              <h3 className="font-title-md text-title-md font-bold">Primary Distribution Hubs</h3>
+              <span className="font-label-caps text-label-caps text-primary font-bold">Live Status</span>
+            </div>
+            <div className="relative h-64 grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-500">
+              <img
+                src={MAP_HUBS_IMG}
+                alt="A dark, stylized map of the world shown on a high-tech digital display highlighting Dubai and Singapore hubs."
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=800&q=80';
+                }}
+              />
+              <div className="absolute inset-0 bg-primary/10 pointer-events-none" />
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="flex items-start gap-4">
+                <span className="material-symbols-outlined text-primary mt-1">location_on</span>
+                <div>
+                  <p className="font-bold">Dubai Logistics City (HQ)</p>
+                  <p className="text-body-sm text-on-surface-variant">Plot B-24, Free Zone Area, UAE</p>
+                  <p className="text-body-sm font-label-caps text-primary mt-1 font-bold">Status: Operational</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <span className="material-symbols-outlined text-primary mt-1">location_on</span>
+                <div>
+                  <p className="font-bold">Singapore Maritime Hub</p>
+                  <p className="text-body-sm text-on-surface-variant">Jurong West, Gateway Drive</p>
+                  <p className="text-body-sm font-label-caps text-primary mt-1 font-bold">Status: High Volume</p>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="lg:col-span-5 space-y-6">
-            {cartItems.length > 0 && (
-              <div className="bg-surface-container industrial-border p-6 rounded-sm space-y-4">
-                <div className="flex justify-between items-center border-b border-outline-variant pb-3">
-                  <h4 className="font-label-caps text-xs text-primary font-bold uppercase tracking-widest">
-                    Selected Cart Items ({cartItems.length})
-                  </h4>
-                  <button onClick={clearCart} className="text-xs text-on-surface-variant hover:text-primary">Clear</button>
-                </div>
-                <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
-                  {cartItems.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center text-xs text-on-surface">
-                      <div>
-                        <span className="font-bold block">{item.title}</span>
-                        <span className="text-on-surface-variant">Size: {item.sizeRange} | Qty: {item.quantity}</span>
-                      </div>
-                      <span className="font-mono font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</span>
-                    </div>
-                  ))}
-                </div>
+          <div className="bg-surface-container/70 backdrop-blur-md p-8 border border-outline-variant/60 flex flex-col gap-4 rounded-sm">
+            <h4 className="font-title-md text-title-md font-bold">Direct Support</h4>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full border border-primary flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-primary">support_agent</span>
               </div>
-            )}
-
-            <GlassCard className="space-y-4">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-primary text-3xl">flight_takeoff</span>
-                <h4 className="font-title-md text-xl text-on-surface font-bold">Global Shipping Corridors</h4>
+              <div>
+                <p className="font-bold">Global Sales Hotline</p>
+                <p className="text-body-sm text-on-surface-variant font-mono">+971 4 555 0192</p>
               </div>
-              <p className="font-body-sm text-on-surface-variant leading-relaxed">
-                Direct export dispatch from our Dubai Logistics City distribution hub and Singapore Maritime Corridor. Accelerated air-freight options available for urgent plant shutdowns.
-              </p>
-            </GlassCard>
-
-            <GlassCard className="space-y-4 border-l-4 border-l-primary-container">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-primary text-3xl">support_agent</span>
-                <h4 className="font-title-md text-xl text-on-surface font-bold">Direct Key Account Support</h4>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full border border-primary flex items-center justify-center shrink-0">
+                <span className="material-symbols-outlined text-primary">mail</span>
               </div>
-              <p className="font-body-sm text-on-surface-variant">
-                Need immediate engineering consultation or custom sample kits dispatched to your facility?
-              </p>
-              <div className="space-y-2 pt-2 text-sm text-on-surface font-mono">
-                <p>Email: <a href="mailto:bulk@ghulamsafety.com" className="text-primary hover:underline">bulk@ghulamsafety.com</a></p>
-                <p>Phone: <a href="tel:+97145550192" className="text-primary hover:underline">+971 4 555 0192</a></p>
+              <div>
+                <p className="font-bold">Enterprise Desk</p>
+                <p className="text-body-sm text-on-surface-variant font-mono">bulk@ghulamsafety.com</p>
               </div>
-              <a
-                href="https://wa.me/97145550192?text=Inquiry%20from%20RFQ%20Page"
-                target="_blank"
-                rel="noreferrer"
-                className="block pt-2"
-              >
-                <Button variant="outline" size="sm" className="w-full">
-                  WhatsApp Support Desk
-                </Button>
-              </a>
-            </GlassCard>
+            </div>
           </div>
         </div>
-      )}
+      </section>
     </div>
   );
 };
