@@ -19,6 +19,15 @@ const ALL_SIZES_LIST = [
   { label: 'Double XL (XXL)', code: 'XXL' },
 ];
 
+const getImageUrl = (url?: string) => {
+  if (!url) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+    return url;
+  }
+  const backendBase = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1').replace('/api/v1', '');
+  return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
+};
+
 export const AdminProducts: React.FC = () => {
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [categories, setCategories] = useState<AdminCategoryItem[]>([]);
@@ -39,7 +48,8 @@ export const AdminProducts: React.FC = () => {
   // Interactive Size Availability Checkboxes
   const [checkedSizeCodes, setCheckedSizeCodes] = useState<string[]>(['S', 'M', 'L', 'XL']);
 
-  // Media Files & Per-Size Mapping State (Capped strictly at 4 photos)
+  // Media State: Existing database images + Newly uploaded files
+  const [existingImages, setExistingImages] = useState<Array<{ url: string; is_primary: boolean; size_code: string }>>([]);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [fileSizeCodes, setFileSizeCodes] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -96,6 +106,7 @@ export const AdminProducts: React.FC = () => {
     setStockStatus('IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
     setDescription('');
+    setExistingImages([]);
     setSelectedFiles([]);
     setFileSizeCodes([]);
     setErrorMsg('');
@@ -105,7 +116,7 @@ export const AdminProducts: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (product: ProductCardData) => {
+  const openEditModal = async (product: ProductCardData) => {
     setEditingProduct(product);
     setSku(product.sku);
     setTitle(product.title);
@@ -114,38 +125,94 @@ export const AdminProducts: React.FC = () => {
     setMoq(String(product.moq));
     setStockStatus(product.stockStatus || 'IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
-    setDescription(product.description || 'Product specification & engineering notes.');
+    setDescription(product.description || '');
+    setExistingImages([]);
     setSelectedFiles([]);
     setFileSizeCodes([]);
     setErrorMsg('');
     setIsModalOpen(true);
+
+    // Fetch full details including existing gallery images and size options
+    try {
+      const res = await ProductService.getProductBySlug(product.slug);
+      if (res.success && res.data) {
+        const detail = res.data;
+        setDescription(detail.description || '');
+
+        // Parse checked size codes from size_options
+        const sizeOptStr = detail.size_options || detail.sizeOptions || '';
+        const codes: string[] = [];
+        if (sizeOptStr.includes('(S)') || sizeOptStr.includes('Small')) codes.push('S');
+        if (sizeOptStr.includes('(M)') || sizeOptStr.includes('Medium')) codes.push('M');
+        if (sizeOptStr.includes('(L)') || sizeOptStr.includes('Large')) codes.push('L');
+        if (sizeOptStr.includes('(XL)') || sizeOptStr.includes('Extra Large')) codes.push('XL');
+        if (sizeOptStr.includes('(XXL)') || sizeOptStr.includes('Double XL')) codes.push('XXL');
+        setCheckedSizeCodes(codes.length > 0 ? codes : ['S', 'M', 'L', 'XL']);
+
+        // Load existing gallery images
+        if (detail.gallery && detail.gallery.length > 0) {
+          setExistingImages(detail.gallery.map(g => ({
+            url: g.url,
+            is_primary: g.is_primary || false,
+            size_code: g.size_code || 'GENERAL',
+          })));
+        } else if (detail.primaryImage) {
+          setExistingImages([{
+            url: detail.primaryImage,
+            is_primary: true,
+            size_code: 'GENERAL',
+          }]);
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch product details for edit:', err);
+    }
   };
+
+  const totalImageCount = existingImages.length + selectedFiles.length;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const newFiles = Array.from(e.target.files);
     
-    // Strict limit of maximum 4 images total
-    const combinedFiles = [...selectedFiles, ...newFiles];
-    if (combinedFiles.length > 4) {
-      alert('Maximum 4 product photos allowed. Extra images have been trimmed.');
+    // Strict limit of maximum 4 images total (existing + new)
+    const availableSlots = 4 - existingImages.length;
+    if (availableSlots <= 0) {
+      alert('Maximum 4 product photos reached. Remove existing photos first to add new ones.');
+      e.target.value = '';
+      return;
+    }
+
+    if (newFiles.length > availableSlots) {
+      alert(`Only ${availableSlots} more photo(s) can be added (Maximum 4 allowed). Extra images trimmed.`);
     }
     
-    const cappedFiles = combinedFiles.slice(0, 4);
-    setSelectedFiles(cappedFiles);
+    const cappedNewFiles = newFiles.slice(0, availableSlots);
+    const combinedFiles = [...selectedFiles, ...cappedNewFiles];
+    setSelectedFiles(combinedFiles);
     
-    const newCodes = newFiles.map(() => 'GENERAL');
-    setFileSizeCodes([...fileSizeCodes, ...newCodes].slice(0, 4));
+    const newCodes = cappedNewFiles.map(() => 'GENERAL');
+    setFileSizeCodes([...fileSizeCodes, ...newCodes]);
     
     e.target.value = '';
   };
 
-  const removeFile = (indexToRemove: number) => {
+  const removeExistingImage = (indexToRemove: number) => {
+    setExistingImages(existingImages.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const updateExistingImageSizeCode = (index: number, newCode: string) => {
+    const updated = [...existingImages];
+    updated[index].size_code = newCode;
+    setExistingImages(updated);
+  };
+
+  const removeNewFile = (indexToRemove: number) => {
     setSelectedFiles(selectedFiles.filter((_, idx) => idx !== indexToRemove));
     setFileSizeCodes(fileSizeCodes.filter((_, idx) => idx !== indexToRemove));
   };
 
-  const handleSizeCodeChange = (index: number, value: string) => {
+  const handleNewSizeCodeChange = (index: number, value: string) => {
     const updated = [...fileSizeCodes];
     updated[index] = value;
     setFileSizeCodes(updated);
@@ -184,7 +251,10 @@ export const AdminProducts: React.FC = () => {
 
       formData.append('description', description || title);
 
-      // Append size mappings for each uploaded file index
+      // Append kept existing images JSON
+      formData.append('existing_images', JSON.stringify(existingImages));
+
+      // Append size mappings for each newly uploaded file index
       const mappingsObj: Record<number, string> = {};
       fileSizeCodes.forEach((code, idx) => {
         if (code && code !== 'GENERAL') {
@@ -193,9 +263,9 @@ export const AdminProducts: React.FC = () => {
       });
       formData.append('size_mappings', JSON.stringify(mappingsObj));
 
-      // Append selected photo files (max 4)
+      // Append selected new photo files
       if (selectedFiles.length > 0) {
-        selectedFiles.slice(0, 4).forEach(file => {
+        selectedFiles.forEach(file => {
           formData.append('images', file);
         });
       }
@@ -372,65 +442,57 @@ export const AdminProducts: React.FC = () => {
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 
-          {/* Multi-Image Upload & Accumulating Per-Size Photo Manager (Max 4 Photos) */}
+          {/* Multi-Image Gallery Manager (Existing MySQL Photos + Newly Uploaded Photos) */}
           <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-4">
             <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
-                  📸 Upload Product Photos ({selectedFiles.length} / 4 Max)
+                  📸 Product Photos Gallery ({totalImageCount} / 4 Max Photos)
                 </label>
-                {selectedFiles.length >= 4 ? (
+                {totalImageCount >= 4 ? (
                   <span className="text-[11px] text-amber-400 font-mono font-bold">
                     ⚠️ Maximum 4 Photos Limit Reached
                   </span>
                 ) : (
-                  selectedFiles.length > 0 && (
+                  totalImageCount > 0 && (
                     <span className="text-[11px] text-emerald-400 font-mono font-bold">
-                      ✓ {selectedFiles.length} Image(s) Selected
+                      ✓ {totalImageCount} Image(s) Attached
                     </span>
                   )
                 )}
               </div>
               <p className="text-[11px] text-on-surface-variant">
-                Upload up to 4 images max. Assign each photo to a size category or leave as General.
+                Manage existing database photos and add new images (max 4 photos total). Assign each photo to a size category or General.
               </p>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                disabled={selectedFiles.length >= 4}
-                onChange={handleFileChange}
-                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container file:text-primary hover:file:bg-surface-variant cursor-pointer pt-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
             </div>
 
-            {/* List selected files with live thumbnail preview, size assignment dropdown, and remove button */}
-            {selectedFiles.length > 0 && (
-              <div className="space-y-3 pt-2 border-t border-outline-variant/60">
-                <span className="text-xs font-bold text-on-surface block">
-                  Attached Photos List ({selectedFiles.length} / 4 Images):
+            {/* Render Existing Database Photos if editing */}
+            {existingImages.length > 0 && (
+              <div className="space-y-2 pt-1">
+                <span className="text-xs font-bold text-primary block">
+                  Current Database Photos ({existingImages.length} Existing):
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {selectedFiles.map((file, idx) => (
-                    <div key={idx} className="bg-surface-container p-3 border border-outline-variant/60 rounded-xs flex items-center justify-between gap-3 text-xs shadow-sm">
+                  {existingImages.map((img, idx) => (
+                    <div key={`existing-${idx}`} className="bg-surface-container p-3 border border-outline-variant/60 rounded-xs flex items-center justify-between gap-3 text-xs shadow-sm">
                       <div className="flex items-center gap-3 truncate">
                         <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Preview ${idx + 1}`}
+                          src={getImageUrl(img.url)}
+                          alt={`Existing ${idx + 1}`}
                           className="w-12 h-12 object-cover rounded-xs border border-outline-variant shrink-0"
                         />
                         <div className="truncate">
-                          <span className="font-bold text-primary block truncate">
-                            {idx === 0 ? '★ Primary Photo' : `Photo ${idx + 1}`}
+                          <span className="font-bold text-on-surface block truncate">
+                            {img.is_primary ? '★ Primary Photo' : `Photo ${idx + 1}`}
                           </span>
-                          <span className="text-on-surface-variant text-[11px] truncate block">{file.name}</span>
+                          <span className="text-emerald-400 text-[10px] font-mono block">Saved in Database</span>
                         </div>
                       </div>
 
                       <div className="flex flex-col items-end gap-1 shrink-0">
                         <select
-                          value={fileSizeCodes[idx] || 'GENERAL'}
-                          onChange={e => handleSizeCodeChange(idx, e.target.value)}
+                          value={img.size_code || 'GENERAL'}
+                          onChange={e => updateExistingImageSizeCode(idx, e.target.value)}
                           className="bg-surface-container-high border border-outline-variant rounded-xs px-2 py-1 text-xs text-on-surface focus:border-primary focus:outline-none"
                         >
                           <option value="GENERAL">General (All Sizes)</option>
@@ -442,7 +504,72 @@ export const AdminProducts: React.FC = () => {
                         </select>
                         <button
                           type="button"
-                          onClick={() => removeFile(idx)}
+                          onClick={() => removeExistingImage(idx)}
+                          className="text-[10px] text-error hover:underline font-mono"
+                        >
+                          ✖ Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* File Input for Uploading New Photos */}
+            <div className="pt-2">
+              <label className="text-xs font-bold text-on-surface block mb-1">
+                + Upload Additional / Replacement Photos:
+              </label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                disabled={totalImageCount >= 4}
+                onChange={handleFileChange}
+                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container file:text-primary hover:file:bg-surface-variant cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+
+            {/* Render Newly Selected Files */}
+            {selectedFiles.length > 0 && (
+              <div className="space-y-3 pt-2 border-t border-outline-variant/60">
+                <span className="text-xs font-bold text-emerald-400 block">
+                  Newly Selected Photos ({selectedFiles.length} Pending Upload):
+                </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {selectedFiles.map((file, idx) => (
+                    <div key={`new-${idx}`} className="bg-surface-container p-3 border border-outline-variant/60 rounded-xs flex items-center justify-between gap-3 text-xs shadow-sm">
+                      <div className="flex items-center gap-3 truncate">
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={`New Preview ${idx + 1}`}
+                          className="w-12 h-12 object-cover rounded-xs border border-outline-variant shrink-0"
+                        />
+                        <div className="truncate">
+                          <span className="font-bold text-primary block truncate">
+                            {existingImages.length === 0 && idx === 0 ? '★ Primary Photo' : `New Photo ${idx + 1}`}
+                          </span>
+                          <span className="text-on-surface-variant text-[11px] truncate block">{file.name}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <select
+                          value={fileSizeCodes[idx] || 'GENERAL'}
+                          onChange={e => handleNewSizeCodeChange(idx, e.target.value)}
+                          className="bg-surface-container-high border border-outline-variant rounded-xs px-2 py-1 text-xs text-on-surface focus:border-primary focus:outline-none"
+                        >
+                          <option value="GENERAL">General (All Sizes)</option>
+                          {ALL_SIZES_LIST.filter(item => checkedSizeCodes.includes(item.code)).map(item => (
+                            <option key={item.code} value={item.code}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          onClick={() => removeNewFile(idx)}
                           className="text-[10px] text-error hover:underline font-mono"
                         >
                           ✖ Remove

@@ -37,7 +37,7 @@ export class AdminProductController {
 
   /**
    * PUT /api/v1/admin/products/:id
-   * Update existing product details & optional uploaded files with size mappings
+   * Update existing product details & optional uploaded files with size mappings & existing images
    */
   static async updateProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -45,8 +45,15 @@ export class AdminProductController {
       const parsedBody = updateAdminProductSchema.parse(req.body);
       const files = req.files as Express.Multer.File[] | undefined;
       const sizeMappingsJson = req.body.size_mappings as string | undefined;
+      const existingImagesJson = req.body.existing_images as string | undefined;
 
-      const product = await AdminProductService.updateProduct(id, parsedBody, files, sizeMappingsJson);
+      const product = await AdminProductService.updateProduct(
+        id,
+        parsedBody,
+        files,
+        sizeMappingsJson,
+        existingImagesJson
+      );
 
       if (!product) {
         res.status(404).json({

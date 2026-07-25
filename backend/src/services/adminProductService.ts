@@ -94,13 +94,14 @@ export class AdminProductService {
   }
 
   /**
-   * Update product by ID and process uploaded multi-images with size_code mappings
+   * Update product by ID and process uploaded multi-images & kept existing images with size_code mappings
    */
   static async updateProduct(
     id: number,
     input: AdminUpdateProductInput,
     files?: Express.Multer.File[],
-    sizeMappingsJson?: string
+    sizeMappingsJson?: string,
+    existingImagesJson?: string
   ): Promise<ProductDetailDto | null> {
     const success = await AdminProductModel.updateProduct(id, input);
 
@@ -113,21 +114,50 @@ export class AdminProductService {
       }
     }
 
-    if (files && files.length > 0) {
+    if (existingImagesJson !== undefined || (files && files.length > 0)) {
       const oldImages = await ProductModel.findProductImages(id);
       await dbPool.query('DELETE FROM product_images WHERE product_id = ?', [id]);
-      
-      // Clean up old orphaned files from disk
-      for (const img of oldImages) {
-        this.deletePhysicalFile(img.image_url);
+
+      let isFirst = true;
+      const reinsertedUrls = new Set<string>();
+
+      // 1. Re-insert kept existing images
+      if (existingImagesJson) {
+        try {
+          const keptImages = JSON.parse(existingImagesJson);
+          if (Array.isArray(keptImages)) {
+            for (const img of keptImages) {
+              if (img && img.url) {
+                const isPrimary = isFirst;
+                isFirst = false;
+                reinsertedUrls.add(img.url);
+                await AdminProductModel.insertProductImage(id, img.url, isPrimary, false, img.size_code || null);
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('[Admin Product Service]: Failed to parse existingImagesJson:', err);
+        }
       }
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const imageUrl = `/uploads/${file.filename}`;
-        const isPrimary = i === 0;
-        const sizeCode = sizeMappings[i] || null;
-        await AdminProductModel.insertProductImage(id, imageUrl, isPrimary, false, sizeCode);
+      // 2. Insert newly uploaded files
+      if (files && files.length > 0) {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const imageUrl = `/uploads/${file.filename}`;
+          const isPrimary = isFirst;
+          isFirst = false;
+          const sizeCode = sizeMappings[i] || null;
+          reinsertedUrls.add(imageUrl);
+          await AdminProductModel.insertProductImage(id, imageUrl, isPrimary, false, sizeCode);
+        }
+      }
+
+      // 3. Clean up physical disk files for any old image URLs that were removed
+      for (const img of oldImages) {
+        if (!reinsertedUrls.has(img.image_url)) {
+          this.deletePhysicalFile(img.image_url);
+        }
       }
     }
 

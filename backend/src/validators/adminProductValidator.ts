@@ -15,7 +15,7 @@ export const createAdminProductSchema = z.object({
   rating_score: z.coerce.number().min(0).max(5).optional().default(5.0),
   review_count: z.coerce.number().int().nonnegative().optional().default(0),
   is_featured: z.coerce.boolean().optional().default(false),
-  video_url: z.string().trim().optional(),
+  existing_images: z.string().optional(),
   specs: z.string().optional(),
   features: z.string().optional(),
 });
