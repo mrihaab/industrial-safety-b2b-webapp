@@ -86,6 +86,8 @@ export class ProductService {
         primaryImage: imageUrl,
         image_url: imageUrl,
         description: row.description,
+        isFeatured: Boolean(row.is_featured),
+        is_featured: Boolean(row.is_featured),
         status_tag: row.status_tag || 'Safety-System-Active',
         short_tag: row.tag_name || 'Industrial Safety',
         certifications: certifications.length > 0 ? certifications : ['CE Certified'],

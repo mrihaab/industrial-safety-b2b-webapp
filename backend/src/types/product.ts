@@ -65,6 +65,8 @@ export interface ProductListItemDto {
   status_tag: string;
   short_tag: string;
   image_url: string;
+  isFeatured?: boolean;
+  is_featured?: boolean;
   certifications: string[];
 }
 
