@@ -83,10 +83,7 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Logout Button */}
-        <div className="pt-6 border-t border-outline-variant space-y-3">
-          <Link to="/" className="block text-center font-label-caps text-xs text-primary hover:underline">
-            ← Back to Public Portal
-          </Link>
+        <div className="pt-6 border-t border-outline-variant">
           <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
             Sign Out Admin
           </Button>
