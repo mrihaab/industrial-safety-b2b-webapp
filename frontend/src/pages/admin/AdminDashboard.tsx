@@ -9,21 +9,21 @@ export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      setLoading(true);
-      try {
-        const response = await AdminDashboardService.getStats();
-        if (response.success && response.data) {
-          setStats(response.data);
-        }
-      } catch (err: unknown) {
-        console.warn('API error fetching dashboard stats:', err);
-      } finally {
-        setLoading(false);
+  const fetchStats = async () => {
+    setLoading(true);
+    try {
+      const response = await AdminDashboardService.getStats();
+      if (response.success && response.data) {
+        setStats(response.data);
       }
-    };
+    } catch (err: unknown) {
+      console.warn('API error fetching dashboard stats:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchStats();
   }, []);
 
@@ -41,7 +41,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Executive Control Center</h1>
-          <p className="font-body-sm text-on-surface-variant">Real-time inventory metrics, RFQ requests, and catalog management.</p>
+          <p className="font-body-sm text-on-surface-variant">Real-time inventory metrics, RFQ requests, and catalog management from MySQL database.</p>
         </div>
         <div className="flex gap-3">
           <Link to="/admin/products">
@@ -129,9 +129,9 @@ export const AdminDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Dynamic Data Tables */}
+      {/* Dynamic Real-Time Data Tables */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Recent Products */}
+        {/* Recent Inventory Additions */}
         <div className="lg:col-span-6 space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-headline-lg text-xl font-bold text-on-surface">Recent Inventory Additions</h3>
@@ -139,7 +139,7 @@ export const AdminDashboard: React.FC = () => {
               View All
             </Link>
           </div>
-          <div className="bg-surface-container industrial-border rounded-sm overflow-hidden">
+          <div className="bg-surface-container industrial-border rounded-sm overflow-hidden shadow-xl">
             <table className="w-full text-left font-body-sm text-sm">
               <thead className="bg-surface-container-high border-b border-outline-variant font-label-caps text-xs text-primary uppercase">
                 <tr>
@@ -165,7 +165,9 @@ export const AdminDashboard: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-on-surface-variant">No products found in database.</td>
+                    <td colSpan={4} className="py-8 text-center text-on-surface-variant font-body-sm">
+                      No products found in inventory.
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -173,7 +175,7 @@ export const AdminDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Recent Inquiries */}
+        {/* Recent Wholesale Inquiries */}
         <div className="lg:col-span-6 space-y-4">
           <div className="flex justify-between items-center">
             <h3 className="font-headline-lg text-xl font-bold text-on-surface">Latest Wholesale RFQs</h3>
@@ -181,7 +183,7 @@ export const AdminDashboard: React.FC = () => {
               View All
             </Link>
           </div>
-          <div className="bg-surface-container industrial-border rounded-sm overflow-hidden">
+          <div className="bg-surface-container industrial-border rounded-sm overflow-hidden shadow-xl">
             <table className="w-full text-left font-body-sm text-sm">
               <thead className="bg-surface-container-high border-b border-outline-variant font-label-caps text-xs text-primary uppercase">
                 <tr>
@@ -196,10 +198,10 @@ export const AdminDashboard: React.FC = () => {
                   stats.latestInquiries.map(inq => (
                     <tr key={inq.id} className="hover:bg-surface-container-high transition-colors">
                       <td className="py-3 px-4 font-bold text-on-surface">{inq.company_name}</td>
-                      <td className="py-3 px-4 text-on-surface-variant">{inq.industry_segment}</td>
+                      <td className="py-3 px-4 text-on-surface-variant">{inq.industry_segment || 'Industrial Safety'}</td>
                       <td className="py-3 px-4">
                         <Badge variant={inq.status === 'pending' ? 'warning' : 'success'}>
-                          {inq.status.toUpperCase()}
+                          {(inq.status || 'pending').toUpperCase()}
                         </Badge>
                       </td>
                       <td className="py-3 px-4 text-right">
@@ -211,7 +213,9 @@ export const AdminDashboard: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="py-6 text-center text-on-surface-variant">No inquiries submitted yet.</td>
+                    <td colSpan={4} className="py-8 text-center text-on-surface-variant font-body-sm">
+                      No RFQ inquiries submitted yet.
+                    </td>
                   </tr>
                 )}
               </tbody>

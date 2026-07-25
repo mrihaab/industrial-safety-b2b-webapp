@@ -41,6 +41,11 @@ export async function testRfqApi() {
   }
   console.log('[RFQ API Test]: Verified Items DB Rows count:', items.length, 'Quantity:', items[0].quantity, 'Size Range:', items[0].size_range);
 
+  // Clean up test inquiry row after assertion verification
+  await dbPool.query('DELETE FROM rfq_items WHERE rfq_id = ?', [response.rfq_id]);
+  await dbPool.query('DELETE FROM rfq_inquiries WHERE id = ?', [response.rfq_id]);
+  console.log('[RFQ API Test]: Test RFQ row cleaned up cleanly.');
+
   console.log('[RFQ API Test]: ALL RFQ MODULE CHECKS PASSED SUCCESSFULLY.');
 }
 
