@@ -44,6 +44,7 @@ export const AdminProducts: React.FC = () => {
   const [moq, setMoq] = useState('50');
   const [stockStatus, setStockStatus] = useState('IN STOCK');
   const [description, setDescription] = useState('');
+  const [isFeatured, setIsFeatured] = useState(false);
 
   // Interactive Size Availability Checkboxes
   const [checkedSizeCodes, setCheckedSizeCodes] = useState<string[]>(['S', 'M', 'L', 'XL']);
@@ -59,7 +60,7 @@ export const AdminProducts: React.FC = () => {
     setLoading(true);
     try {
       const [prodRes, catRes] = await Promise.all([
-        ProductService.getProducts(),
+        ProductService.getProducts({ limit: 50 }),
         AdminCategoryService.getCategories(),
       ]);
 
@@ -106,6 +107,7 @@ export const AdminProducts: React.FC = () => {
     setStockStatus('IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
     setDescription('');
+    setIsFeatured(false);
     setExistingImages([]);
     setSelectedFiles([]);
     setFileSizeCodes([]);
@@ -126,6 +128,7 @@ export const AdminProducts: React.FC = () => {
     setStockStatus(product.stockStatus || 'IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
     setDescription(product.description || '');
+    setIsFeatured(Boolean(product.isFeatured || (product as any).is_featured));
     setExistingImages([]);
     setSelectedFiles([]);
     setFileSizeCodes([]);
@@ -138,6 +141,7 @@ export const AdminProducts: React.FC = () => {
       if (res.success && res.data) {
         const detail = res.data;
         setDescription(detail.description || '');
+        setIsFeatured(Boolean(detail.isFeatured || (detail as any).is_featured));
 
         // Parse checked size codes from size_options
         const sizeOptStr = detail.size_options || detail.sizeOptions || '';
@@ -241,6 +245,7 @@ export const AdminProducts: React.FC = () => {
       formData.append('price', price);
       formData.append('moq', moq);
       formData.append('stock_status', stockStatus);
+      formData.append('is_featured', isFeatured ? '1' : '0');
 
       // Generate human readable size options string from checked checkboxes
       const activeSizeLabels = ALL_SIZES_LIST
@@ -301,7 +306,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Configure product catalog, check size availability, upload max 4 photos bound to available sizes, and manage inventory.</p>
+          <p className="font-body-sm text-on-surface-variant">Configure product catalog, toggle featured Home page status, check size availability, and manage inventory.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -327,32 +332,44 @@ export const AdminProducts: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-outline-variant/40">
               {products.length > 0 ? (
-                products.map(prod => (
-                  <tr key={prod.id} className="hover:bg-surface-container-high transition-colors">
-                    <td className="py-4 px-6 font-mono text-xs font-bold text-on-surface">{prod.sku}</td>
-                    <td className="py-4 px-6 font-bold text-on-surface">{prod.title}</td>
-                    <td className="py-4 px-6 font-mono font-bold text-primary">${Number(prod.price).toFixed(2)}</td>
-                    <td className="py-4 px-6 font-mono text-xs">{prod.moq} units</td>
-                    <td className="py-4 px-6">
-                      <Badge variant={prod.stockStatus === 'IN STOCK' ? 'success' : 'warning'}>
-                        {prod.stockStatus || 'IN STOCK'}
-                      </Badge>
-                    </td>
-                    <td className="py-4 px-6 text-right space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => openEditModal(prod)}>
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-error hover:bg-error/10"
-                        onClick={() => handleDeleteProduct(prod.id)}
-                      >
-                        Delete
-                      </Button>
-                    </td>
-                  </tr>
-                ))
+                products.map(prod => {
+                  const isProdFeatured = Boolean(prod.isFeatured || (prod as any).is_featured);
+                  return (
+                    <tr key={prod.id} className="hover:bg-surface-container-high transition-colors">
+                      <td className="py-4 px-6 font-mono text-xs font-bold text-on-surface">{prod.sku}</td>
+                      <td className="py-4 px-6 font-bold text-on-surface">
+                        <div className="flex items-center gap-2">
+                          <span>{prod.title}</span>
+                          {isProdFeatured && (
+                            <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[10px] font-mono font-bold rounded-xs">
+                              ⭐ Featured
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6 font-mono font-bold text-primary">${Number(prod.price).toFixed(2)}</td>
+                      <td className="py-4 px-6 font-mono text-xs">{prod.moq} units</td>
+                      <td className="py-4 px-6">
+                        <Badge variant={prod.stockStatus === 'IN STOCK' ? 'success' : 'warning'}>
+                          {prod.stockStatus || 'IN STOCK'}
+                        </Badge>
+                      </td>
+                      <td className="py-4 px-6 text-right space-x-2">
+                        <Button variant="outline" size="sm" onClick={() => openEditModal(prod)}>
+                          Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-error hover:bg-error/10"
+                          onClick={() => handleDeleteProduct(prod.id)}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan={6} className="py-12 text-center text-on-surface-variant">
@@ -402,6 +419,21 @@ export const AdminProducts: React.FC = () => {
           <Input label="Product Title *" value={title} onChange={e => setTitle(e.target.value)} required />
           <Input label="URL Slug" value={slug} onChange={e => setSlug(e.target.value)} placeholder="Auto-generated from title if blank" />
 
+          {/* ⭐ Feature Product Checkbox */}
+          <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs">
+            <label className="flex items-center gap-3 cursor-pointer text-xs font-bold text-on-surface">
+              <input
+                type="checkbox"
+                checked={isFeatured}
+                onChange={e => setIsFeatured(e.target.checked)}
+                className="accent-primary w-4 h-4 cursor-pointer"
+              />
+              <span className="text-primary font-bold">
+                ⭐ Feature this Product on Home Page (Display in Featured PPE Gear section)
+              </span>
+            </label>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input label="Wholesale Price ($) *" type="number" step="0.01" value={price} onChange={e => setPrice(e.target.value)} required />
             <Input label="MOQ (Min 50) *" type="number" min={50} value={moq} onChange={e => setMoq(e.target.value)} required />
@@ -442,7 +474,7 @@ export const AdminProducts: React.FC = () => {
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 
-          {/* Multi-Image Gallery Manager (Existing MySQL Photos + Newly Uploaded Photos) */}
+          {/* Multi-Image Gallery Manager */}
           <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-4">
             <div className="space-y-1">
               <div className="flex justify-between items-center">

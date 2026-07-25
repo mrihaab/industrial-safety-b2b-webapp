@@ -79,6 +79,8 @@ export interface ProductDetailDto {
   stock_status: string;
   status_tag: string;
   description: string;
+  isFeatured?: boolean;
+  is_featured?: boolean;
   size_options?: string;
   rating_score: number;
   review_count: number;

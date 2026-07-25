@@ -134,6 +134,8 @@ export class ProductService {
       sizeOptions: product.size_options || 'Assorted S/M/L/XL',
       primaryImage: primaryImage ? primaryImage.image_url : '/uploads/gsh-glove-1.jpg',
       description: product.description,
+      isFeatured: Boolean(product.is_featured),
+      is_featured: Boolean(product.is_featured),
       images: images.map(img => img.image_url),
       gallery: images.map(img => ({
         url: img.image_url,

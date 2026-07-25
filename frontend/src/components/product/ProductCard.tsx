@@ -16,6 +16,8 @@ export interface ProductCardData {
   reviewCount?: number;
   primaryImage?: string;
   description?: string;
+  isFeatured?: boolean;
+  is_featured?: boolean;
   certifications?: string[];
 }
 
