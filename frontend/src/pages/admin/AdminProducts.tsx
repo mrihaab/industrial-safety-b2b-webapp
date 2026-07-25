@@ -39,7 +39,7 @@ export const AdminProducts: React.FC = () => {
   // Interactive Size Availability Checkboxes
   const [checkedSizeCodes, setCheckedSizeCodes] = useState<string[]>(['S', 'M', 'L', 'XL']);
 
-  // Media Files & Per-Size Mapping State
+  // Media Files & Per-Size Mapping State (Capped strictly at 4 photos)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [fileSizeCodes, setFileSizeCodes] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -124,11 +124,19 @@ export const AdminProducts: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
     const newFiles = Array.from(e.target.files);
-    // Append newly chosen files to existing files array so admin can select 3-4 images together or iteratively
+    
+    // Strict limit of maximum 4 images total
     const combinedFiles = [...selectedFiles, ...newFiles];
-    setSelectedFiles(combinedFiles);
-    setFileSizeCodes([...fileSizeCodes, ...newFiles.map(() => 'GENERAL')]);
-    // Reset input value so same files can be re-selected if needed
+    if (combinedFiles.length > 4) {
+      alert('Maximum 4 product photos allowed. Extra images have been trimmed.');
+    }
+    
+    const cappedFiles = combinedFiles.slice(0, 4);
+    setSelectedFiles(cappedFiles);
+    
+    const newCodes = newFiles.map(() => 'GENERAL');
+    setFileSizeCodes([...fileSizeCodes, ...newCodes].slice(0, 4));
+    
     e.target.value = '';
   };
 
@@ -185,9 +193,9 @@ export const AdminProducts: React.FC = () => {
       });
       formData.append('size_mappings', JSON.stringify(mappingsObj));
 
-      // Append selected photo files
+      // Append selected photo files (max 4)
       if (selectedFiles.length > 0) {
-        selectedFiles.forEach(file => {
+        selectedFiles.slice(0, 4).forEach(file => {
           formData.append('images', file);
         });
       }
@@ -198,7 +206,7 @@ export const AdminProducts: React.FC = () => {
         await AdminProductService.createProduct(formData);
       }
 
-      fetchData();
+      await fetchData();
       setIsModalOpen(false);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Save failed.';
@@ -223,7 +231,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Configure product catalog, check size availability, upload 3-4 photos bound to available sizes, and manage inventory.</p>
+          <p className="font-body-sm text-on-surface-variant">Configure product catalog, check size availability, upload max 4 photos bound to available sizes, and manage inventory.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -364,28 +372,35 @@ export const AdminProducts: React.FC = () => {
 
           <Textarea label="Description *" value={description} onChange={e => setDescription(e.target.value)} rows={3} />
 
-          {/* Multi-Image Upload & Accumulating Per-Size Photo Manager */}
+          {/* Multi-Image Upload & Accumulating Per-Size Photo Manager (Max 4 Photos) */}
           <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-4">
             <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
-                  📸 Upload Product Photos ({selectedFiles.length} / 4 Selected)
+                  📸 Upload Product Photos ({selectedFiles.length} / 4 Max)
                 </label>
-                {selectedFiles.length > 0 && (
-                  <span className="text-[11px] text-emerald-400 font-mono font-bold">
-                    ✓ {selectedFiles.length} Image(s) Attached
+                {selectedFiles.length >= 4 ? (
+                  <span className="text-[11px] text-amber-400 font-mono font-bold">
+                    ⚠️ Maximum 4 Photos Limit Reached
                   </span>
+                ) : (
+                  selectedFiles.length > 0 && (
+                    <span className="text-[11px] text-emerald-400 font-mono font-bold">
+                      ✓ {selectedFiles.length} Image(s) Selected
+                    </span>
+                  )
                 )}
               </div>
               <p className="text-[11px] text-on-surface-variant">
-                Select 3 to 4 images together in the file dialog, or add them one-by-one. Each photo can be assigned to a specific size or set as General.
+                Upload up to 4 images max. Assign each photo to a size category or leave as General.
               </p>
               <input
                 type="file"
                 multiple
                 accept="image/*"
+                disabled={selectedFiles.length >= 4}
                 onChange={handleFileChange}
-                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container file:text-primary hover:file:bg-surface-variant cursor-pointer pt-2"
+                className="w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xs file:border-0 file:bg-surface-container file:text-primary hover:file:bg-surface-variant cursor-pointer pt-2 disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
@@ -393,7 +408,7 @@ export const AdminProducts: React.FC = () => {
             {selectedFiles.length > 0 && (
               <div className="space-y-3 pt-2 border-t border-outline-variant/60">
                 <span className="text-xs font-bold text-on-surface block">
-                  Attached Photos List ({selectedFiles.length} Images):
+                  Attached Photos List ({selectedFiles.length} / 4 Images):
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {selectedFiles.map((file, idx) => (
@@ -440,7 +455,8 @@ export const AdminProducts: React.FC = () => {
             )}
           </div>
 
-          <div className="pt-4 flex justify-end gap-3 border-t border-outline-variant">
+          {/* Clean Modal Action Buttons Footer */}
+          <div className="pt-4 pb-1 flex items-center justify-end gap-3 border-t border-outline-variant/80 mt-6 sticky bottom-0 bg-surface-container">
             <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>

@@ -33,22 +33,22 @@ export const Modal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-surface/80 backdrop-blur-md transition-opacity" onClick={onClose} />
 
       {/* Modal Box */}
-      <div className={cn('relative w-full max-w-lg bg-surface-container industrial-border rounded-lg shadow-2xl z-10 p-6 flex flex-col gap-4', className)}>
-        <div className="flex items-center justify-between border-b border-outline-variant pb-3">
+      <div className={cn('relative w-full max-w-lg bg-surface-container industrial-border rounded-sm shadow-2xl z-10 p-6 sm:p-8 flex flex-col gap-4 my-auto', className)}>
+        <div className="flex items-center justify-between border-b border-outline-variant pb-3 shrink-0">
           {title && <h3 className="font-title-md text-title-md text-primary font-bold">{title}</h3>}
           <button
             onClick={onClose}
-            className="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-lg p-1"
+            className="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-lg p-1 cursor-pointer"
           >
             ✕
           </button>
         </div>
-        <div className="max-h-[75vh] overflow-y-auto pr-1">{children}</div>
+        <div className="max-h-[72vh] overflow-y-auto pr-2">{children}</div>
       </div>
     </div>
   );
