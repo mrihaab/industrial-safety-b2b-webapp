@@ -13,7 +13,7 @@ interface FilterSidebarProps {
 }
 
 const SIDEBAR_CERTIFICATIONS = [
-  'CE Marked',
+  'CE Certified',
   'ANSI / ISEA 107',
   'ISO 9001:2015',
   'OSHA Ready',

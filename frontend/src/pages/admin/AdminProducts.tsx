@@ -20,7 +20,7 @@ const ALL_SIZES_LIST = [
 ];
 
 const STANDARD_CERTIFICATIONS = [
-  'CE Marked',
+  'CE Certified',
   'ISO 9001:2015',
   'ANSI / ISEA 107',
   'EN 388:2016',

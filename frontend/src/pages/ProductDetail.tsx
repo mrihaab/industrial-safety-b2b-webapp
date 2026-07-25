@@ -40,7 +40,7 @@ const FALLBACK_PRODUCT: ProductDetailDto = {
     { url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80', is_primary: false, size_code: 'L' },
   ],
   specs: [
-    { key: 'Impact Protection', value: 'Level 3 (EN 388)' },
+    { key: 'Certification', value: 'CE Certified' },
     { key: 'Abrasion Rating', value: '4X (High Intensity)' },
     { key: 'Thermal Resistance', value: 'Up to 250°C' },
     { key: 'Material Composition', value: 'Nitri-Flex / Kevlar' },

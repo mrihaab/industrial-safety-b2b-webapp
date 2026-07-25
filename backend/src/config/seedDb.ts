@@ -42,7 +42,7 @@ export async function seedDatabase() {
     await connection.query('DELETE FROM product_specs WHERE product_id = ?', [productId]);
     await connection.query(`
       INSERT INTO product_specs (product_id, spec_key, spec_value) VALUES
-      (?, 'Impact Protection', 'Level 3 (EN 388)'),
+      (?, 'Certification', 'CE Certified'),
       (?, 'Abrasion Rating', '4X (High Intensity)'),
       (?, 'Thermal Resistance', 'Up to 250°C'),
       (?, 'Material Composition', 'Nitri-Flex / Kevlar');
