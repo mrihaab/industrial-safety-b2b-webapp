@@ -145,12 +145,12 @@ export const ProductDetail: React.FC = () => {
     .map(s => s.trim())
     .filter(Boolean);
 
-  const displaySpecs = product.specs && product.specs.length > 0 ? product.specs : [
+  const displaySpecs = (product.specs && product.specs.length > 0 ? product.specs : [
     { key: 'Impact Protection', value: 'Level 3 (EN 388)' },
     { key: 'Abrasion Rating', value: '4X (High Intensity)' },
     { key: 'Thermal Resistance', value: 'Up to 250°C' },
     { key: 'Material Composition', value: 'Nitri-Flex / Kevlar' },
-  ];
+  ]).slice(0, 4);
 
   const displayFeatures = product.features && product.features.length > 0 ? product.features : [
     { title: 'Anatomical Fit', description: 'Contoured design reduces hand fatigue during long shifts. Curved finger construction mimics natural rest position for improved dexterity in high-precision tasks.', icon: 'construction' },

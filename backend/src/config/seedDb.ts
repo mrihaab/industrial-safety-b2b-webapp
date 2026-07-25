@@ -35,20 +35,18 @@ export async function seedDatabase() {
       INSERT INTO product_images (product_id, image_url, is_primary, is_video) VALUES
       (?, '/uploads/gsh-glove-1.jpg', TRUE, FALSE),
       (?, '/uploads/gsh-glove-2.jpg', FALSE, FALSE),
-      (?, '/uploads/gsh-glove-3.jpg', FALSE, FALSE),
-      (?, '/uploads/gsh-glove-video.mp4', FALSE, TRUE);
-    `, [productId, productId, productId, productId]);
+      (?, '/uploads/gsh-glove-3.jpg', FALSE, FALSE);
+    `, [productId, productId, productId]);
 
-    // 4. Clear & Insert Product Specs
+    // 4. Clear & Insert Product Specs (Exactly 4 items matching HTML mockup)
     await connection.query('DELETE FROM product_specs WHERE product_id = ?', [productId]);
     await connection.query(`
       INSERT INTO product_specs (product_id, spec_key, spec_value) VALUES
       (?, 'Impact Protection', 'Level 3 (EN 388)'),
       (?, 'Abrasion Rating', '4X (High Intensity)'),
       (?, 'Thermal Resistance', 'Up to 250°C'),
-      (?, 'Material Composition', 'Nitri-Flex / Kevlar'),
-      (?, 'Compliance Certification', 'CE EN 388');
-    `, [productId, productId, productId, productId, productId]);
+      (?, 'Material Composition', 'Nitri-Flex / Kevlar');
+    `, [productId, productId, productId, productId]);
 
     // 5. Clear & Insert Product Features
     await connection.query('DELETE FROM product_features WHERE product_id = ?', [productId]);
