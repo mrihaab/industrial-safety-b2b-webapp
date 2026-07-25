@@ -269,19 +269,31 @@ export const ProductDetail: React.FC = () => {
           </div>
 
           {/* Certification Badges matching HTML Mockup */}
-          <div className="flex flex-wrap gap-4 mb-10">
-            <div className="flex items-center gap-2 px-3 py-2 bg-surface-container-high industrial-border rounded">
-              <span className="material-symbols-outlined text-primary text-[20px]">verified</span>
-              <span className="font-label-caps text-label-caps">CE EN388:2016</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-surface-container-high industrial-border rounded">
-              <span className="material-symbols-outlined text-primary text-[20px]">workspace_premium</span>
-              <span className="font-label-caps text-label-caps">ISO 9001:2015</span>
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-surface-container-high industrial-border rounded">
-              <span className="material-symbols-outlined text-primary text-[20px]">security</span>
-              <span className="font-label-caps text-label-caps">ANSI CUT A4</span>
-            </div>
+          <div className="flex flex-wrap gap-3.5 mb-10">
+            {((product.certifications && product.certifications.length > 0)
+              ? product.certifications
+              : ['CE Certified', 'ISO 9001:2015', 'ANSI / ISEA 107']
+            ).map((cert, idx) => {
+              const lower = cert.toLowerCase();
+              let iconName = 'verified';
+              if (lower.includes('iso')) iconName = 'workspace_premium';
+              else if (lower.includes('ansi') || lower.includes('osha') || lower.includes('reach') || lower.includes('shield')) iconName = 'shield';
+              else if (lower.includes('en') || lower.includes('ce') || lower.includes('ukca')) iconName = 'verified';
+
+              return (
+                <div
+                  key={idx}
+                  className="flex items-center gap-3 px-4 py-3 bg-surface-container-high/90 border border-outline-variant/80 rounded-xs shadow-sm hover:border-primary/60 transition-colors"
+                >
+                  <span className="material-symbols-outlined text-primary text-[20px] flex-shrink-0">
+                    {iconName}
+                  </span>
+                  <span className="font-mono text-xs text-primary font-extrabold tracking-widest uppercase whitespace-nowrap">
+                    {cert}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           {/* Bulk Ordering Section matching HTML Mockup */}
