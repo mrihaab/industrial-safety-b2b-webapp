@@ -1,19 +1,28 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
 import { ProductCard, ProductCardData } from '@/components/product/ProductCard';
 import { Loader } from '@/components/ui/Loader';
 import { ProductService } from '@/services/productService';
 
 export const Catalog: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const urlSearch = searchParams.get('search') || '';
+
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [stockFilter, setStockFilter] = useState('all');
   const [sortBy, setSortBy] = useState('Performance Tier');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+
+  useEffect(() => {
+    setSearchQuery(urlSearch);
+    setCurrentPage(1);
+  }, [urlSearch]);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -95,7 +104,13 @@ export const Catalog: React.FC = () => {
                 PPE & Safety Gear
               </h1>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Showing 1-{products.length} of {totalCount > 0 ? totalCount : 148} industrial-grade solutions
+                {searchQuery ? (
+                  <span>
+                    Search results for <strong className="text-primary font-mono font-bold">"{searchQuery}"</strong> ({products.length} found)
+                  </span>
+                ) : (
+                  <span>Showing 1-{products.length} of {totalCount > 0 ? totalCount : 148} industrial-grade solutions</span>
+                )}
               </p>
             </div>
             <div className="flex items-center gap-3 bg-surface-container-low border border-outline-variant px-3 py-2">
@@ -128,10 +143,10 @@ export const Catalog: React.FC = () => {
               <span className="material-symbols-outlined text-primary text-5xl">search_off</span>
               <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Products Found</h3>
               <p className="font-body-sm text-on-surface-variant max-w-sm mx-auto">
-                No safety items match your selected category filters. Try clearing your search or category parameters.
+                No safety items match {searchQuery ? `search query "${searchQuery}"` : 'your selected filters'}. Try clearing your search parameters.
               </p>
               <button onClick={handleReset} className="font-label-caps text-primary underline text-sm">
-                Clear Filters
+                Clear Search & Filters
               </button>
             </div>
           )}

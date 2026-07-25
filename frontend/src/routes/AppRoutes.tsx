@@ -7,6 +7,7 @@ import Home from '@/pages/Home';
 import About from '@/pages/About';
 import Catalog from '@/pages/Catalog';
 import ProductDetail from '@/pages/ProductDetail';
+import Cart from '@/pages/Cart';
 import Rfq from '@/pages/Rfq';
 import Contact from '@/pages/Contact';
 import AdminLogin from '@/pages/admin/AdminLogin';
@@ -26,8 +27,9 @@ export const AppRoutes: React.FC = () => {
           <Route path="about" element={<About />} />
           <Route path="products" element={<Catalog />} />
           <Route path="products/:slug" element={<ProductDetail />} />
-          <Route path="contact" element={<Contact />} />
+          <Route path="cart" element={<Cart />} />
           <Route path="rfq" element={<Rfq />} />
+          <Route path="contact" element={<Contact />} />
         </Route>
 
         {/* Admin Login Route */}
