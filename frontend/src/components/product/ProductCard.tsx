@@ -25,7 +25,7 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const getImageUrl = (url?: string) => {
-    if (!url) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+    if (!url) return 'https://lh3.googleusercontent.com/aida-public/AB6AXuBcxW-JBzpn977rn1IhHg-x0oBELAiNoAQKlnPpgVkxlgienmXVezWj3pQkOWmkBKY2auB7H1l0QFCDRYORkbrB6OnEuUIfEQeb4lpbuQBB7ZqDZVixsCw9GHM3T7GP214LnQt7fW-rkR3R5Ewa8_Tp3OQMHBzJs3LBkasF2q5YKeNzyk5yXbJxPvrrHeRjkiCqwJSXbpcods-hxbvleRjHNMAEJe3-yKbXITx0cDCnOEpU17RBA2odRQ5_xKw_aykL4Lol2mN4CTQ';
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
       return url;
     }
@@ -34,69 +34,69 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   const imageUrl = getImageUrl(product.primaryImage);
-  const statusBadge = product.statusTag || 'SAFETY-SYSTEM-ACTIVE';
+  const statusBadge = product.statusTag || 'Safety-System-Active';
   const displayPrice = formatPrice(product.price);
-  const descText = product.description || 'Reinforced Kevlar stitching with anti-vibration padding for high-impact protection.';
+  const descText = product.description || 'Reinforced Kevlar stitching with anti-vibration padding for high-impact industrial operations.';
 
   return (
-    <div className="group bg-[#051424] border border-[#ff6b00]/30 hover:border-[#ff6b00] p-3 rounded-xs shadow-2xl flex flex-col justify-between space-y-4 transition-all duration-300">
-      {/* Top Image Container */}
-      <div className="relative aspect-4/3 bg-[#0a1f33] overflow-hidden flex items-center justify-center rounded-xs border border-outline-variant/30">
-        {/* Top Right Orange Badge */}
-        <span className="absolute top-2 right-2 z-10 bg-[#ff6b00] text-black font-mono font-extrabold text-[10px] px-2.5 py-1 tracking-wider uppercase rounded-none shadow-md">
+    <div className="group bg-surface-container border border-outline-variant relative overflow-hidden transition-all hover:border-primary flex flex-col justify-between">
+      {/* LED Active Status Tag Top Right */}
+      <div className="absolute top-2 right-2 z-10">
+        <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-2 py-1 uppercase font-bold led-active">
           {statusBadge}
         </span>
+      </div>
 
-        {/* Product Image Link */}
+      {/* Top Image Container */}
+      <div className="aspect-square bg-surface-container-highest overflow-hidden relative">
         <Link to={`/products/${product.slug}`} className="w-full h-full block">
           <img
             src={imageUrl}
             alt={product.title}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80';
+              (e.target as HTMLImageElement).src = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBcxW-JBzpn977rn1IhHg-x0oBELAiNoAQKlnPpgVkxlgienmXVezWj3pQkOWmkBKY2auB7H1l0QFCDRYORkbrB6OnEuUIfEQeb4lpbuQBB7ZqDZVixsCw9GHM3T7GP214LnQt7fW-rkR3R5Ewa8_Tp3OQMHBzJs3LBkasF2q5YKeNzyk5yXbJxPvrrHeRjkiCqwJSXbpcods-hxbvleRjHNMAEJe3-yKbXITx0cDCnOEpU17RBA2odRQ5_xKw_aykL4Lol2mN4CTQ';
             }}
-            className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
           />
         </Link>
+        <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60" />
       </div>
 
-      {/* Content Body */}
-      <div className="space-y-3 px-1 flex-1 flex flex-col justify-between">
-        <div className="space-y-1.5">
-          {/* Title & Price Line */}
-          <div className="flex items-start justify-between gap-2">
-            <Link to={`/products/${product.slug}`} className="flex-1">
-              <h3 className="font-headline-lg text-lg text-[#d4e4fa] font-extrabold group-hover:text-[#ff6b00] transition-colors leading-tight line-clamp-1">
+      {/* Card Content Body */}
+      <div className="p-stack-md flex-1 flex flex-col justify-between space-y-3">
+        <div>
+          <div className="flex justify-between items-start mb-2 gap-2">
+            <Link to={`/products/${product.slug}`}>
+              <h3 className="font-title-md text-title-md text-on-surface group-hover:text-primary transition-colors font-bold line-clamp-1">
                 {product.title}
               </h3>
             </Link>
-            <span className="font-mono text-base font-extrabold text-[#ff6b00] whitespace-nowrap">
+            <span className="font-label-caps text-label-caps text-primary font-bold whitespace-nowrap">
               {displayPrice}
             </span>
           </div>
 
-          {/* Description Line */}
-          <p className="font-body-sm text-xs text-on-surface-variant/90 line-clamp-2 leading-relaxed">
+          <p className="font-body-sm text-body-sm text-on-surface-variant mb-4 line-clamp-2">
             {descText}
           </p>
         </div>
 
-        <div className="space-y-3 pt-1">
-          {/* Rectangular Certification Badges */}
-          <div className="flex flex-wrap gap-2">
-            <span className="border border-emerald-500/60 text-emerald-400 font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider bg-emerald-950/20">
+        <div className="space-y-3">
+          {/* Certification Badges */}
+          <div className="flex items-center gap-2 mb-stack-lg">
+            <span className="px-2 py-0.5 border border-green-500/30 text-green-400 font-label-caps text-[10px] uppercase">
               CE EN 388
             </span>
-            <span className="border border-[#ff6b00]/60 text-[#ff6b00] font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider bg-orange-950/20">
-              LEVEL 5 CUT
+            <span className="px-2 py-0.5 border border-outline-variant text-on-surface-variant font-label-caps text-[10px] uppercase">
+              Level 5 Cut
             </span>
           </div>
 
-          {/* Full Width Orange Button - Navigates directly to Product Detail Page */}
+          {/* Add to Order Button */}
           <Link to={`/products/${product.slug}`} className="block w-full">
-            <button className="w-full bg-[#ff6b00] hover:bg-[#e05e00] text-black font-mono font-extrabold text-xs py-2.5 px-4 rounded-none flex items-center justify-center gap-2 uppercase tracking-widest transition-all orange-glow">
-              <span className="material-symbols-outlined text-sm font-bold">add_shopping_cart</span>
-              ADD TO ORDER
+            <button className="w-full bg-primary-container text-on-primary-container py-3 font-label-caps text-label-caps font-bold orange-glow uppercase flex items-center justify-center gap-2 cursor-pointer transition-all active:opacity-80">
+              <span className="material-symbols-outlined text-[18px]">add_shopping_cart</span>
+              Add to Order
             </button>
           </Link>
         </div>

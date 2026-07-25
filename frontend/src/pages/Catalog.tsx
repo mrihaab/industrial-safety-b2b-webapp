@@ -1,10 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Breadcrumb } from '@/components/layout/Breadcrumb';
-import { SectionHeader } from '@/components/layout/SectionHeader';
 import { FilterSidebar } from '@/components/catalog/FilterSidebar';
-import { SortBar } from '@/components/catalog/SortBar';
 import { ProductCard, ProductCardData } from '@/components/product/ProductCard';
-import { Pagination } from '@/components/ui/Pagination';
 import { Loader } from '@/components/ui/Loader';
 import { ProductService } from '@/services/productService';
 
@@ -13,12 +9,11 @@ export const Catalog: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [stockFilter, setStockFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('featured');
+  const [sortBy, setSortBy] = useState('Performance Tier');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  const breadcrumbItems = [{ label: 'PPE & Safety Catalog' }];
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -38,6 +33,9 @@ export const Catalog: React.FC = () => {
           const pagination = response.pagination || response.meta;
           if (pagination) {
             setTotalPages(pagination.totalPages || 1);
+            setTotalCount(pagination.total || response.data.length);
+          } else {
+            setTotalCount(response.data.length);
           }
         }
       } catch (err: unknown) {
@@ -53,22 +51,15 @@ export const Catalog: React.FC = () => {
   const handleReset = () => {
     setSelectedCategory('all');
     setStockFilter('all');
-    setSortBy('featured');
+    setSortBy('Performance Tier');
     setSearchQuery('');
     setCurrentPage(1);
   };
 
   return (
-    <div className="space-y-8">
-      <Breadcrumb items={breadcrumbItems} />
-
-      <SectionHeader
-        badge="WHOLESALE CATALOG"
-        title="Industrial PPE & Safety Equipment"
-        subtitle="Explore ISO-certified safety gloves, workwear, high-visibility apparel, and industrial protective gear."
-      />
-
-      <div className="flex flex-col lg:flex-row gap-8">
+    <div className="w-full">
+      <div className="flex flex-col md:flex-row gap-gutter">
+        {/* Filter Sidebar matching HTML Mockup */}
         <FilterSidebar
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
@@ -77,30 +68,49 @@ export const Catalog: React.FC = () => {
           onReset={handleReset}
         />
 
-        <div className="flex-1 space-y-6">
-          <SortBar
-            totalItems={products.length}
-            sortBy={sortBy}
-            onSortChange={setSortBy}
-            onSearch={setSearchQuery}
-          />
+        {/* Product Grid Area matching HTML Mockup */}
+        <div className="flex-1">
+          {/* Catalog Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-stack-lg gap-4">
+            <div>
+              <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
+                PPE & Safety Gear
+              </h1>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Showing 1-{products.length} of {totalCount > 0 ? totalCount : 148} industrial-grade solutions
+              </p>
+            </div>
+            <div className="flex items-center gap-3 bg-surface-container-low border border-outline-variant px-3 py-2">
+              <span className="font-label-caps text-label-caps text-on-surface-variant">Sort By:</span>
+              <select
+                value={sortBy}
+                onChange={e => setSortBy(e.target.value)}
+                className="bg-transparent border-none focus:ring-0 text-body-sm font-body-sm text-primary pr-8 py-0 focus:outline-none cursor-pointer"
+              >
+                <option value="Performance Tier" className="bg-surface text-on-surface">Performance Tier</option>
+                <option value="Newest Arrivals" className="bg-surface text-on-surface">Newest Arrivals</option>
+                <option value="Price: High to Low" className="bg-surface text-on-surface">Price: High to Low</option>
+              </select>
+            </div>
+          </div>
 
+          {/* Product Grid */}
           {loading ? (
             <div className="py-20 flex justify-center items-center">
               <Loader size="lg" />
             </div>
           ) : products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <div className="bg-surface-container industrial-border p-12 text-center rounded-sm space-y-4">
+            <div className="bg-surface-container border border-outline-variant p-12 text-center rounded-xs space-y-4">
               <span className="material-symbols-outlined text-primary text-5xl">search_off</span>
               <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Products Found</h3>
               <p className="font-body-sm text-on-surface-variant max-w-sm mx-auto">
-                No safety items match your selected filters or database query. Try resetting your parameters.
+                No safety items match your selected filters. Try clearing your search or category filters.
               </p>
               <button onClick={handleReset} className="font-label-caps text-primary underline text-sm">
                 Clear Filters
@@ -108,11 +118,40 @@ export const Catalog: React.FC = () => {
             </div>
           )}
 
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+          {/* Pagination Controls matching HTML Mockup */}
+          {totalPages > 1 && (
+            <div className="mt-stack-lg flex justify-center items-center gap-4 pt-6">
+              <button
+                disabled={currentPage <= 1}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className="material-symbols-outlined text-on-surface-variant hover:text-primary disabled:opacity-30 cursor-pointer"
+              >
+                chevron_left
+              </button>
+              <div className="flex items-center gap-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).slice(0, 5).map(pageNum => (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-8 h-8 flex items-center justify-center font-label-caps text-label-caps transition-colors cursor-pointer ${
+                      currentPage === pageNum
+                        ? 'bg-primary-container text-on-primary-container font-bold'
+                        : 'border border-outline-variant text-on-surface-variant hover:border-primary'
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+              </div>
+              <button
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                className="material-symbols-outlined text-on-surface-variant hover:text-primary disabled:opacity-30 cursor-pointer"
+              >
+                chevron_right
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
