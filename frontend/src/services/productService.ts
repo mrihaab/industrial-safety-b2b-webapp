@@ -20,6 +20,7 @@ export class ProductService {
   static async getProducts(params?: {
     category?: string;
     stock?: string;
+    certification?: string;
     sort?: string;
     search?: string;
     page?: number;

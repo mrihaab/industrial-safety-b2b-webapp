@@ -74,6 +74,14 @@ export class AdminProductService {
       }
     }
 
+    // Save certifications if provided
+    if ((input as any).certifications) {
+      const certList = String((input as any).certifications).split(',').map(c => c.trim()).filter(Boolean);
+      for (const cert of certList) {
+        await AdminProductModel.insertProductSpec(productId, 'Certification', cert);
+      }
+    }
+
     // Save features if provided
     if (featuresJson) {
       try {
@@ -158,6 +166,14 @@ export class AdminProductService {
         if (!reinsertedUrls.has(img.image_url)) {
           this.deletePhysicalFile(img.image_url);
         }
+      }
+    }
+
+    if ((input as any).certifications !== undefined) {
+      await dbPool.query("DELETE FROM product_specs WHERE product_id = ? AND (spec_key = 'Certification' OR spec_key = 'certification')", [id]);
+      const certList = String((input as any).certifications).split(',').map(c => c.trim()).filter(Boolean);
+      for (const cert of certList) {
+        await AdminProductModel.insertProductSpec(id, 'Certification', cert);
       }
     }
 

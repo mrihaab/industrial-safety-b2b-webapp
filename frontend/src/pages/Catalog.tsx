@@ -13,6 +13,7 @@ export const Catalog: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [stockFilter, setStockFilter] = useState('all');
+  const [certificationFilter, setCertificationFilter] = useState('all');
   const [sortBy, setSortBy] = useState('Performance Tier');
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,6 +33,7 @@ export const Catalog: React.FC = () => {
         const response = await ProductService.getProducts({
           category: categoryQuery,
           stock: stockFilter !== 'all' ? stockFilter : undefined,
+          certification: certificationFilter !== 'all' ? certificationFilter : undefined,
           sort: sortBy,
           search: searchQuery || undefined,
           page: currentPage,
@@ -56,7 +58,7 @@ export const Catalog: React.FC = () => {
     };
 
     fetchProducts();
-  }, [selectedCategories, stockFilter, sortBy, searchQuery, currentPage]);
+  }, [selectedCategories, stockFilter, certificationFilter, sortBy, searchQuery, currentPage]);
 
   const handleToggleCategory = (categorySlug: string) => {
     setSelectedCategories(prev => {
@@ -77,6 +79,7 @@ export const Catalog: React.FC = () => {
   const handleReset = () => {
     setSelectedCategories([]);
     setStockFilter('all');
+    setCertificationFilter('all');
     setSortBy('Performance Tier');
     setSearchQuery('');
     setCurrentPage(1);
@@ -85,17 +88,19 @@ export const Catalog: React.FC = () => {
   return (
     <div className="w-full">
       <div className="flex flex-col md:flex-row gap-gutter">
-        {/* Filter Sidebar matching HTML Mockup */}
+        {/* Filter Sidebar */}
         <FilterSidebar
           selectedCategories={selectedCategories}
           onToggleCategory={handleToggleCategory}
           onSelectAllCategories={handleSelectAllCategories}
           stockFilter={stockFilter}
           onSelectStockFilter={setStockFilter}
+          certificationFilter={certificationFilter}
+          onSelectCertificationFilter={setCertificationFilter}
           onReset={handleReset}
         />
 
-        {/* Product Grid Area matching HTML Mockup */}
+        {/* Product Grid Area */}
         <div className="flex-1">
           {/* Catalog Header */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-stack-lg gap-4">
@@ -107,6 +112,10 @@ export const Catalog: React.FC = () => {
                 {searchQuery ? (
                   <span>
                     Search results for <strong className="text-primary font-mono font-bold">"{searchQuery}"</strong> ({products.length} found)
+                  </span>
+                ) : certificationFilter !== 'all' ? (
+                  <span>
+                    Filtered by certification <strong className="text-primary font-mono font-bold">"{certificationFilter}"</strong> ({products.length} found)
                   </span>
                 ) : (
                   <span>Showing 1-{products.length} of {totalCount > 0 ? totalCount : 148} industrial-grade solutions</span>
@@ -143,7 +152,7 @@ export const Catalog: React.FC = () => {
               <span className="material-symbols-outlined text-primary text-5xl">search_off</span>
               <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Products Found</h3>
               <p className="font-body-sm text-on-surface-variant max-w-sm mx-auto">
-                No safety items match {searchQuery ? `search query "${searchQuery}"` : 'your selected filters'}. Try clearing your search parameters.
+                No safety items match your selected certification or filters. Try clearing your search parameters.
               </p>
               <button onClick={handleReset} className="font-label-caps text-primary underline text-sm">
                 Clear Search & Filters
@@ -151,7 +160,7 @@ export const Catalog: React.FC = () => {
             </div>
           )}
 
-          {/* Pagination Controls matching HTML Mockup */}
+          {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="mt-stack-lg flex justify-center items-center gap-4 pt-6">
               <button

@@ -19,6 +19,16 @@ const ALL_SIZES_LIST = [
   { label: 'Double XL (XXL)', code: 'XXL' },
 ];
 
+const STANDARD_CERTIFICATIONS = [
+  'CE Marked',
+  'ISO 9001:2015',
+  'ANSI / ISEA 107',
+  'EN 388:2016',
+  'OSHA Ready',
+  'REACH Compliant',
+  'UKCA',
+];
+
 const getImageUrl = (url?: string) => {
   if (!url) return 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
@@ -46,8 +56,9 @@ export const AdminProducts: React.FC = () => {
   const [description, setDescription] = useState('');
   const [isFeatured, setIsFeatured] = useState(false);
 
-  // Interactive Size Availability Checkboxes
+  // Interactive Size Availability & Certification Checkboxes
   const [checkedSizeCodes, setCheckedSizeCodes] = useState<string[]>(['S', 'M', 'L', 'XL']);
+  const [selectedCertifications, setSelectedCertifications] = useState<string[]>(['CE Marked', 'ISO 9001:2015']);
 
   // Media State: Existing database images + Newly uploaded files
   const [existingImages, setExistingImages] = useState<Array<{ url: string; is_primary: boolean; size_code: string }>>([]);
@@ -97,6 +108,14 @@ export const AdminProducts: React.FC = () => {
     }
   };
 
+  const toggleCertificationCheckbox = (cert: string) => {
+    if (selectedCertifications.includes(cert)) {
+      setSelectedCertifications(selectedCertifications.filter(c => c !== cert));
+    } else {
+      setSelectedCertifications([...selectedCertifications, cert]);
+    }
+  };
+
   const openCreateModal = () => {
     setEditingProduct(null);
     setSku('');
@@ -106,6 +125,7 @@ export const AdminProducts: React.FC = () => {
     setMoq('50');
     setStockStatus('IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
+    setSelectedCertifications(['CE Marked', 'ISO 9001:2015']);
     setDescription('');
     setIsFeatured(false);
     setExistingImages([]);
@@ -127,6 +147,7 @@ export const AdminProducts: React.FC = () => {
     setMoq(String(product.moq));
     setStockStatus(product.stockStatus || 'IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
+    setSelectedCertifications(product.certifications || ['CE Marked', 'ISO 9001:2015']);
     setDescription(product.description || '');
     setIsFeatured(Boolean(product.isFeatured || (product as any).is_featured));
     setExistingImages([]);
@@ -135,7 +156,6 @@ export const AdminProducts: React.FC = () => {
     setErrorMsg('');
     setIsModalOpen(true);
 
-    // Fetch full details including existing gallery images and size options
     try {
       const res = await ProductService.getProductBySlug(product.slug);
       if (res.success && res.data) {
@@ -143,7 +163,10 @@ export const AdminProducts: React.FC = () => {
         setDescription(detail.description || '');
         setIsFeatured(Boolean(detail.isFeatured || (detail as any).is_featured));
 
-        // Parse checked size codes from size_options
+        if (detail.certifications && detail.certifications.length > 0) {
+          setSelectedCertifications(detail.certifications);
+        }
+
         const sizeOptStr = detail.size_options || detail.sizeOptions || '';
         const codes: string[] = [];
         if (sizeOptStr.includes('(S)') || sizeOptStr.includes('Small')) codes.push('S');
@@ -153,7 +176,6 @@ export const AdminProducts: React.FC = () => {
         if (sizeOptStr.includes('(XXL)') || sizeOptStr.includes('Double XL')) codes.push('XXL');
         setCheckedSizeCodes(codes.length > 0 ? codes : ['S', 'M', 'L', 'XL']);
 
-        // Load existing gallery images
         if (detail.gallery && detail.gallery.length > 0) {
           setExistingImages(detail.gallery.map(g => ({
             url: g.url,
@@ -179,7 +201,6 @@ export const AdminProducts: React.FC = () => {
     if (!e.target.files) return;
     const newFiles = Array.from(e.target.files);
     
-    // Strict limit of maximum 4 images total (existing + new)
     const availableSlots = 4 - existingImages.length;
     if (availableSlots <= 0) {
       alert('Maximum 4 product photos reached. Remove existing photos first to add new ones.');
@@ -247,7 +268,10 @@ export const AdminProducts: React.FC = () => {
       formData.append('stock_status', stockStatus);
       formData.append('is_featured', isFeatured ? '1' : '0');
 
-      // Generate human readable size options string from checked checkboxes
+      // Append Certifications comma-separated string
+      formData.append('certifications', selectedCertifications.join(', '));
+
+      // Generate human readable size options string
       const activeSizeLabels = ALL_SIZES_LIST
         .filter(item => checkedSizeCodes.includes(item.code))
         .map(item => item.label);
@@ -255,11 +279,8 @@ export const AdminProducts: React.FC = () => {
       formData.append('size_options', sizeOptionsString || 'Assorted S/M/L/XL');
 
       formData.append('description', description || title);
-
-      // Append kept existing images JSON
       formData.append('existing_images', JSON.stringify(existingImages));
 
-      // Append size mappings for each newly uploaded file index
       const mappingsObj: Record<number, string> = {};
       fileSizeCodes.forEach((code, idx) => {
         if (code && code !== 'GENERAL') {
@@ -268,7 +289,6 @@ export const AdminProducts: React.FC = () => {
       });
       formData.append('size_mappings', JSON.stringify(mappingsObj));
 
-      // Append selected new photo files
       if (selectedFiles.length > 0) {
         selectedFiles.forEach(file => {
           formData.append('images', file);
@@ -306,7 +326,7 @@ export const AdminProducts: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant pb-6">
         <div>
           <h1 className="font-display-lg text-3xl font-extrabold text-on-surface">Products Inventory Management</h1>
-          <p className="font-body-sm text-on-surface-variant">Configure product catalog, toggle featured Home page status, check size availability, and manage inventory.</p>
+          <p className="font-body-sm text-on-surface-variant">Configure product catalog, set certifications, toggle featured status, check size availability, and manage inventory.</p>
         </div>
         <Button variant="primary" size="md" onClick={openCreateModal}>
           + Create Product
@@ -324,6 +344,7 @@ export const AdminProducts: React.FC = () => {
               <tr>
                 <th className="py-4 px-6">SKU</th>
                 <th className="py-4 px-6">Product Title</th>
+                <th className="py-4 px-6">Certifications</th>
                 <th className="py-4 px-6">Price</th>
                 <th className="py-4 px-6">MOQ</th>
                 <th className="py-4 px-6">Stock Status</th>
@@ -334,6 +355,7 @@ export const AdminProducts: React.FC = () => {
               {products.length > 0 ? (
                 products.map(prod => {
                   const isProdFeatured = Boolean(prod.isFeatured || (prod as any).is_featured);
+                  const certsToShow = prod.certifications || ['CE Marked'];
                   return (
                     <tr key={prod.id} className="hover:bg-surface-container-high transition-colors">
                       <td className="py-4 px-6 font-mono text-xs font-bold text-on-surface">{prod.sku}</td>
@@ -344,6 +366,18 @@ export const AdminProducts: React.FC = () => {
                             <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[10px] font-mono font-bold rounded-xs">
                               ⭐ Featured
                             </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex flex-wrap gap-1">
+                          {certsToShow.slice(0, 2).map((c, i) => (
+                            <span key={i} className="px-2 py-0.5 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono font-bold rounded-xs bg-emerald-950/30">
+                              {c}
+                            </span>
+                          ))}
+                          {certsToShow.length > 2 && (
+                            <span className="text-[10px] text-on-surface-variant font-mono">+{certsToShow.length - 2} more</span>
                           )}
                         </div>
                       </td>
@@ -372,7 +406,7 @@ export const AdminProducts: React.FC = () => {
                 })
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-on-surface-variant">
+                  <td colSpan={7} className="py-12 text-center text-on-surface-variant">
                     No products found in inventory.
                   </td>
                 </tr>
@@ -432,6 +466,29 @@ export const AdminProducts: React.FC = () => {
                 ⭐ Feature this Product on Home Page (Display in Featured PPE Gear section)
               </span>
             </label>
+          </div>
+
+          {/* 📜 Product Certifications Checkboxes */}
+          <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-3">
+            <label className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block">
+              📜 Product Certifications (Select Safety & ISO Standards)
+            </label>
+            <p className="text-[11px] text-on-surface-variant">
+              Check all certifications that apply to this product. These will be displayed on product cards and filtered in catalog.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-1">
+              {STANDARD_CERTIFICATIONS.map(cert => (
+                <label key={cert} className="flex items-center gap-2 cursor-pointer text-xs font-mono text-on-surface bg-surface-container px-3 py-2 border border-outline-variant/60 rounded-xs hover:border-primary/50">
+                  <input
+                    type="checkbox"
+                    checked={selectedCertifications.includes(cert)}
+                    onChange={() => toggleCertificationCheckbox(cert)}
+                    className="accent-primary w-4 h-4 cursor-pointer"
+                  />
+                  <span>{cert}</span>
+                </label>
+              ))}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
