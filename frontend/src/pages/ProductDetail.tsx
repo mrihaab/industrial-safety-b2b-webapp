@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { Breadcrumb } from '@/components/layout/Breadcrumb';
+import { useParams, Link } from 'react-router-dom';
 import { Loader } from '@/components/ui/Loader';
 import { useCart } from '@/contexts/CartContext';
 import { ProductService, ProductDetailDto } from '@/services/productService';
@@ -19,13 +18,13 @@ const FALLBACK_PRODUCT: ProductDetailDto = {
   slug: 'gsh-elite-industrial-gloves',
   sku: 'GSH-WG-001',
   title: 'GSH Elite Industrial Gloves',
-  seriesName: 'HEAVY DUTY SERIES',
+  seriesName: 'Heavy Duty Series',
   price: 45.00,
   moq: 50,
   stockStatus: 'IN STOCK',
   statusTag: 'NEW ARRIVAL',
   description: 'Designed for high-precision industrial environments. The GSH Elite features reinforced synthetic fiber construction with Grade-A abrasion resistance and impact-shielding knuckles. Engineered for the most demanding logistics and manufacturing workflows.',
-  ratingScore: 5.0,
+  ratingScore: 4.80,
   reviewCount: 124,
   size_options: 'Small (S), Medium (M), Large (L), Extra Large (XL)',
   sizeOptions: 'Small (S), Medium (M), Large (L), Extra Large (XL)',
@@ -41,13 +40,13 @@ const FALLBACK_PRODUCT: ProductDetailDto = {
     { url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80', is_primary: false, size_code: 'L' },
   ],
   specs: [
-    { key: 'IMPACT PROTECTION', value: 'Level 3 (EN 388)' },
-    { key: 'ABRASION RATING', value: '4X (High Intensity)' },
-    { key: 'THERMAL RESISTANCE', value: 'Up to 250°C' },
-    { key: 'MATERIAL COMPOSITION', value: 'Nitri-Flex / Kevlar' },
+    { key: 'Impact Protection', value: 'Level 3 (EN 388)' },
+    { key: 'Abrasion Rating', value: '4X (High Intensity)' },
+    { key: 'Thermal Resistance', value: 'Up to 250°C' },
+    { key: 'Material Composition', value: 'Nitri-Flex / Kevlar' },
   ],
   features: [
-    { title: 'Anatomical Fit', description: 'Contoured design reduces hand fatigue during long shifts. Curved finger construction mimics natural rest position for improved dexterity in high-precision tasks.', icon: 'build' },
+    { title: 'Anatomical Fit', description: 'Contoured design reduces hand fatigue during long shifts. Curved finger construction mimics natural rest position for improved dexterity in high-precision tasks.', icon: 'construction' },
     { title: 'Fluid Resistance', description: 'Dual-layer coating provides superior grip even when saturated with hydraulic fluids or lubricants. ISO certified for chemical splash protection.', icon: 'water_drop' },
     { title: 'Reinforced Core', description: 'Proprietary HPPE blend provides ANSI level A4 cut protection without sacrificing tactile sensitivity. 13-gauge seamless knit liner for comfort.', icon: 'shield' },
   ],
@@ -86,12 +85,6 @@ export const ProductDetail: React.FC = () => {
     fetchDetail();
   }, [slug]);
 
-  const breadcrumbItems = [
-    { label: 'Products', path: '/products' },
-    { label: 'PPE Gear', path: '/products' },
-    { label: product.title },
-  ];
-
   // Combine gallery items from API
   const rawGallery: Array<{ url: string; is_primary?: boolean; size_code?: string }> =
     (product.gallery && product.gallery.length > 0)
@@ -124,7 +117,7 @@ export const ProductDetail: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    const validQty = Math.max(50, quantity);
+    const validQty = Math.max(product.moq || 50, quantity);
     addToCart({
       productId: product.id,
       title: product.title,
@@ -152,46 +145,63 @@ export const ProductDetail: React.FC = () => {
     .map(s => s.trim())
     .filter(Boolean);
 
+  const displaySpecs = product.specs && product.specs.length > 0 ? product.specs : [
+    { key: 'Impact Protection', value: 'Level 3 (EN 388)' },
+    { key: 'Abrasion Rating', value: '4X (High Intensity)' },
+    { key: 'Thermal Resistance', value: 'Up to 250°C' },
+    { key: 'Material Composition', value: 'Nitri-Flex / Kevlar' },
+  ];
+
+  const displayFeatures = product.features && product.features.length > 0 ? product.features : [
+    { title: 'Anatomical Fit', description: 'Contoured design reduces hand fatigue during long shifts. Curved finger construction mimics natural rest position for improved dexterity in high-precision tasks.', icon: 'construction' },
+    { title: 'Fluid Resistance', description: 'Dual-layer coating provides superior grip even when saturated with hydraulic fluids or lubricants. ISO certified for chemical splash protection.', icon: 'water_drop' },
+    { title: 'Reinforced Core', description: 'Proprietary HPPE blend provides ANSI level A4 cut protection without sacrificing tactile sensitivity. 13-gauge seamless knit liner for comfort.', icon: 'shield' },
+  ];
+
   return (
-    <div className="space-y-16">
+    <div className="w-full">
       {addedToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#051424] border border-[#ff6b00] text-[#ff6b00] px-6 py-3 rounded-none shadow-2xl font-mono text-xs uppercase tracking-widest animate-bounce">
+        <div className="fixed bottom-6 right-6 z-50 bg-surface-container-high border border-primary text-primary px-6 py-3 rounded-lg shadow-2xl font-label-caps text-xs uppercase tracking-widest animate-bounce">
           ✓ Added {quantity} pairs ({selectedSizeRange}) to Bulk RFQ Cart!
         </div>
       )}
 
-      <Breadcrumb items={breadcrumbItems} />
+      {/* Breadcrumbs matching HTML Mockup */}
+      <nav className="flex items-center gap-2 mb-stack-lg text-on-surface-variant font-body-sm">
+        <Link to="/products" className="hover:text-primary">Products</Link>
+        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <Link to="/products" className="hover:text-primary">PPE Gear</Link>
+        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
+        <span className="text-on-surface">{product.title}</span>
+      </nav>
 
-      {/* Main Top Grid (2 Columns matching product-detail.html mockup) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left Column: Media Container & Gallery Thumbnails */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="relative aspect-square bg-[#051424] border border-outline-variant/60 rounded-none overflow-hidden flex items-center justify-center p-2 shadow-2xl">
-            <span className="absolute top-3 right-3 z-10 bg-[#ff6b00] text-black font-mono font-extrabold text-[10px] px-3 py-1 tracking-wider uppercase">
-              {product.statusTag || 'NEW ARRIVAL'}
-            </span>
-
+      {/* Top Main Section matching HTML Mockup (Flex Layout lg:flex-row) */}
+      <div className="flex flex-col lg:flex-row gap-12">
+        {/* Left Column: Product Image Gallery */}
+        <div className="w-full lg:w-1/2 space-y-gutter">
+          <div className="aspect-square bg-surface-container industrial-border overflow-hidden group cursor-zoom-in relative">
             <img
               src={currentMedia.url}
               alt={product.title}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
               }}
-              className="object-cover h-full w-full"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
+            <div className="absolute top-4 right-4 bg-primary-container text-on-primary-container px-3 py-1 font-label-caps text-label-caps rounded">
+              {product.statusTag || 'NEW ARRIVAL'}
+            </div>
           </div>
 
-          {/* 4 Thumbnails list matching mockup */}
+          {/* 4 Thumbnails Grid */}
           {galleryItems.length > 0 && (
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-4 gap-4">
               {galleryItems.slice(0, 4).map((item, idx: number) => (
-                <button
+                <div
                   key={idx}
                   onClick={() => setActiveMediaIndex(idx)}
-                  className={`relative aspect-square bg-[#051424] border rounded-none overflow-hidden p-1 transition-all ${
-                    activeMediaIndex === idx
-                      ? 'border-[#ff6b00] ring-1 ring-[#ff6b00]'
-                      : 'border-outline-variant/60 hover:border-[#ff6b00]/50'
+                  className={`aspect-square bg-surface-container-high industrial-border cursor-pointer hover:border-primary transition-all relative ${
+                    activeMediaIndex === idx ? 'border-primary border-2' : ''
                   }`}
                 >
                   <img
@@ -200,215 +210,181 @@ export const ProductDetail: React.FC = () => {
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80';
                     }}
-                    className="object-cover h-full w-full"
+                    className="w-full h-full object-cover"
                   />
                   {item.sizeCode && (
-                    <span className="absolute bottom-1 right-1 bg-black/80 text-[#ff6b00] font-mono text-[9px] px-1 font-bold rounded-xs">
+                    <span className="absolute bottom-1 right-1 bg-surface-container-lowest/90 text-primary font-mono text-[9px] px-1 font-bold rounded-xs border border-outline-variant">
                       {item.sizeCode}
                     </span>
                   )}
-                </button>
+                </div>
               ))}
             </div>
           )}
         </div>
 
-        {/* Right Column: Title, Specs Matrix & Bulk Orders Box */}
-        <div className="lg:col-span-6 space-y-6">
-          <div className="space-y-2">
-            <span className="font-mono text-xs text-on-surface-variant uppercase tracking-widest block font-semibold">
-              {product.seriesName || 'HEAVY DUTY SERIES'}
+        {/* Right Column: Technical Details & Ordering */}
+        <div className="w-full lg:w-1/2 flex flex-col">
+          <div className="mb-stack-md">
+            <span className="font-label-caps text-label-caps text-primary uppercase tracking-widest">
+              {product.seriesName || 'Heavy Duty Series'}
             </span>
-            <h1 className="font-display-lg text-4xl font-extrabold text-on-surface leading-tight">
+            <h1 className="font-display-lg text-display-lg mt-2 mb-4">
               {product.title}
             </h1>
-            <div className="flex items-center gap-3 text-xs pt-1">
-              <div className="flex items-center gap-1 text-[#FFD700]">
-                <span>☆☆☆☆☆</span>
-                <span className="text-on-surface-variant font-mono">({product.reviewCount || 124} Global Reviews)</span>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex text-primary">
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star_half</span>
               </div>
-              <span className="text-outline-variant">|</span>
-              <span className="text-emerald-400 font-mono font-bold tracking-wider uppercase">
+              <span className="text-body-sm text-on-surface-variant">
+                ({product.reviewCount || 124} Global Reviews)
+              </span>
+              <div className="h-4 w-[1px] bg-outline-variant"></div>
+              <span className="font-label-caps text-label-caps text-[#4ade80]">
                 {product.stockStatus || 'IN STOCK'}
               </span>
             </div>
           </div>
 
-          <p className="font-body-lg text-sm text-on-surface-variant/90 leading-relaxed">
+          <p className="text-on-surface-variant font-body-lg mb-8 leading-relaxed">
             {product.description}
           </p>
 
-          {/* 2x2 Tech Specs Grid matching product-detail.html mockup */}
-          <div className="grid grid-cols-2 gap-4 bg-[#0d1c2f] border border-outline-variant/60 p-4">
-            <div>
-              <span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider block">IMPACT PROTECTION</span>
-              <span className="font-body-lg text-sm text-on-surface font-bold">Level 3 (EN 388)</span>
+          {/* Technical Specifications Grid matching HTML Mockup */}
+          <div className="grid grid-cols-2 gap-px bg-outline-variant industrial-border mb-8 overflow-hidden">
+            {displaySpecs.map((s, idx) => (
+              <div key={idx} className="bg-surface-container p-4">
+                <span className="font-label-caps text-[10px] text-on-surface-variant uppercase block mb-1">
+                  {s.key}
+                </span>
+                <span className="font-title-md text-title-md">
+                  {s.value}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Certification Badges matching HTML Mockup */}
+          <div className="flex flex-wrap gap-4 mb-10">
+            <div className="flex items-center gap-2 px-3 py-2 bg-surface-container-high industrial-border rounded">
+              <span className="material-symbols-outlined text-primary text-[20px]">verified</span>
+              <span className="font-label-caps text-label-caps">CE EN388:2016</span>
             </div>
-            <div>
-              <span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider block">ABRASION RATING</span>
-              <span className="font-body-lg text-sm text-on-surface font-bold">4X (High Intensity)</span>
+            <div className="flex items-center gap-2 px-3 py-2 bg-surface-container-high industrial-border rounded">
+              <span className="material-symbols-outlined text-primary text-[20px]">workspace_premium</span>
+              <span className="font-label-caps text-label-caps">ISO 9001:2015</span>
             </div>
-            <div>
-              <span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider block">THERMAL RESISTANCE</span>
-              <span className="font-body-lg text-sm text-on-surface font-bold">Up to 250°C</span>
-            </div>
-            <div>
-              <span className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider block">MATERIAL COMPOSITION</span>
-              <span className="font-body-lg text-sm text-on-surface font-bold">Nitri-Flex / Kevlar</span>
+            <div className="flex items-center gap-2 px-3 py-2 bg-surface-container-high industrial-border rounded">
+              <span className="material-symbols-outlined text-primary text-[20px]">security</span>
+              <span className="font-label-caps text-label-caps">ANSI CUT A4</span>
             </div>
           </div>
 
-          {/* 3 Rectangular Badges */}
-          <div className="flex flex-wrap gap-3">
-            <span className="border border-outline-variant/80 bg-[#0d1c2f] text-on-surface-variant font-mono text-[11px] font-bold px-3 py-1 uppercase tracking-wider flex items-center gap-1.5">
-              🛡️ CE EN388:2016
-            </span>
-            <span className="border border-outline-variant/80 bg-[#0d1c2f] text-on-surface-variant font-mono text-[11px] font-bold px-3 py-1 uppercase tracking-wider flex items-center gap-1.5">
-              🏆 ISO 9001:2015
-            </span>
-            <span className="border border-outline-variant/80 bg-[#0d1c2f] text-on-surface-variant font-mono text-[11px] font-bold px-3 py-1 uppercase tracking-wider flex items-center gap-1.5">
-              🛡️ ANSI CUT A4
-            </span>
-          </div>
-
-          {/* Bulk Distributor Orders Box matching product-detail.html mockup */}
-          <div className="bg-[#0d1c2f] border border-outline-variant/80 p-6 rounded-none space-y-5 shadow-2xl">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#ff6b00]">local_shipping</span>
-                <h3 className="font-headline-lg text-base font-extrabold text-on-surface">Bulk Distributor Orders</h3>
+          {/* Bulk Ordering Section matching HTML Mockup */}
+          <div className="bg-surface-container-highest p-6 rounded-lg industrial-border border-primary/20">
+            <h3 className="font-title-md text-title-md mb-4 flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary">local_shipping</span>
+              Bulk Distributor Orders
+            </h3>
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between items-center text-body-sm text-on-surface-variant">
+                <span>MOQ: {product.moq || 50} Units</span>
+                <span className="text-primary font-bold">Volume Discounts Available</span>
               </div>
-              <span className="font-mono text-xs text-[#ff6b00] font-semibold">Volume Discounts Available</span>
-            </div>
-
-            <div className="text-xs font-mono text-on-surface-variant">
-              MOQ: {product.moq || 50} Units
-            </div>
-
-            {/* Quantity and Size Range Side-by-Side Inputs matching Screenshot 2 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider block">
-                  QUANTITY (PAIRS)
-                </label>
-                <input
-                  type="number"
-                  min={50}
-                  value={quantity}
-                  onChange={e => setQuantity(parseInt(e.target.value) || 50)}
-                  className="w-full bg-[#051424] border border-outline-variant rounded-none px-3 py-2 text-sm text-on-surface font-mono focus:border-[#ff6b00] focus:outline-none"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-mono text-[10px] text-on-surface-variant uppercase tracking-wider block">
-                  SIZE RANGE
-                </label>
-                <select
-                  value={selectedSizeRange}
-                  onChange={e => handleSelectSize(e.target.value)}
-                  className="w-full bg-[#051424] border border-outline-variant rounded-none px-3 py-2 text-sm text-on-surface font-mono focus:border-[#ff6b00] focus:outline-none"
-                >
-                  {sizeOptionsList.map((opt, i) => (
-                    <option key={i} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="font-label-caps text-[10px] text-on-surface-variant mb-1 block">Quantity (Pairs)</label>
+                  <input
+                    type="number"
+                    min={50}
+                    value={quantity}
+                    onChange={e => setQuantity(parseInt(e.target.value) || 50)}
+                    className="w-full bg-surface industrial-border rounded px-4 py-3 focus:border-primary outline-none text-on-surface"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="font-label-caps text-[10px] text-on-surface-variant mb-1 block">Size Range</label>
+                  <select
+                    value={selectedSizeRange}
+                    onChange={e => handleSelectSize(e.target.value)}
+                    className="w-full bg-surface industrial-border rounded px-4 py-3 focus:border-primary outline-none text-on-surface appearance-none cursor-pointer"
+                  >
+                    {sizeOptionsList.map((opt, i) => (
+                      <option key={i} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
-
-            {/* 2 Buttons side-by-side matching product-detail.html mockup */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAddToCart}
-                className="w-full bg-[#ff6b00] hover:bg-[#e05e00] text-black font-mono font-extrabold text-xs py-3.5 px-4 rounded-none flex items-center justify-center gap-2 uppercase tracking-widest transition-all orange-glow"
+                className="flex-1 bg-primary-container text-on-primary-container font-bold py-4 rounded glow-button text-center uppercase tracking-wider"
               >
-                REQUEST WHOLESALE QUOTE
+                Request Wholesale Quote
               </button>
-
               <button
                 onClick={() => alert(`Technical Specs PDF for ${product.title} (SKU: ${product.sku}) generated.`)}
-                className="w-full border border-outline-variant bg-[#051424] hover:bg-surface-variant text-on-surface font-mono text-xs py-3.5 px-4 rounded-none flex items-center justify-center gap-2 uppercase tracking-wider transition-all"
+                className="px-8 py-4 border border-outline-variant hover:border-primary transition-all flex items-center justify-center"
               >
-                <span className="material-symbols-outlined text-sm">download</span>
-                Technical Specs PDF
+                <span className="material-symbols-outlined">download</span>
+                <span className="ml-2 font-label-caps">Technical Specs PDF</span>
               </button>
             </div>
-
-            <p className="font-mono text-[10px] text-on-surface-variant/70 text-center pt-1">
-              Standard international shipping: 5-7 business days via GSH Logistics.
-            </p>
+            <p className="text-[11px] text-on-surface-variant mt-4 text-center">Standard international shipping: 5-7 business days via GSH Logistics.</p>
           </div>
         </div>
       </div>
 
-      {/* Engineering Specifications Section matching product-detail.html mockup */}
-      <section className="space-y-6 pt-6 border-t border-outline-variant/40">
-        <h2 className="font-headline-lg text-2xl font-extrabold text-on-surface flex items-center gap-3">
-          <span className="text-[#ff6b00]">—</span> Engineering Specifications
+      {/* Engineering Specifications Section (Asymmetric Layout matching HTML Mockup) */}
+      <section className="mt-24">
+        <h2 className="font-headline-lg text-headline-lg mb-12 flex items-center gap-3">
+          <span className="w-12 h-[2px] bg-primary"></span>
+          Engineering Specifications
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {product.features && product.features.length > 0 ? (
-            product.features.map((feat, idx) => (
-              <div key={idx} className="bg-[#0d1c2f] border border-outline-variant/60 p-6 rounded-none space-y-3">
-                <span className="material-symbols-outlined text-[#ff6b00] text-3xl">{feat.icon || 'build'}</span>
-                <h3 className="font-title-md text-lg text-on-surface font-bold">{feat.title}</h3>
-                <p className="font-body-sm text-xs text-on-surface-variant/90 leading-relaxed">{feat.description}</p>
-              </div>
-            ))
-          ) : (
-            <>
-              <div className="bg-[#0d1c2f] border border-outline-variant/60 p-6 rounded-none space-y-3">
-                <span className="material-symbols-outlined text-[#ff6b00] text-3xl">build</span>
-                <h3 className="font-title-md text-lg text-on-surface font-bold">Anatomical Fit</h3>
-                <p className="font-body-sm text-xs text-on-surface-variant/90 leading-relaxed">
-                  Contoured design reduces hand fatigue during long shifts. Curved finger construction mimics natural rest position for improved dexterity in high-precision tasks.
-                </p>
-              </div>
-              <div className="bg-[#0d1c2f] border border-outline-variant/60 p-6 rounded-none space-y-3">
-                <span className="material-symbols-outlined text-[#ff6b00] text-3xl">water_drop</span>
-                <h3 className="font-title-md text-lg text-on-surface font-bold">Fluid Resistance</h3>
-                <p className="font-body-sm text-xs text-on-surface-variant/90 leading-relaxed">
-                  Dual-layer coating provides superior grip even when saturated with hydraulic fluids or lubricants. ISO certified for chemical splash protection.
-                </p>
-              </div>
-              <div className="bg-[#0d1c2f] border border-outline-variant/60 p-6 rounded-none space-y-3">
-                <span className="material-symbols-outlined text-[#ff6b00] text-3xl">shield</span>
-                <h3 className="font-title-md text-lg text-on-surface font-bold">Reinforced Core</h3>
-                <p className="font-body-sm text-xs text-on-surface-variant/90 leading-relaxed">
-                  Proprietary HPPE blend provides ANSI level A4 cut protection without sacrificing tactile sensitivity. 13-gauge seamless knit liner for comfort.
-                </p>
-              </div>
-            </>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {displayFeatures.map((f, idx) => (
+            <div key={idx} className="p-8 bg-surface-container industrial-border hover:bg-surface-container-high transition-colors group">
+              <span className="material-symbols-outlined text-[48px] text-primary mb-6 group-hover:scale-110 transition-transform inline-block">
+                {f.icon || 'construction'}
+              </span>
+              <h4 className="font-title-md text-title-md mb-4">{f.title}</h4>
+              <p className="text-on-surface-variant text-body-sm">{f.description}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Compliance & Safety Standards Section matching product-detail.html mockup */}
-      <section className="space-y-6 pt-6 border-t border-outline-variant/40 text-center">
-        <h2 className="font-headline-lg text-2xl font-extrabold text-on-surface">
-          Compliance & Safety Standards
-        </h2>
-        <p className="font-body-sm text-xs text-on-surface-variant max-w-xl mx-auto">
-          Ghulam Safety Hub ensures all Elite series products undergo rigorous stress testing in third-party laboratories to meet and exceed global safety mandates.
-        </p>
-        <div className="flex flex-wrap justify-center gap-6 pt-4">
-          <div className="border border-outline-variant/80 bg-[#0d1c2f] px-6 py-4 rounded-none space-y-1">
-            <span className="font-mono text-xl font-bold text-on-surface block">CE</span>
-            <span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-wider block">EUROPEAN COMPLIANT</span>
+      {/* Certifications & Compliance matching HTML Mockup */}
+      <section className="mt-24 py-16 border-y border-outline-variant">
+        <div className="text-center mb-12">
+          <h3 className="font-headline-lg text-headline-lg mb-4">Compliance & Safety Standards</h3>
+          <p className="text-on-surface-variant max-w-2xl mx-auto">
+            Ghulam Safety Hub ensures all Elite series products undergo rigorous stress testing in third-party laboratories to meet and exceed global safety mandates.
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-center gap-12 opacity-60 hover:opacity-100 transition-opacity">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-16 h-16 rounded-full industrial-border flex items-center justify-center font-bold text-lg">CE</div>
+            <span className="font-label-caps text-[10px]">EUROPEAN COMPLIANT</span>
           </div>
-          <div className="border border-outline-variant/80 bg-[#0d1c2f] px-6 py-4 rounded-none space-y-1">
-            <span className="font-mono text-xl font-bold text-on-surface block">ISO</span>
-            <span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-wider block">QUALITY MGMT</span>
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-16 h-16 rounded-full industrial-border flex items-center justify-center font-bold text-lg">ISO</div>
+            <span className="font-label-caps text-[10px]">QUALITY MGMT</span>
           </div>
-          <div className="border border-outline-variant/80 bg-[#0d1c2f] px-6 py-4 rounded-none space-y-1">
-            <span className="font-mono text-xl font-bold text-on-surface block">ANSI</span>
-            <span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-wider block">US SAFETY STD</span>
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-16 h-16 rounded-full industrial-border flex items-center justify-center font-bold text-lg">ANSI</div>
+            <span className="font-label-caps text-[10px]">US SAFETY STD</span>
           </div>
-          <div className="border border-outline-variant/80 bg-[#0d1c2f] px-6 py-4 rounded-none space-y-1">
-            <span className="font-mono text-xl font-bold text-on-surface block">UKCA</span>
-            <span className="font-mono text-[9px] text-on-surface-variant uppercase tracking-wider block">UK CONFORMITY</span>
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-16 h-16 rounded-full industrial-border flex items-center justify-center font-bold text-lg">UKCA</div>
+            <span className="font-label-caps text-[10px]">UK CONFORMITY</span>
           </div>
         </div>
       </section>
