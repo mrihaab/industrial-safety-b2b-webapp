@@ -296,16 +296,17 @@ export const Home: React.FC = () => {
       {/* 4. Export Expertise Section matching HTML Mockup */}
       <section className="py-24 bg-surface-container-lowest overflow-hidden -mx-gutter px-gutter">
         <div className="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          <div className="relative">
-            <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary-container/10 rounded-full blur-3xl" />
+          <div className="relative group overflow-hidden border border-outline-variant hover:border-primary transition-all duration-500 rounded-sm shadow-2xl cursor-pointer">
+            <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary-container/10 rounded-full blur-3xl group-hover:bg-primary-container/30 transition-all duration-500" />
             <img
               src={MAP_IMG}
               alt="A stylized 3D digital map of the world rendered in a dark, tech-inspired aesthetic."
-              className="relative z-10 w-full aspect-square object-cover border border-outline-variant rounded-sm shadow-2xl"
+              className="relative z-10 w-full aspect-square object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700 opacity-90 group-hover:opacity-100"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1000&q=80';
               }}
             />
+            <div className="absolute inset-0 z-20 bg-gradient-to-t from-surface via-transparent to-transparent opacity-40 group-hover:opacity-10 transition-opacity duration-500" />
           </div>
           <div>
             <span className="font-label-caps text-primary mb-4 block">GLOBAL LOGISTICS</span>
