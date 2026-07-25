@@ -84,24 +84,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         <div className="space-y-3">
-          {/* Dynamic Certification Badges */}
-          <div className="flex flex-wrap items-center gap-1.5 mb-stack-lg min-h-[24px]">
-            {(product.certifications && product.certifications.length > 0
-              ? product.certifications
-              : ['CE Marked', 'ISO 9001:2015']
-            ).map((cert, idx) => (
-              <span
-                key={idx}
-                className={`px-2 py-0.5 border text-[10px] font-mono uppercase font-bold rounded-xs ${
-                  idx === 0
-                    ? 'border-emerald-500/40 text-emerald-400 bg-emerald-950/20'
-                    : 'border-outline-variant text-on-surface-variant'
-                }`}
-              >
-                {cert}
-              </span>
-            ))}
-          </div>
+          {/* Strict Dynamic Certifications (Rendered ONLY if selected by Admin) */}
+          {product.certifications && product.certifications.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 mb-stack-lg min-h-[24px]">
+              {product.certifications.map((cert, idx) => (
+                <span
+                  key={idx}
+                  className={`px-2 py-0.5 border text-[10px] font-mono uppercase font-bold rounded-xs ${
+                    idx === 0
+                      ? 'border-emerald-500/40 text-emerald-400 bg-emerald-950/20'
+                      : 'border-outline-variant text-on-surface-variant'
+                  }`}
+                >
+                  {cert}
+                </span>
+              ))}
+            </div>
+          )}
 
           {/* Add to Order Button */}
           <Link to={`/products/${product.slug}`} className="block w-full">

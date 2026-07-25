@@ -125,7 +125,7 @@ export const AdminProducts: React.FC = () => {
     setMoq('50');
     setStockStatus('IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
-    setSelectedCertifications(['CE Marked', 'ISO 9001:2015']);
+    setSelectedCertifications([]);
     setDescription('');
     setIsFeatured(false);
     setExistingImages([]);
@@ -147,7 +147,7 @@ export const AdminProducts: React.FC = () => {
     setMoq(String(product.moq));
     setStockStatus(product.stockStatus || 'IN STOCK');
     setCheckedSizeCodes(['S', 'M', 'L', 'XL']);
-    setSelectedCertifications(product.certifications || ['CE Marked', 'ISO 9001:2015']);
+    setSelectedCertifications(product.certifications || []);
     setDescription(product.description || '');
     setIsFeatured(Boolean(product.isFeatured || (product as any).is_featured));
     setExistingImages([]);

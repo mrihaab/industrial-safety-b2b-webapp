@@ -90,7 +90,7 @@ export class ProductService {
         is_featured: Boolean(row.is_featured),
         status_tag: row.status_tag || 'Safety-System-Active',
         short_tag: row.tag_name || 'Industrial Safety',
-        certifications: certifications.length > 0 ? certifications : ['CE Certified'],
+        certifications: certifications,
       };
     });
 
