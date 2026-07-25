@@ -62,14 +62,10 @@ export class ProductService {
 
       const certifications = specs
         .filter(spec => 
-          spec.spec_key.toLowerCase().includes('cert') || 
-          spec.spec_key.toLowerCase().includes('protection') ||
-          spec.spec_value.toLowerCase().includes('ansi') ||
-          spec.spec_value.toLowerCase().includes('ce') ||
-          spec.spec_value.toLowerCase().includes('iso')
+          spec.spec_key.toLowerCase() === 'certification' || 
+          spec.spec_key.toLowerCase() === 'certifications'
         )
-        .map(spec => spec.spec_value)
-        .slice(0, 3);
+        .map(spec => spec.spec_value);
 
       return {
         id: row.id,
@@ -138,6 +134,12 @@ export class ProductService {
       description: product.description,
       isFeatured: Boolean(product.is_featured),
       is_featured: Boolean(product.is_featured),
+      certifications: specs
+        .filter(spec => 
+          spec.spec_key.toLowerCase() === 'certification' || 
+          spec.spec_key.toLowerCase() === 'certifications'
+        )
+        .map(spec => spec.spec_value),
       images: images.map(img => img.image_url),
       gallery: images.map(img => ({
         url: img.image_url,

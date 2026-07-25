@@ -355,7 +355,7 @@ export const AdminProducts: React.FC = () => {
               {products.length > 0 ? (
                 products.map(prod => {
                   const isProdFeatured = Boolean(prod.isFeatured || (prod as any).is_featured);
-                  const certsToShow = prod.certifications || ['CE Marked'];
+                  const certsToShow = prod.certifications || [];
                   return (
                     <tr key={prod.id} className="hover:bg-surface-container-high transition-colors">
                       <td className="py-4 px-6 font-mono text-xs font-bold text-on-surface">{prod.sku}</td>
@@ -370,16 +370,20 @@ export const AdminProducts: React.FC = () => {
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        <div className="flex flex-wrap gap-1">
-                          {certsToShow.slice(0, 2).map((c, i) => (
-                            <span key={i} className="px-2 py-0.5 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono font-bold rounded-xs bg-emerald-950/30">
-                              {c}
-                            </span>
-                          ))}
-                          {certsToShow.length > 2 && (
-                            <span className="text-[10px] text-on-surface-variant font-mono">+{certsToShow.length - 2} more</span>
-                          )}
-                        </div>
+                        {certsToShow && certsToShow.length > 0 ? (
+                          <div className="flex flex-wrap gap-1">
+                            {certsToShow.slice(0, 2).map((c, i) => (
+                              <span key={i} className="px-2 py-0.5 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono font-bold rounded-xs bg-emerald-950/30">
+                                {c}
+                              </span>
+                            ))}
+                            {certsToShow.length > 2 && (
+                              <span className="text-[10px] text-on-surface-variant font-mono">+{certsToShow.length - 2} more</span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-on-surface-variant/40 font-mono text-xs">- None -</span>
+                        )}
                       </td>
                       <td className="py-4 px-6 font-mono font-bold text-primary">${Number(prod.price).toFixed(2)}</td>
                       <td className="py-4 px-6 font-mono text-xs">{prod.moq} units</td>
