@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+const HERO_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuD8GK08yQJcOjxafEsZTZrH9RUknWBXayS4Hb4lJv06QTs5HAR_BfsWNs1pxSmUyUXouN3hv3UXoyTcSJ1FCfaKqr6YOgLa9iaEWeiP8m77pQ_ea3-QFAQ6z66GnhmViZVE6K7Wfk8yFOGBqj5YSh7yRRB1Wgyj1dQbcDllZi2PMeLJ4tHSiXl7YXabCKwvsU8qN2WXFXYUGqc6QgvBkPyTnooiOCCEryPxJ9yd3Nw1D6zy9apNtAf9XMrWolUS0IzwaGaSkK-cRD4";
+const TITAN_X_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuCGKdrJ_ZE3KYkKmWECvfIkfSOiSPR4_H6Lqxq6dSyfy2YmYY7dZBgxZ4lYDcxh8UzAlRBQ9HSxBQsVGpzt-x4Z4E24tYQD7tiQGjxEpyP-CFj2bH2iOj1Cl4J_0VGdZdcPDw3sN0_uX0Lwzdc3ms6cH7dGHtd9XtqeG9-_LW-v5ndOwte6VLmwyoUpjYqZKuu1OyUHlSR7OaQWDgiq1vwAkY0srLg13XV1i41Wk_yhxhRJbGMf-YMzgIDBmX7duLbCy6mOxJSlCvc";
+const PRO_VIS_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuC4e9kR8UrCA1IjdY4-JhwJNKNnI2Wws-m3DLuMZDKyJRF87rg_E_OO06wMivwKr7bo4ewIU0WtJUKD1cus-zHE5kfgyLb2di1lBo3MDmkjknC5Kj8uQzVjLNoGEkmKx3B4ct4nlZ0M_TO_hTOhM2pAZxVTulMtq0brRVrIi6HkuX4H30HIEqmYDfbOos7RsNjMTHydXHsvq7DF_2N49eh0SOU3X8dhHUn2LnT-qG2ly_yp9b8QNY7xompaeRUjWvfaDvtjawH2-VU";
+const BOOTS_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuCvEuPdv-53b90VVbhBehdhqMSIu3fxFfLwKUA6olsk7Cd4Foa6-iW9qxg3SNQbkXf2s8eZdOVaP_UXygXwsqF7IYNSop7sfRN7_VWkzm4WjVo_yCECaXpuHs3ZCqCh53JoLJ6uCOwJtJVzFgsttlxQFVx3ETUVNiOtBVlBjC_pghP3rZ0l9oGDNo9iihw86z3bCu4gJgQcziPiIadhVJ1S83hytNl-a--h-LhO3oIqRXWCT_FnH77sLPmSgRGjUxEPiliRgLd6SR4";
+const MAP_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuChT9-yQ6kh7fkUmoeib05VnFZmKupzkbl-uHGuV2H0ab2D0AZwZYvt4XXgzT6Bt2aS0K0NYYnTVmgD5NSKVB66EBtYZJGQD1TQFl8cNf5DXyw3Yq-MoGL_AoIFA-wFPTU1TwNQvdeC5TcS_tDuYjNPYSFCcPqdFgR69zj0-4h05poO1zqce-hyGR0clWoxsmYTFOKlW5_1ycmfzVuiXeqJwJBJdOykEEs07bWgZgdqsE-nPbS4_49hJ_tFqooM0z8lHL19jZKhYF4";
+
 export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [emailInput, setEmailInput] = useState('');
@@ -16,11 +22,11 @@ export const Home: React.FC = () => {
       <section className="relative min-h-[85vh] flex items-center overflow-hidden industrial-grid border-b border-outline-variant -mt-stack-lg -mx-gutter px-gutter">
         <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10" />
         <img
-          src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80"
-          alt="Industrial Heavy-Duty Safety Workbench"
+          src={HERO_IMG}
+          alt="A high-contrast cinematic photograph of professional heavy-duty safety gloves resting on a brushed steel industrial workbench."
           className="absolute right-0 top-0 h-full w-full lg:w-2/3 object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 opacity-60 lg:opacity-100"
           onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1920&q=80';
+            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80';
           }}
         />
 
@@ -119,9 +125,12 @@ export const Home: React.FC = () => {
             {/* Main Feature (6-col hero card) */}
             <div className="md:col-span-6 md:row-span-2 group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[400px]">
               <img
-                src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80"
-                alt="Titan-X Safety System"
+                src={TITAN_X_IMG}
+                alt="A matte black industrial safety helmet with an integrated carbon-fiber visor."
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80';
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/60 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8">
@@ -130,11 +139,11 @@ export const Home: React.FC = () => {
                 </div>
                 <h3 className="font-headline-lg text-on-surface mb-2 font-bold">Titan-X Safety System</h3>
                 <p className="text-on-surface-variant max-w-sm mb-6 font-body-sm">
-                  Impact-resistant carbon composite shells & Level 5 cut protection for extreme industrial environments.
+                  Impact-resistant carbon composite shells for extreme environments.
                 </p>
                 <Link
                   to="/products/gsh-elite-industrial-gloves"
-                  className="bg-on-surface text-surface px-6 py-3 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary transition-colors rounded-xs"
+                  className="bg-white text-surface px-6 py-2 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary transition-colors rounded-xs"
                 >
                   View Specs <span className="material-symbols-outlined">open_in_new</span>
                 </Link>
@@ -144,29 +153,29 @@ export const Home: React.FC = () => {
             {/* Secondary Feature 1 (6-col card) */}
             <div className="md:col-span-6 md:row-span-1 group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[240px]">
               <img
-                src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1200&q=80"
-                alt="Pro-Vis Series Apparel"
+                src={PRO_VIS_IMG}
+                alt="Detailed macro shot of high-visibility safety apparel showing the intricate weave of the neon fabric."
                 className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1200&q=80';
+                }}
               />
               <div className="absolute inset-0 bg-surface/40 group-hover:bg-transparent transition-colors" />
               <div className="absolute top-8 left-8">
                 <h3 className="font-title-md text-on-surface font-bold text-xl">Pro-Vis Series</h3>
-                <p className="text-on-surface-variant font-body-sm">EN ISO 20471 Certified High-Vis Workwear</p>
-                <Link
-                  to="/products"
-                  className="inline-block mt-3 text-primary font-label-caps hover:underline text-xs"
-                >
-                  Explore Workwear →
-                </Link>
+                <p className="text-on-surface-variant font-body-sm">EN ISO 20471 Certified High-Vis</p>
               </div>
             </div>
 
             {/* Secondary Feature 2 (3-col card) */}
             <div className="md:col-span-3 md:row-span-1 group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[220px]">
               <img
-                src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80"
-                alt="IronStride Boots"
+                src={BOOTS_IMG}
+                alt="Industrial steel-toed boots in a premium dark leather finish."
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80';
+                }}
               />
               <div className="absolute inset-x-0 bottom-0 p-6 bg-surface-container/90 backdrop-blur-sm transform translate-y-full group-hover:translate-y-0 transition-transform">
                 <span className="font-label-caps text-primary text-xs uppercase block mb-1">FOOTWEAR</span>
@@ -179,7 +188,7 @@ export const Home: React.FC = () => {
               <span className="material-symbols-outlined text-primary text-5xl mb-4">settings_input_component</span>
               <h3 className="font-title-md text-on-surface mb-2 font-bold">Custom Fitting</h3>
               <p className="font-body-sm text-on-surface-variant text-xs">
-                Tailored safety solutions & volume private labeling for your workforce.
+                Tailored safety solutions for your entire workforce.
               </p>
               <Link to="/rfq" className="mt-4 text-primary font-label-caps hover:underline text-xs">
                 Get Started
@@ -195,9 +204,12 @@ export const Home: React.FC = () => {
           <div className="relative">
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary-container/10 rounded-full blur-3xl" />
             <img
-              src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1000&q=80"
-              alt="Global Supply Chain Logistics"
+              src={MAP_IMG}
+              alt="A stylized 3D digital map of the world rendered in a dark, tech-inspired aesthetic."
               className="relative z-10 w-full aspect-square object-cover border border-outline-variant rounded-sm shadow-2xl"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1000&q=80';
+              }}
             />
           </div>
           <div>
@@ -302,7 +314,7 @@ export const Home: React.FC = () => {
             />
             <button
               type="submit"
-              className="bg-on-primary-container text-primary-container px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-on-primary transition-colors whitespace-nowrap font-mono text-xs"
+              className="bg-on-primary-container text-primary-container px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-on-primary transition-colors whitespace-nowrap font-mono text-xs cursor-pointer"
             >
               Contact Sales
             </button>
