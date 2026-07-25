@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { AdminLayout } from '@/components/layout/AdminLayout';
+import { ScrollToTop } from '@/components/layout/ScrollToTop';
 import Home from '@/pages/Home';
 import About from '@/pages/About';
 import Catalog from '@/pages/Catalog';
@@ -17,6 +18,7 @@ import AdminInquiries from '@/pages/admin/AdminInquiries';
 export const AppRoutes: React.FC = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* Public Application Routes */}
         <Route path="/" element={<MainLayout />}>
