@@ -7,7 +7,7 @@ import { ProductService } from '@/services/productService';
 export const Catalog: React.FC = () => {
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [stockFilter, setStockFilter] = useState('all');
   const [sortBy, setSortBy] = useState('Performance Tier');
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,8 +19,9 @@ export const Catalog: React.FC = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
+        const categoryQuery = selectedCategories.length > 0 ? selectedCategories.join(',') : undefined;
         const response = await ProductService.getProducts({
-          category: selectedCategory !== 'all' ? selectedCategory : undefined,
+          category: categoryQuery,
           stock: stockFilter !== 'all' ? stockFilter : undefined,
           sort: sortBy,
           search: searchQuery || undefined,
@@ -46,10 +47,26 @@ export const Catalog: React.FC = () => {
     };
 
     fetchProducts();
-  }, [selectedCategory, stockFilter, sortBy, searchQuery, currentPage]);
+  }, [selectedCategories, stockFilter, sortBy, searchQuery, currentPage]);
+
+  const handleToggleCategory = (categorySlug: string) => {
+    setSelectedCategories(prev => {
+      if (prev.includes(categorySlug)) {
+        return prev.filter(c => c !== categorySlug);
+      } else {
+        return [...prev, categorySlug];
+      }
+    });
+    setCurrentPage(1);
+  };
+
+  const handleSelectAllCategories = () => {
+    setSelectedCategories([]);
+    setCurrentPage(1);
+  };
 
   const handleReset = () => {
-    setSelectedCategory('all');
+    setSelectedCategories([]);
     setStockFilter('all');
     setSortBy('Performance Tier');
     setSearchQuery('');
@@ -61,8 +78,9 @@ export const Catalog: React.FC = () => {
       <div className="flex flex-col md:flex-row gap-gutter">
         {/* Filter Sidebar matching HTML Mockup */}
         <FilterSidebar
-          selectedCategory={selectedCategory}
-          onSelectCategory={setSelectedCategory}
+          selectedCategories={selectedCategories}
+          onToggleCategory={handleToggleCategory}
+          onSelectAllCategories={handleSelectAllCategories}
           stockFilter={stockFilter}
           onSelectStockFilter={setStockFilter}
           onReset={handleReset}
@@ -110,7 +128,7 @@ export const Catalog: React.FC = () => {
               <span className="material-symbols-outlined text-primary text-5xl">search_off</span>
               <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Products Found</h3>
               <p className="font-body-sm text-on-surface-variant max-w-sm mx-auto">
-                No safety items match your selected filters. Try clearing your search or category filters.
+                No safety items match your selected category filters. Try clearing your search or category parameters.
               </p>
               <button onClick={handleReset} className="font-label-caps text-primary underline text-sm">
                 Clear Filters

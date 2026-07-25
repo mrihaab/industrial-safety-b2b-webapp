@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { CategoryService, CategoryTreeDto } from '@/services/categoryService';
 
 interface FilterSidebarProps {
-  selectedCategory: string;
-  onSelectCategory: (categorySlug: string) => void;
+  selectedCategories: string[];
+  onToggleCategory: (categorySlug: string) => void;
+  onSelectAllCategories: () => void;
   stockFilter: string;
   onSelectStockFilter: (stock: string) => void;
   onReset: () => void;
 }
 
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({
-  selectedCategory,
-  onSelectCategory,
+  selectedCategories,
+  onToggleCategory,
+  onSelectAllCategories,
   stockFilter,
   onSelectStockFilter,
   onReset,
@@ -33,6 +35,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     fetchCategories();
   }, []);
 
+  const isAllSelected = selectedCategories.length === 0;
+
   return (
     <aside className="w-full md:w-64 flex-shrink-0 space-y-stack-lg">
       <div className="flex items-center justify-between gap-2 mb-4">
@@ -40,17 +44,17 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <span className="material-symbols-outlined text-primary">filter_list</span>
           <h2 className="font-title-md text-title-md uppercase tracking-widest text-on-surface font-bold">Filters</h2>
         </div>
-        {selectedCategory !== 'all' && (
+        {!isAllSelected && (
           <button
-            onClick={() => onSelectCategory('all')}
-            className="text-[11px] font-label-caps text-primary hover:underline"
+            onClick={onSelectAllCategories}
+            className="text-[11px] font-label-caps text-primary hover:underline cursor-pointer"
           >
-            Show All
+            Clear Selected ({selectedCategories.length})
           </button>
         )}
       </div>
 
-      {/* Actual Database Product Categories Section matching HTML Mockup checkbox styling */}
+      {/* Actual Database Product Categories Section with Multi-select Checkboxes */}
       <div className="border-t border-outline-variant pt-stack-md">
         <h3 className="font-label-caps text-label-caps text-primary mb-stack-md uppercase tracking-wider font-bold">
           Product Categories
@@ -59,63 +63,69 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <label className="flex items-center gap-3 group cursor-pointer">
             <input
               type="checkbox"
-              checked={selectedCategory === 'all'}
-              onChange={() => onSelectCategory('all')}
+              checked={isAllSelected}
+              onChange={onSelectAllCategories}
               className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
             />
             <span className={`font-body-sm text-body-sm transition-colors ${
-              selectedCategory === 'all' ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:text-on-surface'
+              isAllSelected ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:text-on-surface'
             }`}>
               All Categories
             </span>
           </label>
 
           {categories.length > 0 ? (
-            categories.map(cat => (
-              <div key={cat.id} className="space-y-2">
-                <label className="flex items-center gap-3 group cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategory === cat.slug}
-                    onChange={() => onSelectCategory(selectedCategory === cat.slug ? 'all' : cat.slug)}
-                    className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
-                  />
-                  <span className={`font-body-sm text-body-sm transition-colors capitalize ${
-                    selectedCategory === cat.slug ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:text-on-surface'
-                  }`}>
-                    {cat.name}
-                  </span>
-                </label>
+            categories.map(cat => {
+              const isChecked = selectedCategories.includes(cat.slug);
+              return (
+                <div key={cat.id} className="space-y-2">
+                  <label className="flex items-center gap-3 group cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => onToggleCategory(cat.slug)}
+                      className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
+                    />
+                    <span className={`font-body-sm text-body-sm transition-colors capitalize ${
+                      isChecked ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:text-on-surface'
+                    }`}>
+                      {cat.name}
+                    </span>
+                  </label>
 
-                {/* Subcategories Indented List */}
-                {cat.children && cat.children.length > 0 && (
-                  <div className="pl-6 space-y-1.5 border-l border-outline-variant/40 ml-2">
-                    {cat.children.map((sub: CategoryTreeDto) => (
-                      <label key={sub.id} className="flex items-center gap-2.5 group cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedCategory === sub.slug}
-                          onChange={() => onSelectCategory(selectedCategory === sub.slug ? 'all' : sub.slug)}
-                          className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-3.5 h-3.5 cursor-pointer"
-                        />
-                        <span className={`font-body-sm text-xs transition-colors capitalize ${
-                          selectedCategory === sub.slug ? 'text-primary font-bold' : 'text-on-surface-variant/80 group-hover:text-on-surface'
-                        }`}>
-                          {sub.name}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))
+                  {/* Subcategories Indented List */}
+                  {cat.children && cat.children.length > 0 && (
+                    <div className="pl-6 space-y-1.5 border-l border-outline-variant/40 ml-2">
+                      {cat.children.map((sub: CategoryTreeDto) => {
+                        const isSubChecked = selectedCategories.includes(sub.slug);
+                        return (
+                          <label key={sub.id} className="flex items-center gap-2.5 group cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={isSubChecked}
+                              onChange={() => onToggleCategory(sub.slug)}
+                              className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-3.5 h-3.5 cursor-pointer"
+                            />
+                            <span className={`font-body-sm text-xs transition-colors capitalize ${
+                              isSubChecked ? 'text-primary font-bold' : 'text-on-surface-variant/80 group-hover:text-on-surface'
+                            }`}>
+                              {sub.name}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })
           ) : (
             <div className="space-y-2">
               <label className="flex items-center gap-3 group cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={selectedCategory === 'working-gloves'}
-                  onChange={() => onSelectCategory('working-gloves')}
+                  checked={selectedCategories.includes('working-gloves')}
+                  onChange={() => onToggleCategory('working-gloves')}
                   className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
                 />
                 <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
@@ -125,8 +135,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               <label className="flex items-center gap-3 group cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={selectedCategory === 'sports-gloves'}
-                  onChange={() => onSelectCategory('sports-gloves')}
+                  checked={selectedCategories.includes('sports-gloves')}
+                  onChange={() => onToggleCategory('sports-gloves')}
                   className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
                 />
                 <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
@@ -136,8 +146,8 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               <label className="flex items-center gap-3 group cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={selectedCategory === 'workwear-safety-wear'}
-                  onChange={() => onSelectCategory('workwear-safety-wear')}
+                  checked={selectedCategories.includes('workwear-safety-wear')}
+                  onChange={() => onToggleCategory('workwear-safety-wear')}
                   className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
                 />
                 <span className="font-body-sm text-body-sm text-on-surface-variant group-hover:text-on-surface transition-colors">
@@ -217,7 +227,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           onClick={onReset}
           className="w-full font-label-caps text-label-caps py-3 border border-primary text-primary hover:bg-primary-container hover:text-on-primary-container transition-all uppercase tracking-widest cursor-pointer"
         >
-          Clear All
+          Clear All Filters
         </button>
       </div>
     </aside>

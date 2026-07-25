@@ -23,7 +23,7 @@ export class ProductModel {
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE 1=1
     `;
-    const params: (string | number)[] = [];
+    const params: any[] = [];
 
     if (query.search) {
       sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ?)`;
@@ -32,8 +32,14 @@ export class ProductModel {
     }
 
     if (query.category && query.category !== 'all') {
-      sql += ` AND (c.slug = ? OR c.parent_id = (SELECT id FROM categories WHERE slug = ? LIMIT 1))`;
-      params.push(query.category, query.category);
+      const categorySlugs = String(query.category).split(',').map(s => s.trim()).filter(Boolean);
+      if (categorySlugs.length === 1) {
+        sql += ` AND (c.slug = ? OR c.parent_id = (SELECT id FROM categories WHERE slug = ? LIMIT 1))`;
+        params.push(categorySlugs[0], categorySlugs[0]);
+      } else if (categorySlugs.length > 1) {
+        sql += ` AND (c.slug IN (?) OR c.parent_id IN (SELECT id FROM categories WHERE slug IN (?)))`;
+        params.push(categorySlugs, categorySlugs);
+      }
     }
 
     if (query.stock && query.stock !== 'all') {
@@ -91,7 +97,7 @@ export class ProductModel {
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE 1=1
     `;
-    const params: (string | number)[] = [];
+    const params: any[] = [];
 
     if (query.search) {
       sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ?)`;
@@ -100,8 +106,14 @@ export class ProductModel {
     }
 
     if (query.category && query.category !== 'all') {
-      sql += ` AND (c.slug = ? OR c.parent_id = (SELECT id FROM categories WHERE slug = ? LIMIT 1))`;
-      params.push(query.category, query.category);
+      const categorySlugs = String(query.category).split(',').map(s => s.trim()).filter(Boolean);
+      if (categorySlugs.length === 1) {
+        sql += ` AND (c.slug = ? OR c.parent_id = (SELECT id FROM categories WHERE slug = ? LIMIT 1))`;
+        params.push(categorySlugs[0], categorySlugs[0]);
+      } else if (categorySlugs.length > 1) {
+        sql += ` AND (c.slug IN (?) OR c.parent_id IN (SELECT id FROM categories WHERE slug IN (?)))`;
+        params.push(categorySlugs, categorySlugs);
+      }
     }
 
     if (query.stock && query.stock !== 'all') {
