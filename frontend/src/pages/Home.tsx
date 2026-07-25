@@ -5,8 +5,6 @@ import { ProductCardData } from '@/components/product/ProductCard';
 
 const HERO_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuD8GK08yQJcOjxafEsZTZrH9RUknWBXayS4Hb4lJv06QTs5HAR_BfsWNs1pxSmUyUXouN3hv3UXoyTcSJ1FCfaKqr6YOgLa9iaEWeiP8m77pQ_ea3-QFAQ6z66GnhmViZVE6K7Wfk8yFOGBqj5YSh7yRRB1Wgyj1dQbcDllZi2PMeLJ4tHSiXl7YXabCKwvsU8qN2WXFXYUGqc6QgvBkPyTnooiOCCEryPxJ9yd3Nw1D6zy9apNtAf9XMrWolUS0IzwaGaSkK-cRD4";
 const FALLBACK_TITAN_X = "https://lh3.googleusercontent.com/aida-public/AB6AXuCGKdrJ_ZE3KYkKmWECvfIkfSOiSPR4_H6Lqxq6dSyfy2YmYY7dZBgxZ4lYDcxh8UzAlRBQ9HSxBQsVGpzt-x4Z4E24tYQD7tiQGjxEpyP-CFj2bH2iOj1Cl4J_0VGdZdcPDw3sN0_uX0Lwzdc3ms6cH7dGHtd9XtqeG9-_LW-v5ndOwte6VLmwyoUpjYqZKuu1OyUHlSR7OaQWDgiq1vwAkY0srLg13XV1i41Wk_yhxhRJbGMf-YMzgIDBmX7duLbCy6mOxJSlCvc";
-const PRO_VIS_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuC4e9kR8UrCA1IjdY4-JhwJNKNnI2Wws-m3DLuMZDKyJRF87rg_E_OO06wMivwKr7bo4ewIU0WtJUKD1cus-zHE5kfgyLb2di1lBo3MDmkjknC5Kj8uQzVjLNoGEkmKx3B4ct4nlZ0M_TO_hTOhM2pAZxVTulMtq0brRVrIi6HkuX4H30HIEqmYDfbOos7RsNjMTHydXHsvq7DF_2N49eh0SOU3X8dhHUn2LnT-qG2ly_yp9b8QNY7xompaeRUjWvfaDvtjawH2-VU";
-const BOOTS_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuCvEuPdv-53b90VVbhBehdhqMSIu3fxFfLwKUA6olsk7Cd4Foa6-iW9qxg3SNQbkXf2s8eZdOVaP_UXygXwsqF7IYNSop7sfRN7_VWkzm4WjVo_yCECaXpuHs3ZCqCh53JoLJ6uCOwJtJVzFgsttlxQFVx3ETUVNiOtBVlBjC_pghP3rZ0l9oGDNo9iihw86z3bCu4gJgQcziPiIadhVJ1S83hytNl-a--h-LhO3oIqRXWCT_FnH77sLPmSgRGjUxEPiliRgLd6SR4";
 const MAP_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuChT9-yQ6kh7fkUmoeib05VnFZmKupzkbl-uHGuV2H0ab2D0AZwZYvt4XXgzT6Bt2aS0K0NYYnTVmgD5NSKVB66EBtYZJGQD1TQFl8cNf5DXyw3Yq-MoGL_AoIFA-wFPTU1TwNQvdeC5TcS_tDuYjNPYSFCcPqdFgR69zj0-4h05poO1zqce-hyGR0clWoxsmYTFOKlW5_1ycmfzVuiXeqJwJBJdOykEEs07bWgZgdqsE-nPbS4_49hJ_tFqooM0z8lHL19jZKhYF4";
 
 const getImageUrl = (url?: string) => {
@@ -22,17 +20,30 @@ export const Home: React.FC = () => {
   const navigate = useNavigate();
   const [emailInput, setEmailInput] = useState('');
   const [featuredProducts, setFeaturedProducts] = useState<ProductCardData[]>([]);
+  const [featuredGallery, setFeaturedGallery] = useState<string[]>([]);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
 
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await ProductService.getProducts({ limit: 20 });
+        const res = await ProductService.getProducts({ limit: 50 });
         if (res.success && res.data) {
+          // Strictly filter products that Admin explicitly set as featured (is_featured = 1)
           const featuredOnly = res.data.filter(p => p.isFeatured || (p as any).is_featured);
+          setFeaturedProducts(featuredOnly);
+
+          // If featured products exist, fetch full gallery images for the primary featured product
           if (featuredOnly.length > 0) {
-            setFeaturedProducts(featuredOnly);
-          } else {
-            setFeaturedProducts(res.data);
+            const primarySlug = featuredOnly[0].slug;
+            const detailRes = await ProductService.getProductBySlug(primarySlug);
+            if (detailRes.success && detailRes.data) {
+              const galleryUrls = (detailRes.data.gallery || []).map(g => getImageUrl(g.url));
+              if (galleryUrls.length > 0) {
+                setFeaturedGallery(galleryUrls);
+              } else if (detailRes.data.primaryImage) {
+                setFeaturedGallery([getImageUrl(detailRes.data.primaryImage)]);
+              }
+            }
           }
         }
       } catch (err) {
@@ -49,8 +60,9 @@ export const Home: React.FC = () => {
   };
 
   const mainFeatured = featuredProducts.length > 0 ? featuredProducts[0] : null;
-  const secondaryFeatured1 = featuredProducts.length > 1 ? featuredProducts[1] : null;
-  const secondaryFeatured2 = featuredProducts.length > 2 ? featuredProducts[2] : null;
+  const mainImageToShow = featuredGallery.length > 0 && activeGalleryIndex < featuredGallery.length
+    ? featuredGallery[activeGalleryIndex]
+    : getImageUrl(mainFeatured?.primaryImage);
 
   return (
     <div className="w-full space-y-0">
@@ -140,7 +152,7 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. Featured PPE Gear (Dynamic Admin Bento Grid) matching HTML Mockup */}
+      {/* 3. Featured PPE Gear Section (STRICTLY Admin Featured Products Only) */}
       <section className="py-24 bg-surface">
         <div className="max-w-container-max mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
@@ -156,99 +168,128 @@ export const Home: React.FC = () => {
             </Link>
           </div>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-6 min-h-[700px]">
-            {/* Main Feature (6-col hero card) */}
-            <div className="md:col-span-6 md:row-span-2 group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[400px]">
-              <img
-                src={getImageUrl(mainFeatured?.primaryImage)}
-                alt={mainFeatured?.title || 'Titan-X Safety System'}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/60 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-8">
-                <div className="bg-primary-container text-on-primary-container inline-block px-3 py-1 font-label-caps mb-4 rounded-xs">
-                  {mainFeatured?.statusTag || 'NEW RELEASE'}
+          {featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 min-h-[550px]">
+              {/* Main Hero Card for Featured Product */}
+              <div className={`${featuredProducts.length > 1 ? 'md:col-span-8' : 'md:col-span-12'} group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[480px] flex flex-col justify-between p-8`}>
+                <img
+                  src={mainImageToShow}
+                  alt={mainFeatured?.title || 'Featured Product'}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/60 to-transparent" />
+
+                {/* Top Badge */}
+                <div className="relative z-10 flex justify-between items-start">
+                  <div className="bg-primary-container text-on-primary-container px-3 py-1 font-label-caps rounded-xs font-bold uppercase tracking-wider">
+                    {mainFeatured?.statusTag || 'FEATURED GEAR'}
+                  </div>
+                  {mainFeatured?.price && (
+                    <div className="bg-surface/80 backdrop-blur-sm border border-outline-variant text-primary px-4 py-1.5 font-mono font-bold text-lg rounded-xs">
+                      ${Number(mainFeatured.price).toFixed(2)}
+                    </div>
+                  )}
                 </div>
-                <h3 className="font-headline-lg text-on-surface mb-2 font-bold">
-                  {mainFeatured?.title || 'Titan-X Safety System'}
-                </h3>
-                <p className="text-on-surface-variant max-w-sm mb-6 font-body-sm line-clamp-2">
-                  {mainFeatured?.description || 'Impact-resistant carbon composite shells for extreme environments.'}
-                </p>
-                {/* View Specs Button: Navigates directly to Product Detail page */}
-                <Link
-                  to={`/products/${mainFeatured?.slug || 'gsh-elite-industrial-gloves'}`}
-                  className="bg-white text-surface px-6 py-2.5 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary transition-colors rounded-xs cursor-pointer"
-                >
-                  View Specs <span className="material-symbols-outlined">open_in_new</span>
-                </Link>
-              </div>
-            </div>
 
-            {/* Secondary Feature 1 (6-col card) */}
-            <div className="md:col-span-6 md:row-span-1 group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[240px]">
-              <img
-                src={secondaryFeatured1 ? getImageUrl(secondaryFeatured1.primaryImage) : PRO_VIS_IMG}
-                alt={secondaryFeatured1?.title || 'Pro-Vis Series'}
-                className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = PRO_VIS_IMG;
-                }}
-              />
-              <div className="absolute inset-0 bg-surface/40 group-hover:bg-transparent transition-colors" />
-              <div className="absolute top-8 left-8">
-                <h3 className="font-title-md text-on-surface font-bold text-xl">
-                  {secondaryFeatured1?.title || 'Pro-Vis Series'}
-                </h3>
-                <p className="text-on-surface-variant font-body-sm line-clamp-1">
-                  {secondaryFeatured1?.description || 'EN ISO 20471 Certified High-Vis'}
-                </p>
-                <Link
-                  to={`/products/${secondaryFeatured1?.slug || ''}`}
-                  className="inline-block mt-3 text-primary font-label-caps hover:underline text-xs"
-                >
-                  View Product Detail →
-                </Link>
-              </div>
-            </div>
+                {/* Content & Action */}
+                <div className="relative z-10 space-y-4 max-w-xl">
+                  <h3 className="font-headline-lg text-headline-lg text-on-surface font-extrabold leading-tight">
+                    {mainFeatured?.title}
+                  </h3>
+                  <p className="text-on-surface-variant font-body-sm line-clamp-3">
+                    {mainFeatured?.description || 'Industrial precision engineered safety solution.'}
+                  </p>
 
-            {/* Secondary Feature 2 (3-col card) */}
-            <div className="md:col-span-3 md:row-span-1 group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[220px]">
-              <img
-                src={secondaryFeatured2 ? getImageUrl(secondaryFeatured2.primaryImage) : BOOTS_IMG}
-                alt={secondaryFeatured2?.title || 'IronStride Boots'}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = BOOTS_IMG;
-                }}
-              />
-              <Link
-                to={`/products/${secondaryFeatured2?.slug || ''}`}
-                className="absolute inset-x-0 bottom-0 p-6 bg-surface-container/90 backdrop-blur-sm transform translate-y-full group-hover:translate-y-0 transition-transform block"
-              >
-                <span className="font-label-caps text-primary text-xs uppercase block mb-1">FEATURED GEAR</span>
-                <div className="text-on-surface font-title-md font-bold truncate">
-                  {secondaryFeatured2?.title || 'IronStride Boots'}
+                  {/* Dynamic Gallery Thumbnails Strip (if Admin uploaded multiple pictures for this product) */}
+                  {featuredGallery.length > 1 && (
+                    <div className="pt-2 pb-1">
+                      <span className="text-[11px] font-label-caps text-primary uppercase block mb-2 font-bold">
+                        📸 Product Photos ({featuredGallery.length} Available):
+                      </span>
+                      <div className="flex gap-3">
+                        {featuredGallery.map((imgUrl, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setActiveGalleryIndex(idx)}
+                            className={`w-14 h-14 rounded-xs border-2 overflow-hidden transition-all cursor-pointer ${
+                              activeGalleryIndex === idx
+                                ? 'border-primary shadow-lg scale-105'
+                                : 'border-outline-variant/60 opacity-70 hover:opacity-100'
+                            }`}
+                          >
+                            <img src={imgUrl} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-3">
+                    <Link
+                      to={`/products/${mainFeatured?.slug}`}
+                      className="bg-white text-surface px-8 py-3 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary transition-colors rounded-xs cursor-pointer orange-glow"
+                    >
+                      View Specs <span className="material-symbols-outlined">open_in_new</span>
+                    </Link>
+                  </div>
                 </div>
-              </Link>
-            </div>
+              </div>
 
-            {/* Secondary Feature 3 (3-col custom fitting solution card) */}
-            <div className="md:col-span-3 md:row-span-1 group relative overflow-hidden bg-surface-container-high border border-primary-container/30 flex flex-col justify-center items-center text-center p-8">
-              <span className="material-symbols-outlined text-primary text-5xl mb-4">settings_input_component</span>
-              <h3 className="font-title-md text-on-surface mb-2 font-bold">Custom Fitting</h3>
-              <p className="font-body-sm text-on-surface-variant text-xs">
-                Tailored safety solutions for your entire workforce.
+              {/* Additional Featured Products (Only rendered if Admin marked 2nd or 3rd product as featured) */}
+              {featuredProducts.length > 1 && (
+                <div className="md:col-span-4 flex flex-col gap-6">
+                  {featuredProducts.slice(1, 3).map((item, index) => (
+                    <div
+                      key={item.id || index}
+                      className="group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[220px] flex-1 flex flex-col justify-end p-6"
+                    >
+                      <img
+                        src={getImageUrl(item.primaryImage)}
+                        alt={item.title}
+                        className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-105"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/70 to-transparent" />
+                      <div className="relative z-10">
+                        <span className="font-label-caps text-primary text-xs uppercase block mb-1 font-bold">
+                          ⭐ FEATURED GEAR #{index + 2}
+                        </span>
+                        <h4 className="font-title-md text-on-surface font-bold text-lg mb-1 truncate">
+                          {item.title}
+                        </h4>
+                        <p className="text-on-surface-variant text-xs line-clamp-1 mb-3">
+                          {item.description}
+                        </p>
+                        <Link
+                          to={`/products/${item.slug}`}
+                          className="text-primary font-label-caps hover:underline text-xs inline-flex items-center gap-1 font-bold"
+                        >
+                          View Specs →
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-surface-container border border-outline-variant p-12 text-center rounded-xs space-y-4">
+              <span className="material-symbols-outlined text-primary text-5xl">grade</span>
+              <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Featured Products Selected</h3>
+              <p className="font-body-sm text-on-surface-variant max-w-md mx-auto">
+                No items are currently set as Featured. In Admin Panel, check the "⭐ Feature this Product on Home Page" option on any product to display it here.
               </p>
-              <Link to="/rfq" className="mt-4 text-primary font-label-caps hover:underline text-xs">
-                Get Started
+              <Link to="/products" className="inline-block font-label-caps text-primary underline text-sm">
+                Browse Full Catalog →
               </Link>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
