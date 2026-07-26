@@ -60,10 +60,10 @@ export const Navbar: React.FC = () => {
         <nav className="flex justify-between items-center px-gutter w-full max-w-container-max mx-auto h-20 gap-4">
           {/* Left: Brand Logo & Navigation Links Container */}
           <div className="flex items-center gap-6 lg:gap-10 min-w-0 flex-shrink-0">
-            {/* Brand Logo */}
-            <Link to="/" className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+            {/* Brand Logo (Non-clickable static header emblem) */}
+            <div className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap cursor-default">
               <Logo />
-            </Link>
+            </div>
 
             {/* Nav Links (Desktop) */}
             <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-shrink-0 whitespace-nowrap font-body-lg">

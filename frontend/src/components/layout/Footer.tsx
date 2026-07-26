@@ -7,9 +7,9 @@ export const Footer: React.FC = () => {
       <div className="max-w-container-max mx-auto px-gutter flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
         {/* Left: Brand Name & Copyright */}
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left flex-shrink-0">
-          <Link to="/" className="font-headline-lg text-lg font-bold text-on-surface hover:text-primary transition-colors whitespace-nowrap">
+          <span className="font-headline-lg text-lg font-bold text-on-surface whitespace-nowrap cursor-default">
             Ghulam Safety Hub
-          </Link>
+          </span>
           <span className="text-on-surface-variant/70 font-mono text-[11px] whitespace-nowrap">
             © {new Date().getFullYear()} Ghulam Safety Hub. Industrial Precision Engineering.
           </span>

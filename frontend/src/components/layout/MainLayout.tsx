@@ -11,7 +11,7 @@ export const MainLayout: React.FC = () => {
       <Navbar />
 
       {/* Main Page Body */}
-      <main className="flex-1 w-full max-w-container-max mx-auto px-gutter py-stack-lg">
+      <main className="flex-1 w-full">
         <Outlet />
       </main>
 
