@@ -164,6 +164,128 @@ export const ProductDetail: React.FC = () => {
     { title: 'Reinforced Core', description: 'Proprietary HPPE blend provides ANSI level A4 cut protection without sacrificing tactile sensitivity. 13-gauge seamless knit liner for comfort.', icon: 'shield' },
   ];
 
+  const handleDownloadPdf = () => {
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Please allow popups in your browser to view and save the Technical Data Sheet PDF.');
+      return;
+    }
+
+    const certsList = (product.certifications && product.certifications.length > 0
+      ? product.certifications
+      : ['CE Certified', 'ISO 9001:2015', 'EN 388:2016']
+    );
+
+    const specsRows = (displaySpecs && displaySpecs.length > 0 ? displaySpecs : [
+      { key: 'Impact Protection', value: 'Level 3 (EN 388)' },
+      { key: 'Abrasion Rating', value: '4X (High Intensity)' },
+      { key: 'Thermal Resistance', value: 'Up to 250°C' },
+      { key: 'Material Composition', value: 'Nitri-Flex / Kevlar Blend' },
+    ]).map(s => `
+      <tr>
+        <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-weight: bold; color: #1e293b;">${s.key}</td>
+        <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; color: #475569; font-family: monospace;">${s.value}</td>
+      </tr>
+    `).join('');
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Technical Data Sheet - ${product.title} (SKU: ${product.sku})</title>
+          <style>
+            @page { size: A4; margin: 15mm; }
+            body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #0f172a; margin: 0; padding: 20px; background: #fff; }
+            .header { border-bottom: 3px solid #ff6b00; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
+            .title { font-size: 22px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.5px; }
+            .subtitle { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+            .doc-id { font-family: monospace; font-size: 12px; color: #ff6b00; font-weight: bold; }
+            .grid { display: flex; gap: 30px; margin-bottom: 30px; }
+            .img-box { width: 200px; height: 200px; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; flex-shrink: 0; }
+            .img-box img { width: 100%; height: 100%; object-fit: cover; }
+            .info-box { flex: 1; }
+            .product-title { font-size: 20px; font-weight: bold; color: #0f172a; margin-bottom: 8px; }
+            .meta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 15px; }
+            .meta-item { background: #f8fafc; padding: 6px 12px; border-radius: 4px; border: 1px solid #e2e8f0; }
+            .meta-label { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: bold; display: block; }
+            .meta-val { font-weight: bold; color: #0f172a; font-size: 12px; }
+            .desc { font-size: 12px; color: #334155; line-height: 1.6; margin-bottom: 20px; }
+            .section-heading { font-size: 13px; font-weight: 800; text-transform: uppercase; color: #ff6b00; border-bottom: 2px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 12px; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 25px; font-size: 12px; }
+            .cert-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; }
+            .cert-badge { background: #0f172a; color: #ff6b00; padding: 6px 12px; font-size: 11px; font-weight: bold; font-family: monospace; border-radius: 4px; }
+            .footer { margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 15px; font-size: 10px; color: #64748b; display: flex; justify-content: space-between; align-items: center; }
+            @media print {
+              .no-print { display: none !important; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="no-print" style="background: #fff7ed; border: 1px solid #ffedd5; padding: 12px 20px; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 13px; color: #c2410c; font-weight: bold;">📄 Technical Data Sheet Preview (Printable PDF Ready)</span>
+            <button onclick="window.print()" style="background: #ff6b00; color: #fff; border: none; padding: 8px 18px; font-weight: bold; border-radius: 4px; cursor: pointer;">Save as PDF / Print</button>
+          </div>
+
+          <div class="header">
+            <div>
+              <div class="title">Ghulam Safety Hub</div>
+              <div class="subtitle">Industrial Protective Equipment • Technical Data Sheet (TDS)</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="doc-id">DOC: TDS-GSH-${product.sku}</div>
+              <div style="font-size: 10px; color: #64748b;">Generated: ${new Date().toLocaleDateString()}</div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="img-box">
+              <img src="${currentMedia.url}" alt="${product.title}" />
+            </div>
+            <div class="info-box">
+              <div class="product-title">${product.title}</div>
+              <div class="meta-row">
+                <div class="meta-item"><span class="meta-label">SKU Number</span><span class="meta-val">${product.sku}</span></div>
+                <div class="meta-item"><span class="meta-label">Wholesale Price</span><span class="meta-val">$${Number(product.price).toFixed(2)}</span></div>
+                <div class="meta-item"><span class="meta-label">MOQ</span><span class="meta-val">${product.moq || 50} Units</span></div>
+                <div class="meta-item"><span class="meta-label">Stock Status</span><span class="meta-val">${product.stockStatus || 'IN STOCK'}</span></div>
+              </div>
+              <div class="desc">${product.description}</div>
+            </div>
+          </div>
+
+          <div class="section-heading">Certified Safety Standards & Compliance</div>
+          <div class="cert-badges">
+            ${certsList.map(c => `<div class="cert-badge">✓ ${c}</div>`).join('')}
+          </div>
+
+          <div class="section-heading">Engineering & Technical Specifications</div>
+          <table>
+            <tbody>
+              ${specsRows}
+            </tbody>
+          </table>
+
+          <div class="footer">
+            <div>© ${new Date().getFullYear()} Ghulam Safety Hub. All Rights Reserved. Official Technical Specification.</div>
+            <div>International Logistics: Dubai • Singapore • Sialkot</div>
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.open();
+    printWindow.document.write(htmlContent);
+    printWindow.document.close();
+  };
+
   return (
     <div className="w-full">
       {addedToast && (
@@ -350,8 +472,8 @@ export const ProductDetail: React.FC = () => {
                 Request Wholesale Quote
               </button>
               <button
-                onClick={() => alert(`Technical Specs PDF for ${product.title} (SKU: ${product.sku}) generated.`)}
-                className="px-8 py-4 border border-outline-variant hover:border-primary transition-all flex items-center justify-center"
+                onClick={handleDownloadPdf}
+                className="px-8 py-4 border border-outline-variant hover:border-primary hover:text-primary transition-all flex items-center justify-center font-bold cursor-pointer"
               >
                 <span className="material-symbols-outlined">download</span>
                 <span className="ml-2 font-label-caps">Technical Specs PDF</span>
