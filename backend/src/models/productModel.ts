@@ -26,9 +26,9 @@ export class ProductModel {
     const params: any[] = [];
 
     if (query.search) {
-      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ?)`;
+      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ? OR c.name LIKE ? OR p.series_name LIKE ?)`;
       const searchPattern = `%${query.search}%`;
-      params.push(searchPattern, searchPattern, searchPattern);
+      params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
     }
 
     if (query.category && query.category !== 'all') {
@@ -64,11 +64,15 @@ export class ProductModel {
     }
 
     if (query.certification) {
-      sql += ` AND EXISTS (
-        SELECT 1 FROM product_specs ps 
-        WHERE ps.product_id = p.id AND ps.spec_value LIKE ?
-      )`;
-      params.push(`%${query.certification}%`);
+      const certList = String(query.certification).split(',').map(c => c.trim()).filter(Boolean);
+      if (certList.length > 0) {
+        const certConditions = certList.map(() => `ps.spec_value LIKE ?`).join(' OR ');
+        sql += ` AND EXISTS (
+          SELECT 1 FROM product_specs ps 
+          WHERE ps.product_id = p.id AND (${certConditions})
+        )`;
+        certList.forEach(c => params.push(`%${c}%`));
+      }
     }
 
     // Sorting logic
@@ -100,9 +104,9 @@ export class ProductModel {
     const params: any[] = [];
 
     if (query.search) {
-      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ?)`;
+      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ? OR c.name LIKE ? OR p.series_name LIKE ?)`;
       const searchPattern = `%${query.search}%`;
-      params.push(searchPattern, searchPattern, searchPattern);
+      params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
     }
 
     if (query.category && query.category !== 'all') {
@@ -138,11 +142,15 @@ export class ProductModel {
     }
 
     if (query.certification) {
-      sql += ` AND EXISTS (
-        SELECT 1 FROM product_specs ps 
-        WHERE ps.product_id = p.id AND ps.spec_value LIKE ?
-      )`;
-      params.push(`%${query.certification}%`);
+      const certList = String(query.certification).split(',').map(c => c.trim()).filter(Boolean);
+      if (certList.length > 0) {
+        const certConditions = certList.map(() => `ps.spec_value LIKE ?`).join(' OR ');
+        sql += ` AND EXISTS (
+          SELECT 1 FROM product_specs ps 
+          WHERE ps.product_id = p.id AND (${certConditions})
+        )`;
+        certList.forEach(c => params.push(`%${c}%`));
+      }
     }
 
     const [rows] = await dbPool.query<RowDataPacket[]>(sql, params);

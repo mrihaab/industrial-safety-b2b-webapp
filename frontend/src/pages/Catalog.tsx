@@ -6,14 +6,14 @@ import { Loader } from '@/components/ui/Loader';
 import { ProductService } from '@/services/productService';
 
 export const Catalog: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const urlSearch = searchParams.get('search') || '';
 
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [stockFilter, setStockFilter] = useState('all');
-  const [certificationFilter, setCertificationFilter] = useState('all');
+  const [selectedCertifications, setSelectedCertifications] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('Performance Tier');
   const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,12 +30,14 @@ export const Catalog: React.FC = () => {
       setLoading(true);
       try {
         const categoryQuery = selectedCategories.length > 0 ? selectedCategories.join(',') : undefined;
+        const certQuery = selectedCertifications.length > 0 ? selectedCertifications.join(',') : undefined;
+
         const response = await ProductService.getProducts({
           category: categoryQuery,
           stock: stockFilter !== 'all' ? stockFilter : undefined,
-          certification: certificationFilter !== 'all' ? certificationFilter : undefined,
+          certification: certQuery,
           sort: sortBy,
-          search: searchQuery || undefined,
+          search: searchQuery.trim() || undefined,
           page: currentPage,
           limit: 12,
         });
@@ -49,16 +51,21 @@ export const Catalog: React.FC = () => {
           } else {
             setTotalCount(response.data.length);
           }
+        } else {
+          setProducts([]);
+          setTotalCount(0);
         }
       } catch (err: unknown) {
         console.warn('API error during product catalog fetch:', err);
+        setProducts([]);
+        setTotalCount(0);
       } finally {
         setLoading(false);
       }
     };
 
     fetchProducts();
-  }, [selectedCategories, stockFilter, certificationFilter, sortBy, searchQuery, currentPage]);
+  }, [selectedCategories, stockFilter, selectedCertifications, sortBy, searchQuery, currentPage]);
 
   const handleToggleCategory = (categorySlug: string) => {
     setSelectedCategories(prev => {
@@ -76,12 +83,29 @@ export const Catalog: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleToggleCertification = (cert: string) => {
+    setSelectedCertifications(prev => {
+      if (prev.includes(cert)) {
+        return prev.filter(c => c !== cert);
+      } else {
+        return [...prev, cert];
+      }
+    });
+    setCurrentPage(1);
+  };
+
+  const handleSelectAllCertifications = () => {
+    setSelectedCertifications([]);
+    setCurrentPage(1);
+  };
+
   const handleReset = () => {
     setSelectedCategories([]);
     setStockFilter('all');
-    setCertificationFilter('all');
+    setSelectedCertifications([]);
     setSortBy('Performance Tier');
     setSearchQuery('');
+    setSearchParams({});
     setCurrentPage(1);
   };
 
@@ -95,8 +119,9 @@ export const Catalog: React.FC = () => {
           onSelectAllCategories={handleSelectAllCategories}
           stockFilter={stockFilter}
           onSelectStockFilter={setStockFilter}
-          certificationFilter={certificationFilter}
-          onSelectCertificationFilter={setCertificationFilter}
+          selectedCertifications={selectedCertifications}
+          onToggleCertification={handleToggleCertification}
+          onSelectAllCertifications={handleSelectAllCertifications}
           onReset={handleReset}
         />
 
@@ -108,17 +133,17 @@ export const Catalog: React.FC = () => {
               <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight font-extrabold">
                 PPE & Safety Gear
               </h1>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
+              <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
                 {searchQuery ? (
                   <span>
                     Search results for <strong className="text-primary font-mono font-bold">"{searchQuery}"</strong> ({products.length} found)
                   </span>
-                ) : certificationFilter !== 'all' ? (
+                ) : selectedCertifications.length > 0 ? (
                   <span>
-                    Filtered by certification <strong className="text-primary font-mono font-bold">"{certificationFilter}"</strong> ({products.length} found)
+                    Filtered by certifications <strong className="text-primary font-mono font-bold">"{selectedCertifications.join(', ')}"</strong> ({products.length} found)
                   </span>
                 ) : (
-                  <span>Showing 1-{products.length} of {totalCount > 0 ? totalCount : 148} industrial-grade solutions</span>
+                  <span>Showing 1-{products.length} of {totalCount > 0 ? totalCount : products.length} industrial-grade solutions</span>
                 )}
               </p>
             </div>
@@ -152,10 +177,13 @@ export const Catalog: React.FC = () => {
               <span className="material-symbols-outlined text-primary text-5xl">search_off</span>
               <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Products Found</h3>
               <p className="font-body-sm text-on-surface-variant max-w-sm mx-auto">
-                No safety items match your selected certification or filters. Try clearing your search parameters.
+                No safety items match your selected filters or search query <strong className="text-primary">{searchQuery ? `"${searchQuery}"` : ''}</strong>.
               </p>
-              <button onClick={handleReset} className="font-label-caps text-primary underline text-sm">
-                Clear Search & Filters
+              <button
+                onClick={handleReset}
+                className="font-label-caps text-primary underline text-sm cursor-pointer font-bold uppercase tracking-wider"
+              >
+                Clear Search & Reset All Filters
               </button>
             </div>
           )}

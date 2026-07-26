@@ -7,16 +7,20 @@ interface FilterSidebarProps {
   onSelectAllCategories: () => void;
   stockFilter: string;
   onSelectStockFilter: (stock: string) => void;
-  certificationFilter: string;
-  onSelectCertificationFilter: (cert: string) => void;
+  selectedCertifications: string[];
+  onToggleCertification: (cert: string) => void;
+  onSelectAllCertifications: () => void;
   onReset: () => void;
 }
 
 const SIDEBAR_CERTIFICATIONS = [
   'CE Certified',
-  'ANSI / ISEA 107',
   'ISO 9001:2015',
+  'ANSI / ISEA 107',
+  'EN 388:2016',
   'OSHA Ready',
+  'REACH Compliant',
+  'UKCA',
 ];
 
 export const FilterSidebar: React.FC<FilterSidebarProps> = ({
@@ -25,8 +29,9 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onSelectAllCategories,
   stockFilter,
   onSelectStockFilter,
-  certificationFilter,
-  onSelectCertificationFilter,
+  selectedCertifications,
+  onToggleCertification,
+  onSelectAllCertifications,
   onReset,
 }) => {
   const [categories, setCategories] = useState<CategoryTreeDto[]>([]);
@@ -47,6 +52,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   }, []);
 
   const isAllCategoriesSelected = selectedCategories.length === 0;
+  const isAllCertificationsSelected = selectedCertifications.length === 0;
 
   return (
     <aside className="w-full md:w-64 flex-shrink-0 space-y-stack-lg">
@@ -55,12 +61,12 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <span className="material-symbols-outlined text-primary">filter_list</span>
           <h2 className="font-title-md text-title-md uppercase tracking-widest text-on-surface font-bold">Filters</h2>
         </div>
-        {(!isAllCategoriesSelected || stockFilter !== 'all' || certificationFilter !== 'all') && (
+        {(!isAllCategoriesSelected || stockFilter !== 'all' || !isAllCertificationsSelected) && (
           <button
             onClick={onReset}
-            className="text-[11px] font-label-caps text-primary hover:underline cursor-pointer"
+            className="text-[11px] font-label-caps text-primary hover:underline cursor-pointer font-bold"
           >
-            Reset All
+            Clear All
           </button>
         )}
       </div>
@@ -200,7 +206,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
       </div>
 
-      {/* Dynamic Certification Filter */}
+      {/* Multi-Select Certification Standards Section */}
       <div className="border-t border-outline-variant pt-stack-md">
         <h3 className="font-label-caps text-label-caps text-primary mb-stack-md uppercase tracking-wider font-bold">
           Certification Standards
@@ -209,25 +215,25 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <label className="flex items-center gap-3 group cursor-pointer">
             <input
               type="checkbox"
-              checked={certificationFilter === 'all'}
-              onChange={() => onSelectCertificationFilter('all')}
+              checked={isAllCertificationsSelected}
+              onChange={onSelectAllCertifications}
               className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
             />
             <span className={`font-body-sm text-body-sm transition-colors ${
-              certificationFilter === 'all' ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:text-on-surface'
+              isAllCertificationsSelected ? 'text-primary font-bold' : 'text-on-surface-variant group-hover:text-on-surface'
             }`}>
               All Certifications
             </span>
           </label>
 
           {SIDEBAR_CERTIFICATIONS.map(cert => {
-            const isCertChecked = certificationFilter === cert;
+            const isCertChecked = selectedCertifications.includes(cert);
             return (
               <label key={cert} className="flex items-center gap-3 group cursor-pointer">
                 <input
                   type="checkbox"
                   checked={isCertChecked}
-                  onChange={() => onSelectCertificationFilter(isCertChecked ? 'all' : cert)}
+                  onChange={() => onToggleCertification(cert)}
                   className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
                 />
                 <span className={`font-body-sm text-body-sm transition-colors ${
@@ -244,7 +250,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       <div className="pt-stack-lg">
         <button
           onClick={onReset}
-          className="w-full font-label-caps text-label-caps py-3 border border-primary text-primary hover:bg-primary-container hover:text-on-primary-container transition-all uppercase tracking-widest cursor-pointer"
+          className="w-full font-label-caps text-label-caps py-3 border border-primary text-primary hover:bg-primary-container hover:text-on-primary-container transition-all uppercase tracking-widest cursor-pointer font-bold"
         >
           Clear All Filters
         </button>
