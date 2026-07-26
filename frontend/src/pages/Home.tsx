@@ -67,7 +67,7 @@ export const Home: React.FC = () => {
   return (
     <div className="w-full space-y-0">
       {/* 1. Hero Section matching HTML Mockup */}
-      <section className="relative min-h-[85vh] flex items-center overflow-hidden industrial-grid border-b border-outline-variant -mt-stack-lg -mx-gutter px-gutter">
+      <section className="relative min-h-[85vh] w-screen left-1/2 -translate-x-1/2 flex items-center overflow-hidden industrial-grid border-b border-outline-variant -mt-stack-lg px-gutter">
         <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10" />
         <img
           src={HERO_IMG}
