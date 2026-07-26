@@ -12,6 +12,7 @@ import Rfq from '@/pages/Rfq';
 import Contact from '@/pages/Contact';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import ShippingPolicy from '@/pages/ShippingPolicy';
+import CeStandards from '@/pages/CeStandards';
 import AdminLogin from '@/pages/admin/AdminLogin';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminProducts from '@/pages/admin/AdminProducts';
@@ -34,6 +35,7 @@ export const AppRoutes: React.FC = () => {
           <Route path="contact" element={<Contact />} />
           <Route path="privacy-policy" element={<PrivacyPolicy />} />
           <Route path="shipping-policy" element={<ShippingPolicy />} />
+          <Route path="ce-standards" element={<CeStandards />} />
         </Route>
 
         {/* Admin Login Route */}

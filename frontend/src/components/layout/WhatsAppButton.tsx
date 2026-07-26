@@ -5,8 +5,8 @@ export const WhatsAppButton: React.FC = () => {
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello Ghulam Safety Hub Engineering Team, I am inquiring about wholesale safety gear procurement.')}`;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 group">
-      {/* Floating Tooltip Label (Desktop) */}
+    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 group pointer-events-none">
+      {/* Floating Tooltip Label (Desktop) - Only captures mouse when hovered directly over button */}
       <span className="hidden sm:inline-block bg-surface-container border border-outline-variant text-on-surface font-label-caps text-xs px-3 py-1.5 rounded-xs shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
         Chat with Key Account Desk
       </span>
@@ -16,7 +16,7 @@ export const WhatsAppButton: React.FC = () => {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Instant WhatsApp Key Account Support"
-        className="relative bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center orange-glow-hover"
+        className="pointer-events-auto relative bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center orange-glow-hover"
       >
         {/* Active Online Pulse Indicator */}
         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
