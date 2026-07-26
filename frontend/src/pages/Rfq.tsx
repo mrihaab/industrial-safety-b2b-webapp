@@ -343,7 +343,7 @@ export const Rfq: React.FC = () => {
               </div>
               <div>
                 <p className="font-bold">Global Sales Hotline</p>
-                <p className="text-body-sm text-on-surface-variant font-mono">+971 4 555 0192</p>
+                <p className="text-body-sm text-on-surface-variant font-mono">03267249998</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -352,7 +352,7 @@ export const Rfq: React.FC = () => {
               </div>
               <div>
                 <p className="font-bold">Enterprise Desk</p>
-                <p className="text-body-sm text-on-surface-variant font-mono">bulk@ghulamsafety.com</p>
+                <p className="text-body-sm text-on-surface-variant font-mono">ghulamsafehub@gmail.com</p>
               </div>
             </div>
           </div>

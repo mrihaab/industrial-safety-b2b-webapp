@@ -204,7 +204,7 @@ export const Contact: React.FC = () => {
                 <span>YouTube Demos</span>
               </a>
               <a
-                href="https://wa.me/97145550192"
+                href="https://wa.me/923267249998"
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 p-3 bg-[#25D366]/10 border border-[#25D366]/40 rounded-xs hover:border-[#25D366] transition-colors text-[#25D366] font-semibold"

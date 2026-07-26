@@ -6,7 +6,7 @@ export class MailService {
    * Send notification email to sales desk on RFQ submission
    */
   static async sendRfqNotification(payload: RfqEmailPayload): Promise<boolean> {
-    const targetRecipient = process.env.SMTP_USER || 'bulk@ghulamsafety.com';
+    const targetRecipient = process.env.SMTP_USER || 'ghulamsafehub@gmail.com';
     const { subject, html, text } = buildRfqNotificationEmail(payload);
 
     try {
