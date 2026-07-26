@@ -12,10 +12,35 @@ export const Navbar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    const searchParam = new URLSearchParams(location.search).get('search') || '';
+    setSearchQuery(searchParam);
+  }, [location.search]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    if (!val.trim()) {
+      if (location.pathname === '/products') {
+        navigate('/products', { replace: true });
+      }
+    } else {
+      navigate(`/products?search=${encodeURIComponent(val.trim())}`, { replace: true });
+    }
+  };
+
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+    if (!searchQuery.trim()) {
+      navigate('/products', { replace: true });
+    } else {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`, { replace: true });
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    if (location.pathname === '/products') {
+      navigate('/products', { replace: true });
     }
   };
 
@@ -90,14 +115,14 @@ export const Navbar: React.FC = () => {
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={e => handleSearchChange(e.target.value)}
                   placeholder="Search safety products..."
                   className="bg-transparent border-none focus:ring-0 text-xs font-body-sm w-36 xl:w-56 text-on-surface px-2 focus:outline-none placeholder:text-on-surface-variant/60 whitespace-nowrap"
                 />
                 {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => setSearchQuery('')}
+                    onClick={handleClearSearch}
                     className="text-on-surface-variant hover:text-primary text-xs ml-1 cursor-pointer"
                   >
                     ✕
