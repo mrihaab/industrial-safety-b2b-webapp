@@ -35,7 +35,7 @@ export const About: React.FC = () => {
           
           {/* VERBATIM CLIENT COPY */}
           <blockquote className="font-body-lg text-lg text-on-surface leading-relaxed italic border-l-2 border-outline-variant pl-6 py-2">
-            "Ghulam Safety Hub was founded to provide reliable, high-quality safety products that protect hardworking people every day. What started as a local business is growing into a trusted brand serving customers across Pakistan and international markets. The company specializes in safety gloves, workwear, safety vests, coveralls, and protective equipment built for durability, comfort, and performance — with a mission to help businesses create safer workplaces without compromising on quality, and a focus on long-term partnerships through honest service, competitive pricing, and consistent quality."
+            "Ghulam Safety Hub was founded with a simple mission: to provide reliable, high-quality safety products that protect hardworking people every day. What started as a local business is now growing into a trusted brand serving customers across Pakistan and international markets. We specialize in safety gloves, workwear, safety vests, coveralls, and protective equipment built for durability, comfort, and performance. Our purpose is to help businesses create safer workplaces without compromising on quality. Every product reflects our commitment to excellence, reliability, and customer satisfaction. We focus on building long-term partnerships through honest service, competitive pricing, and consistent quality. Choose Ghulam Safety Hub for safety solutions you can trust and a partner dedicated to your success."
           </blockquote>
         </GlassCard>
       </section>

@@ -67,8 +67,8 @@ export const Contact: React.FC = () => {
           <p className="font-body-sm text-on-surface-variant">
             Direct wholesale quotes and enterprise contract inquiries:
           </p>
-          <a href="mailto:bulk@ghulamsafety.com" className="font-mono text-primary text-sm font-bold block hover:underline">
-            bulk@ghulamsafety.com
+          <a href="mailto:ghulamsafehub@gmail.com" className="font-mono text-primary text-sm font-bold block hover:underline">
+            ghulamsafehub@gmail.com
           </a>
           <span className="text-xs text-on-surface-variant block">Response within 4 business hours</span>
         </Card>
@@ -81,8 +81,8 @@ export const Contact: React.FC = () => {
           <p className="font-body-sm text-on-surface-variant">
             Direct helpline for urgent dispatch and order status tracking:
           </p>
-          <a href="tel:+97145550192" className="font-mono text-primary text-sm font-bold block hover:underline">
-            +971 4 555 0192
+          <a href="tel:03267249998" className="font-mono text-primary text-sm font-bold block hover:underline">
+            03267249998
           </a>
           <span className="text-xs text-on-surface-variant block">24/7 International Customer Line</span>
         </Card>
