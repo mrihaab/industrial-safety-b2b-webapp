@@ -159,18 +159,18 @@ export const AdminInquiries: React.FC = () => {
                         value={inq.status}
                         disabled={updatingId === inq.id}
                         onChange={e => handleStatusChange(inq.id, e.target.value)}
-                        className={`text-xs font-label-caps font-bold rounded-xs px-2 py-1 border transition-all ${
+                        className={`text-xs font-label-caps font-bold rounded-xs px-3 py-1.5 border transition-all cursor-pointer bg-[#1e293b] ${
                           inq.status === 'pending'
-                            ? 'bg-warning/10 text-warning border-warning/40'
+                            ? 'text-amber-400 border-amber-500/50'
                             : inq.status === 'approved' || inq.status === 'completed'
-                            ? 'bg-success/10 text-success border-success/40'
-                            : 'bg-error/10 text-error border-error/40'
+                            ? 'text-emerald-400 border-emerald-500/50'
+                            : 'text-rose-400 border-rose-500/50'
                         }`}
                       >
-                        <option value="pending">PENDING</option>
-                        <option value="approved">APPROVED</option>
-                        <option value="completed">COMPLETED</option>
-                        <option value="rejected">REJECTED</option>
+                        <option value="pending" className="bg-[#1e293b] text-amber-400 font-bold py-2">PENDING</option>
+                        <option value="approved" className="bg-[#1e293b] text-emerald-400 font-bold py-2">APPROVED</option>
+                        <option value="completed" className="bg-[#1e293b] text-emerald-400 font-bold py-2">COMPLETED</option>
+                        <option value="rejected" className="bg-[#1e293b] text-rose-400 font-bold py-2">REJECTED</option>
                       </select>
                     </td>
                     <td className="py-4 px-6 text-right whitespace-nowrap">

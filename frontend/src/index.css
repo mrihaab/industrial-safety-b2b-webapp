@@ -58,14 +58,34 @@ input:focus, textarea:focus, select:focus {
 /* Custom Webkit Industrial Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #051424;
+  background: #0f172a;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #273647;
-  border-radius: 2px;
+  background: #334155;
+  border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #ffb693;
+  background: #ff6b00;
+}
+
+/* Global Select Option Styling for Dark Mode */
+select option {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  padding: 8px 12px !important;
+  font-weight: 600 !important;
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: #334155 !important;
+  color: #ff6b00 !important;
 }
