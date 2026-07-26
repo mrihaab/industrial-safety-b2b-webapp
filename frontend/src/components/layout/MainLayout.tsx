@@ -10,8 +10,8 @@ export const MainLayout: React.FC = () => {
       {/* Sticky Main Navbar */}
       <Navbar />
 
-      {/* Main Page Body */}
-      <main className="flex-1 w-full">
+      {/* Main Page Body matching HTML Mockup Design */}
+      <main className="flex-1 w-full max-w-container-max mx-auto px-gutter py-stack-lg">
         <Outlet />
       </main>
 
@@ -23,3 +23,5 @@ export const MainLayout: React.FC = () => {
     </div>
   );
 };
+
+export default MainLayout;
