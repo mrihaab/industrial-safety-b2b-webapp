@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { ZodError } from 'zod';
 import { RfqService } from '@/services/rfqService';
 import { createRfqSchema } from '@/validators/rfqValidator';
 
@@ -17,7 +18,15 @@ export class RfqController {
         message: 'Quotation request initialized successfully',
         data: result,
       });
-    } catch (error) {
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        const readableMsg = error.errors.map(err => err.message).join('. ');
+        res.status(400).json({
+          success: false,
+          message: readableMsg || 'Please provide valid quotation details.',
+        });
+        return;
+      }
       next(error);
     }
   }
