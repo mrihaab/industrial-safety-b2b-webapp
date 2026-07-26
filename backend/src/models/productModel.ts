@@ -18,17 +18,18 @@ export class ProductModel {
     const offset = (page - 1) * limit;
 
     let sql = `
-      SELECT p.*, c.name AS category_name, c.slug AS category_slug, c.tag_name
+      SELECT p.*, c.name AS category_name, c.slug AS category_slug, c.tag_name, parent_cat.name AS parent_category_name
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN categories parent_cat ON c.parent_id = parent_cat.id
       WHERE 1=1
     `;
     const params: any[] = [];
 
     if (query.search) {
-      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ? OR c.name LIKE ? OR p.series_name LIKE ?)`;
+      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ? OR c.name LIKE ? OR c.slug LIKE ? OR parent_cat.name LIKE ? OR parent_cat.slug LIKE ? OR p.series_name LIKE ?)`;
       const searchPattern = `%${query.search}%`;
-      params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+      params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
     }
 
     if (query.category && query.category !== 'all') {
@@ -99,14 +100,15 @@ export class ProductModel {
       SELECT COUNT(DISTINCT p.id) AS total
       FROM products p
       LEFT JOIN categories c ON p.category_id = c.id
+      LEFT JOIN categories parent_cat ON c.parent_id = parent_cat.id
       WHERE 1=1
     `;
     const params: any[] = [];
 
     if (query.search) {
-      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ? OR c.name LIKE ? OR p.series_name LIKE ?)`;
+      sql += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.sku LIKE ? OR c.name LIKE ? OR c.slug LIKE ? OR parent_cat.name LIKE ? OR parent_cat.slug LIKE ? OR p.series_name LIKE ?)`;
       const searchPattern = `%${query.search}%`;
-      params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
+      params.push(searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern);
     }
 
     if (query.category && query.category !== 'all') {

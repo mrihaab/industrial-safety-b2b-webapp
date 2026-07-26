@@ -174,16 +174,27 @@ export const Catalog: React.FC = () => {
             </div>
           ) : (
             <div className="bg-surface-container border border-outline-variant p-12 text-center rounded-xs space-y-4">
-              <span className="material-symbols-outlined text-primary text-5xl">search_off</span>
-              <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Products Found</h3>
-              <p className="font-body-sm text-on-surface-variant max-w-sm mx-auto">
-                No safety items match your selected filters or search query <strong className="text-primary">{searchQuery ? `"${searchQuery}"` : ''}</strong>.
+              <span className="material-symbols-outlined text-primary text-5xl">inventory_2</span>
+              <h3 className="font-headline-lg text-xl text-on-surface font-bold">
+                {selectedCategories.length > 0
+                  ? 'No Products Currently in This Category'
+                  : searchQuery
+                    ? `No Products Found for "${searchQuery}"`
+                    : 'No Products Available'}
+              </h3>
+              <p className="font-body-sm text-on-surface-variant max-w-md mx-auto leading-relaxed">
+                {selectedCategories.length > 0
+                  ? 'Currently, there are no active safety products listed in this specific category. New industrial-grade inventory will be added soon!'
+                  : searchQuery
+                    ? `We couldn't find any products matching "${searchQuery}". New stock is arriving soon!`
+                    : 'No items match your selected filters. Explore our full catalog by resetting filters.'}
               </p>
               <button
                 onClick={handleReset}
-                className="font-label-caps text-primary underline text-sm cursor-pointer font-bold uppercase tracking-wider"
+                className="font-label-caps text-primary underline text-sm cursor-pointer font-bold uppercase tracking-wider inline-flex items-center gap-2"
               >
-                Clear Search & Reset All Filters
+                <span className="material-symbols-outlined text-[18px]">refresh</span>
+                Explore All Products & Clear Filters
               </button>
             </div>
           )}
