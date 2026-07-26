@@ -230,15 +230,15 @@ export const ProductDetail: React.FC = () => {
         </div>
 
         {/* Right Column: Technical Details & Ordering */}
-        <div className="w-full lg:w-1/2 flex flex-col">
+        <div className="w-full lg:w-1/2 flex flex-col min-w-0">
           <div className="mb-stack-md">
             <span className="font-label-caps text-label-caps text-primary uppercase tracking-widest">
               {product.seriesName || 'Heavy Duty Series'}
             </span>
-            <h1 className="font-display-lg text-display-lg mt-2 mb-4">
+            <h1 className="font-display-lg text-display-lg mt-2 mb-4 break-words">
               {product.title}
             </h1>
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4 mb-6 flex-wrap">
               <div className="flex text-primary">
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
                 <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
@@ -256,23 +256,25 @@ export const ProductDetail: React.FC = () => {
             </div>
           </div>
 
-          <p className="text-on-surface-variant font-body-lg mb-8 leading-relaxed">
+          <p className="text-on-surface-variant font-body-lg mb-8 leading-relaxed break-words whitespace-pre-line max-w-full overflow-hidden">
             {product.description}
           </p>
 
-          {/* Technical Specifications Grid matching HTML Mockup */}
-          <div className="grid grid-cols-2 gap-px bg-outline-variant industrial-border mb-8 overflow-hidden">
-            {displaySpecs.map((s, idx) => (
-              <div key={idx} className="bg-surface-container p-4">
-                <span className="font-label-caps text-[10px] text-on-surface-variant uppercase block mb-1">
-                  {s.key}
-                </span>
-                <span className="font-title-md text-title-md">
-                  {s.value}
-                </span>
-              </div>
-            ))}
-          </div>
+          {/* Technical Specifications Grid (Only rendered if specs exist) */}
+          {displaySpecs && displaySpecs.length > 0 && (
+            <div className="grid grid-cols-2 gap-px bg-outline-variant industrial-border mb-8 overflow-hidden">
+              {displaySpecs.map((s, idx) => (
+                <div key={idx} className="bg-surface-container p-4 min-w-0">
+                  <span className="font-label-caps text-[10px] text-on-surface-variant uppercase block mb-1 truncate">
+                    {s.key}
+                  </span>
+                  <span className="font-title-md text-title-md break-words">
+                    {s.value}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Certification Badges matching HTML Mockup */}
           <div className="flex flex-wrap gap-3.5 mb-10">
