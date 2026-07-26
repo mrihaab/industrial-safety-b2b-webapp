@@ -28,8 +28,8 @@ export const Home: React.FC = () => {
       try {
         const res = await ProductService.getProducts({ limit: 50 });
         if (res.success && res.data) {
-          // Strictly filter products that Admin explicitly set as featured (is_featured = 1)
-          const featuredOnly = res.data.filter(p => p.isFeatured || (p as any).is_featured);
+          // Strictly filter products that Admin explicitly set as featured (is_featured = 1, max 3)
+          const featuredOnly = res.data.filter(p => p.isFeatured || (p as any).is_featured).slice(0, 3);
           setFeaturedProducts(featuredOnly);
 
           // If featured products exist, fetch full gallery images for the primary featured product

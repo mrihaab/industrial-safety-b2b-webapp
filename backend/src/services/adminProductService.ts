@@ -33,6 +33,13 @@ export class AdminProductService {
     featuresJson?: string,
     sizeMappingsJson?: string
   ): Promise<ProductDetailDto | null> {
+    if (input.is_featured) {
+      const currentFeatured = await AdminProductModel.countFeaturedProducts();
+      if (currentFeatured >= 3) {
+        throw new Error('Maximum limit reached: You can only feature up to 3 products on the home page at a time. Please unfeature another product first.');
+      }
+    }
+
     const productId = await AdminProductModel.insertProduct(input);
 
     let sizeMappings: Record<number, string> = {};
@@ -111,6 +118,13 @@ export class AdminProductService {
     sizeMappingsJson?: string,
     existingImagesJson?: string
   ): Promise<ProductDetailDto | null> {
+    if (input.is_featured === true) {
+      const currentFeatured = await AdminProductModel.countFeaturedProducts(id);
+      if (currentFeatured >= 3) {
+        throw new Error('Maximum limit reached: You can only feature up to 3 products on the home page at a time. Please unfeature another product first.');
+      }
+    }
+
     const success = await AdminProductModel.updateProduct(id, input);
 
     let sizeMappings: Record<number, string> = {};

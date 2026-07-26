@@ -457,20 +457,50 @@ export const AdminProducts: React.FC = () => {
           <Input label="Product Title *" value={title} onChange={e => setTitle(e.target.value)} required />
           <Input label="URL Slug" value={slug} onChange={e => setSlug(e.target.value)} placeholder="Auto-generated from title if blank" />
 
-          {/* ⭐ Feature Product Checkbox */}
-          <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs">
-            <label className="flex items-center gap-3 cursor-pointer text-xs font-bold text-on-surface">
-              <input
-                type="checkbox"
-                checked={isFeatured}
-                onChange={e => setIsFeatured(e.target.checked)}
-                className="accent-primary w-4 h-4 cursor-pointer"
-              />
-              <span className="text-primary font-bold">
-                ⭐ Feature this Product on Home Page (Display in Featured PPE Gear section)
-              </span>
-            </label>
-          </div>
+          {/* ⭐ Feature Product Checkbox (Max 3 Limit) */}
+          {(() => {
+            const currentFeaturedCount = products.filter(p => {
+              const isPFeatured = Boolean(p.isFeatured || (p as any).is_featured);
+              if (!isPFeatured) return false;
+              if (editingProduct && p.id === editingProduct.id) return false;
+              return true;
+            }).length;
+
+            const isLimitReached = !isFeatured && currentFeaturedCount >= 3;
+
+            return (
+              <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-1">
+                <div className="flex justify-between items-center">
+                  <label className="flex items-center gap-3 cursor-pointer text-xs font-bold text-on-surface">
+                    <input
+                      type="checkbox"
+                      checked={isFeatured}
+                      disabled={isLimitReached}
+                      onChange={e => {
+                        if (e.target.checked && currentFeaturedCount >= 3) {
+                          alert('Limit Reached: Only 3 products can be featured on the home page at a time. Please unfeature another product first.');
+                          return;
+                        }
+                        setIsFeatured(e.target.checked);
+                      }}
+                      className="accent-primary w-4 h-4 cursor-pointer disabled:opacity-50"
+                    />
+                    <span className="text-primary font-bold">
+                      ⭐ Feature this Product on Home Page (Display in Featured PPE Gear section)
+                    </span>
+                  </label>
+                  <span className="font-mono text-xs font-bold text-amber-400">
+                    ({currentFeaturedCount + (isFeatured ? 1 : 0)} / 3 Featured Max)
+                  </span>
+                </div>
+                {isLimitReached && (
+                  <p className="text-[11px] text-amber-400 font-mono pl-7">
+                    ⚠️ Maximum 3 products limit reached. Unfeature a product to feature this one.
+                  </p>
+                )}
+              </div>
+            );
+          })()}
 
           {/* 📜 Product Certifications Checkboxes */}
           <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-3">

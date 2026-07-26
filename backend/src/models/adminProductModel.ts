@@ -22,6 +22,21 @@ export interface AdminUpdateProductInput extends Partial<AdminCreateProductInput
 
 export class AdminProductModel {
   /**
+   * Count current featured products in database
+   */
+  static async countFeaturedProducts(excludeId?: number): Promise<number> {
+    let sql = 'SELECT COUNT(*) as count FROM products WHERE is_featured = 1';
+    const params: number[] = [];
+
+    if (excludeId !== undefined) {
+      sql += ' AND id != ?';
+      params.push(excludeId);
+    }
+
+    const [rows] = await dbPool.query<any[]>(sql, params);
+    return Number(rows[0]?.count || 0);
+  }
+  /**
    * Insert new product row
    */
   static async insertProduct(input: AdminCreateProductInput): Promise<number> {
