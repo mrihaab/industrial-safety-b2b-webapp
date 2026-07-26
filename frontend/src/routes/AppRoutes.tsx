@@ -10,6 +10,8 @@ import ProductDetail from '@/pages/ProductDetail';
 import Cart from '@/pages/Cart';
 import Rfq from '@/pages/Rfq';
 import Contact from '@/pages/Contact';
+import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import ShippingPolicy from '@/pages/ShippingPolicy';
 import AdminLogin from '@/pages/admin/AdminLogin';
 import AdminDashboard from '@/pages/admin/AdminDashboard';
 import AdminProducts from '@/pages/admin/AdminProducts';
@@ -30,6 +32,8 @@ export const AppRoutes: React.FC = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="rfq" element={<Rfq />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="shipping-policy" element={<ShippingPolicy />} />
         </Route>
 
         {/* Admin Login Route */}
