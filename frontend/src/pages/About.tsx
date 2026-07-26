@@ -10,13 +10,13 @@ export const About: React.FC = () => {
   const breadcrumbItems = [{ label: 'About Us' }];
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-10">
       {/* Breadcrumb Navigation */}
       <Breadcrumb items={breadcrumbItems} />
 
-      {/* 1. HERO BANNER */}
-      <section className="relative overflow-hidden industrial-grid border-b border-outline-variant -mx-gutter px-gutter py-16 rounded-b-lg">
-        <div className="max-w-container-max mx-auto space-y-4">
+      {/* 1. HERO BANNER - Clean Top Alignment matching Contact Page */}
+      <section className="relative overflow-hidden industrial-grid border-b border-outline-variant/60 -mx-gutter px-gutter py-6 md:py-8 rounded-b-lg">
+        <div className="max-w-container-max mx-auto space-y-2">
           <SectionHeader
             badge="COMPANY BACKGROUND"
             title="About Ghulam Safety Hub"
