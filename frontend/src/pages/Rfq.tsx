@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '@/contexts/CartContext';
 import { RfqService } from '@/services/rfqService';
 
@@ -21,6 +22,10 @@ export const Rfq: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (cartItems.length === 0) {
+      setFormError('First select the product from catalog');
+      return;
+    }
     if (!companyName || !businessEmail) {
       setFormError('Please fill in your Company Name and Business Email.');
       return;
@@ -30,13 +35,11 @@ export const Rfq: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const itemsToSubmit = cartItems.length > 0
-        ? cartItems.map(item => ({
-            productId: item.productId,
-            quantity: item.quantity,
-            sizeRange: item.sizeRange,
-          }))
-        : [{ productId: 1, quantity: 100, sizeRange: 'L' }];
+      const itemsToSubmit = cartItems.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        sizeRange: item.sizeRange,
+      }));
 
       const response = await RfqService.submitRfq({
         companyName,
@@ -180,6 +183,27 @@ export const Rfq: React.FC = () => {
               {formError && (
                 <div className="p-4 bg-error/10 border border-error/40 text-error rounded-xs font-body-sm">
                   {formError}
+                </div>
+              )}
+
+              {/* Cart Empty Warning Notice (Procurement Flow Enforcement) */}
+              {cartItems.length === 0 && (
+                <div className="p-5 bg-amber-500/10 border-2 border-amber-500/40 rounded-xs mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="material-symbols-outlined text-amber-400 text-3xl shrink-0">shopping_cart_checkout</span>
+                    <div>
+                      <h4 className="font-title-md text-amber-300 font-bold text-base">First select the product from catalog</h4>
+                      <p className="text-body-sm text-on-surface-variant text-xs mt-0.5">
+                        Please select your required safety products from our catalog first, view product details, add them to your Quote Cart, and then initialize your RFQ.
+                      </p>
+                    </div>
+                  </div>
+                  <Link
+                    to="/products"
+                    className="bg-primary-container text-on-primary-container px-5 py-2.5 font-bold text-xs orange-glow hover:scale-105 transition-all whitespace-nowrap rounded-xs shrink-0 uppercase tracking-wider"
+                  >
+                    Go to Catalog →
+                  </Link>
                 </div>
               )}
 
