@@ -15,8 +15,8 @@ export const AdminLogin: React.FC = () => {
     return <Navigate to="/admin/dashboard" replace />;
   }
 
-  const [email, setEmail] = useState('admin@ghulamsafety.com');
-  const [password, setPassword] = useState('AdminPassword123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,7 +39,7 @@ export const AdminLogin: React.FC = () => {
         setError(response.message || 'Invalid credentials.');
       }
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'Login failed.';
+      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please check your credentials.';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -66,7 +66,7 @@ export const AdminLogin: React.FC = () => {
           <Input
             label="Admin Email *"
             type="email"
-            placeholder="admin@ghulamsafety.com"
+            placeholder="admin@example.com"
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
@@ -91,10 +91,6 @@ export const AdminLogin: React.FC = () => {
             LOG IN TO DASHBOARD
           </Button>
         </form>
-
-        <div className="text-center text-xs text-on-surface-variant pt-2 border-t border-outline-variant">
-          Default Credentials: <code className="text-primary font-mono font-bold">admin@ghulamsafety.com</code>
-        </div>
       </div>
     </div>
   );
