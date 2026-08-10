@@ -42,11 +42,6 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
 
       {/* Action Buttons */}
       <div className="mt-auto space-y-4 pt-6 border-t border-outline-variant">
-        <Link to="/admin/login" onClick={onClose} className="block w-full text-center">
-          <Button variant="outline" className="w-full">
-            Admin Login
-          </Button>
-        </Link>
         <Link to="/rfq" onClick={onClose} className="block w-full text-center">
           <Button variant="primary" className="w-full">
             Request Bulk Quote

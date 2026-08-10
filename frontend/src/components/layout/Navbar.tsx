@@ -145,14 +145,6 @@ export const Navbar: React.FC = () => {
               )}
             </Link>
 
-            {/* Login Button */}
-            <Link
-              to="/admin/login"
-              className="hidden md:inline-flex items-center justify-center font-label-caps text-xs border border-outline-variant px-4 py-2 hover:bg-surface-variant transition-all text-on-surface rounded-xs whitespace-nowrap flex-shrink-0 font-bold"
-            >
-              Login
-            </Link>
-
             {/* Bulk Quote Button -> Opens Official Wholesale RFQ Page (/rfq) */}
             <Link
               to="/rfq"
