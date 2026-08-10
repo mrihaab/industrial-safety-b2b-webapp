@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -7,13 +7,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AuthService } from '@/services/authService';
 
 export const AdminLogin: React.FC = () => {
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  // If already authenticated, redirect directly to admin dashboard
+  if (isAuthenticated) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
   const [email, setEmail] = useState('admin@ghulamsafety.com');
   const [password, setPassword] = useState('AdminPassword123!');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  const { login } = useAuth();
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

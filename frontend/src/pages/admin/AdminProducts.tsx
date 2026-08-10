@@ -338,7 +338,7 @@ export const AdminProducts: React.FC = () => {
           <Loader size="lg" />
         </div>
       ) : (
-        <div className="bg-surface-container industrial-border rounded-sm overflow-hidden shadow-xl">
+        <div className="bg-surface-container industrial-border rounded-sm overflow-x-auto shadow-xl">
           <table className="w-full text-left font-body-sm text-sm">
             <thead className="bg-surface-container-high border-b border-outline-variant font-label-caps text-xs text-primary uppercase">
               <tr>

@@ -22,7 +22,7 @@ export const AdminLayout: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-background text-on-surface flex flex-col md:flex-row">
+    <div className="min-h-screen bg-background text-on-surface flex flex-col md:flex-row overflow-x-hidden">
       {/* Admin Sidebar */}
       <aside className="w-full md:w-64 border-r border-outline-variant bg-surface p-6 flex flex-col justify-between space-y-6">
         <div className="space-y-8">

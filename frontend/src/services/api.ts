@@ -54,6 +54,10 @@ class ApiClient {
     const data = await response.json();
 
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        localStorage.removeItem('gsh_admin_token');
+        localStorage.removeItem('gsh_admin_user');
+      }
       throw new Error(data.message || `API Error: ${response.statusText}`);
     }
 

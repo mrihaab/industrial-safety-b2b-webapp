@@ -6,7 +6,7 @@ import { WhatsAppButton } from '@/components/layout/WhatsAppButton';
 
 export const MainLayout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background text-on-surface flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+    <div className="min-h-screen bg-background text-on-surface flex flex-col overflow-x-hidden selection:bg-primary-container selection:text-on-primary-container">
       {/* Sticky Main Navbar */}
       <Navbar />
 
