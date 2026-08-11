@@ -390,13 +390,13 @@ export const Home: React.FC = () => {
       </section>
 
       {/* 6. Newsletter / Contact Sales CTA matching HTML Mockup */}
-      <section className="py-20 bg-primary-container -mx-gutter px-gutter rounded-sm shadow-2xl">
+      <section className="py-20 bg-surface-container border border-outline-variant -mx-gutter px-gutter rounded-sm shadow-2xl">
         <div className="max-w-container-max mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
-          <div className="text-on-primary-container text-center lg:text-left">
-            <h2 className="font-headline-lg text-headline-lg font-extrabold mb-2">
+          <div className="text-left">
+            <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold mb-2">
               Ready to Secure Your Workforce?
             </h2>
-            <p className="font-body-lg text-on-primary-container/90">
+            <p className="font-body-lg text-on-surface-variant">
               Get a custom quote for industrial-scale safety equipment.
             </p>
           </div>
@@ -405,12 +405,12 @@ export const Home: React.FC = () => {
               type="email"
               value={emailInput}
               onChange={e => setEmailInput(e.target.value)}
-              className="bg-surface/10 border border-on-primary-container/30 text-on-primary-container placeholder:text-on-primary-container/60 px-6 py-4 rounded-sm w-full lg:w-80 focus:ring-on-primary-container focus:border-on-primary-container font-mono text-sm"
+              className="bg-surface-container-high border border-outline-variant text-on-surface placeholder:text-on-surface-variant/60 px-6 py-4 rounded-sm w-full lg:w-80 focus:ring-primary focus:border-primary font-mono text-sm"
               placeholder="Corporate Email Address"
             />
             <button
               type="submit"
-              className="bg-on-primary-container text-primary-container px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-on-primary transition-colors whitespace-nowrap font-mono text-xs cursor-pointer"
+              className="bg-primary text-on-primary px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-primary-fixed-dim transition-all whitespace-nowrap font-mono text-xs cursor-pointer orange-glow"
             >
               Contact Sales
             </button>
