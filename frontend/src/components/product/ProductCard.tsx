@@ -35,6 +35,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
+  const getCleanSlug = (slug?: string): string => {
+    if (!slug) return 'gsh-elite-industrial-gloves';
+    let s = String(slug).trim();
+    if (s.startsWith('http://') || s.startsWith('https://')) {
+      try {
+        const url = new URL(s);
+        s = url.pathname.replace(/^\/products\//, '').replace(/^\//, '');
+      } catch {
+        s = s.replace(/^https?:\/*/, '');
+      }
+    }
+    s = s.replace(/^https?:\/*/, '').replace(/^\/+/, '');
+    return s || 'gsh-elite-industrial-gloves';
+  };
+
+  const cleanSlug = getCleanSlug(product.slug);
   const imageUrl = getImageUrl(product.primaryImage);
   const statusBadge = product.statusTag || 'Safety-System-Active';
   const displayPrice = formatPrice(product.price);
@@ -51,7 +67,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
       {/* Top Image Container */}
       <div className="aspect-square bg-surface-container-highest overflow-hidden relative">
-        <Link to={`/products/${product.slug}`} className="w-full h-full block">
+        <Link to={`/products/${cleanSlug}`} className="w-full h-full block">
           <img
             src={imageUrl}
             alt={product.title}
@@ -68,7 +84,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-stack-md flex-1 flex flex-col justify-between space-y-3">
         <div>
           <div className="flex justify-between items-start mb-2 gap-2">
-            <Link to={`/products/${product.slug}`}>
+            <Link to={`/products/${cleanSlug}`}>
               <h3 className="font-title-md text-title-md text-on-surface group-hover:text-primary transition-colors font-bold line-clamp-1">
                 {product.title}
               </h3>
@@ -103,7 +119,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
 
           {/* Add to Order Button */}
-          <Link to={`/products/${product.slug}`} className="block w-full">
+          <Link to={`/products/${cleanSlug}`} className="block w-full">
             <button className="w-full bg-primary-container text-on-primary-container py-3 font-label-caps text-label-caps font-bold orange-glow uppercase flex items-center justify-center gap-2 cursor-pointer transition-all active:opacity-80">
               <span className="material-symbols-outlined text-[18px]">add_shopping_cart</span>
               Add to Order

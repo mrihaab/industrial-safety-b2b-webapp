@@ -60,6 +60,9 @@ export const Home: React.FC = () => {
   };
 
   const mainFeatured = featuredProducts.length > 0 ? featuredProducts[0] : null;
+  const cleanMainSlug = mainFeatured?.slug 
+    ? mainFeatured.slug.replace(/^https?:\/*/, '').replace(/^\/+/, '') 
+    : 'gsh-elite-industrial-gloves';
   const mainImageToShow = featuredGallery.length > 0 && activeGalleryIndex < featuredGallery.length
     ? featuredGallery[activeGalleryIndex]
     : getImageUrl(mainFeatured?.primaryImage);
@@ -230,7 +233,7 @@ export const Home: React.FC = () => {
 
                   <div className="pt-3">
                     <Link
-                      to={`/products/${mainFeatured?.slug}`}
+                      to={`/products/${cleanMainSlug}`}
                       className="bg-white text-surface px-8 py-3 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary transition-colors rounded-xs cursor-pointer orange-glow"
                     >
                       View Specs <span className="material-symbols-outlined">open_in_new</span>
