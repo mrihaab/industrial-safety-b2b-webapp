@@ -60,9 +60,12 @@ export const Home: React.FC = () => {
   };
 
   const mainFeatured = featuredProducts.length > 0 ? featuredProducts[0] : null;
-  const cleanMainSlug = mainFeatured?.slug 
-    ? mainFeatured.slug.replace(/^https?:\/*/, '').replace(/^\/+/, '') 
-    : 'gsh-elite-industrial-gloves';
+  const cleanMainSlug = (mainFeatured?.slug || mainFeatured?.title || 'gsh-elite-industrial-gloves')
+    .toLowerCase()
+    .trim()
+    .replace(/^https?:\/*/, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'gsh-elite-industrial-gloves';
   const mainImageToShow = featuredGallery.length > 0 && activeGalleryIndex < featuredGallery.length
     ? featuredGallery[activeGalleryIndex]
     : getImageUrl(mainFeatured?.primaryImage);

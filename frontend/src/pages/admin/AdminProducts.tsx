@@ -261,7 +261,13 @@ export const AdminProducts: React.FC = () => {
       const formData = new FormData();
       formData.append('sku', sku);
       formData.append('title', title);
-      formData.append('slug', slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
+      const cleanFormSlug = (slug || title)
+        .toLowerCase()
+        .trim()
+        .replace(/^https?:\/*/, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      formData.append('slug', cleanFormSlug || 'product');
       formData.append('category_id', categoryId || '1');
       formData.append('price', price);
       formData.append('moq', moq);

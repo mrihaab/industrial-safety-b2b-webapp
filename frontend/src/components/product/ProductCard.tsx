@@ -35,22 +35,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
   };
 
-  const getCleanSlug = (slug?: string): string => {
-    if (!slug) return 'gsh-elite-industrial-gloves';
-    let s = String(slug).trim();
-    if (s.startsWith('http://') || s.startsWith('https://')) {
-      try {
-        const url = new URL(s);
-        s = url.pathname.replace(/^\/products\//, '').replace(/^\//, '');
-      } catch {
-        s = s.replace(/^https?:\/*/, '');
-      }
-    }
-    s = s.replace(/^https?:\/*/, '').replace(/^\/+/, '');
-    return s || 'gsh-elite-industrial-gloves';
+  const getCleanSlug = (slug?: string, title?: string): string => {
+    const raw = (slug || title || 'gsh-elite-industrial-gloves')
+      .toLowerCase()
+      .trim()
+      .replace(/^https?:\/*/, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return raw || 'gsh-elite-industrial-gloves';
   };
 
-  const cleanSlug = getCleanSlug(product.slug);
+  const cleanSlug = getCleanSlug(product.slug, product.title);
   const imageUrl = getImageUrl(product.primaryImage);
   const statusBadge = product.statusTag || 'Safety-System-Active';
   const displayPrice = formatPrice(product.price);
