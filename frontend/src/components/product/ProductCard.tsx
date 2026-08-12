@@ -26,7 +26,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const DEFAULT_SAFETY_IMAGE = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
+  const DEFAULT_SAFETY_IMAGE = 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80';
 
   const getImageUrl = (url?: string) => {
     if (!url) return DEFAULT_SAFETY_IMAGE;
