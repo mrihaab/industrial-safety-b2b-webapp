@@ -56,9 +56,9 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header className="w-full top-0 border-b border-outline-variant bg-surface sticky z-50">
-        <nav className="flex justify-between items-center px-4 sm:px-gutter w-full max-w-container-max mx-auto h-20 gap-2">
-          {/* Left: Brand Logo */}
-          <div className="flex items-center gap-4 lg:gap-10 shrink-0">
+        <nav className="flex justify-between items-center px-4 sm:px-gutter w-full max-w-container-max mx-auto h-16 sm:h-20 gap-2">
+          {/* Left: Brand Logo & Desktop Nav */}
+          <div className="flex items-center gap-4 lg:gap-10 shrink-0 min-w-0">
             <Link to="/" className="flex items-center gap-2 shrink-0">
               <Logo />
             </Link>
@@ -101,9 +101,9 @@ export const Navbar: React.FC = () => {
             </div>
           </div>
 
-          {/* Desktop & Mobile Actions Container */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            {/* Desktop Search Bar (Visible on md and up) */}
+          {/* Right Actions Container */}
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
+            {/* Desktop Search Bar */}
             <form
               onSubmit={handleSearchSubmit}
               className="hidden md:flex items-center bg-surface-container-high px-3 py-1.5 border border-outline-variant rounded-xs focus-within:border-primary transition-colors"
@@ -125,11 +125,11 @@ export const Navbar: React.FC = () => {
               )}
             </form>
 
-            {/* Mobile Search Toggle Icon (Visible on mobile < 768px) */}
+            {/* Mobile Search Toggle Icon */}
             <button
               type="button"
               onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-              className="md:hidden p-2 text-on-surface-variant hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer rounded-xs"
+              className="md:hidden p-2 text-on-surface-variant hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer rounded-xs transition-colors"
               title="Search Catalog"
             >
               <svg className="w-6 h-6 text-on-surface" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,20 +140,20 @@ export const Navbar: React.FC = () => {
             {/* Shopping Cart Icon Link */}
             <Link
               to="/cart"
-              className="relative p-2 text-on-surface-variant hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0 cursor-pointer"
+              className="relative p-2 text-on-surface-variant hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0 cursor-pointer transition-colors"
               title="View Wholesale Cart"
             >
               <svg className="w-6 h-6 text-on-surface" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
               {totalItems > 0 && (
-                <span className="absolute top-1 right-1 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
+                <span className="absolute top-1.5 right-1.5 bg-primary-container text-on-primary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse">
                   {totalItems}
                 </span>
               )}
             </Link>
 
-            {/* Desktop / Large Tablet Bulk Quote CTA Button */}
+            {/* Desktop / Tablet Bulk Quote CTA Button */}
             <Link
               to="/rfq"
               className="hidden sm:inline-flex bg-primary-container text-on-primary-container font-label-caps text-xs px-4 py-2.5 rounded-xs font-bold orange-glow uppercase tracking-wider shrink-0 items-center justify-center min-h-[40px]"
@@ -161,21 +161,21 @@ export const Navbar: React.FC = () => {
               Bulk Quote
             </Link>
 
-            {/* Mobile Hamburger Menu Toggle Button (Guaranteed Visible on All Mobile Devices) */}
+            {/* Seamless Mobile Hamburger Menu Toggle Button */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open Navigation Menu"
-              className="md:hidden p-2 text-primary hover:text-on-primary min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0 border border-primary/30 rounded-xs bg-surface-container-high cursor-pointer"
+              className="md:hidden p-2 text-on-surface hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0 cursor-pointer transition-colors"
             >
-              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
+              <svg className="w-6.5 h-6.5 text-on-surface hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
           </div>
         </nav>
 
-        {/* Mobile Dropdown Search Input Bar (Toggled on mobile < 768px) */}
+        {/* Mobile Dropdown Search Bar */}
         {mobileSearchOpen && (
           <div className="md:hidden border-t border-outline-variant bg-surface-container-high p-3 transition-all">
             <form onSubmit={handleSearchSubmit} className="flex items-center bg-surface-container-lowest px-3 py-2 border border-primary/60 rounded-xs">
