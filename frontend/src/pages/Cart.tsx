@@ -52,7 +52,7 @@ export const Cart: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Cart Items List */}
           <div className="lg:col-span-8 space-y-4">
-            <div className="flex justify-between items-center bg-surface-container-high px-6 py-4 border border-outline-variant rounded-sm font-label-caps text-xs text-primary uppercase">
+            <div className="hidden sm:flex justify-between items-center bg-surface-container-high px-6 py-4 border border-outline-variant rounded-sm font-label-caps text-xs text-primary uppercase">
               <span>Product & Selected Size</span>
               <span>MOQ / Quantity</span>
               <span>Subtotal</span>

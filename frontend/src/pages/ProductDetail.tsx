@@ -289,7 +289,7 @@ export const ProductDetail: React.FC = () => {
   return (
     <div className="w-full">
       {addedToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-surface-container-high border border-primary text-primary px-6 py-3 rounded-lg shadow-2xl font-label-caps text-xs uppercase tracking-widest animate-bounce">
+        <div className="fixed bottom-24 left-4 right-4 sm:bottom-6 sm:left-auto sm:right-6 z-50 bg-surface-container-high border border-primary text-primary px-5 py-3 rounded-lg shadow-2xl font-label-caps text-xs uppercase tracking-widest animate-bounce text-center max-w-sm ml-auto">
           ✓ Added {quantity} pairs ({selectedSizeRange}) to Bulk RFQ Cart!
         </div>
       )}
@@ -437,7 +437,7 @@ export const ProductDetail: React.FC = () => {
                 <span>MOQ: {product.moq || 50} Units</span>
                 <span className="text-primary font-bold">Volume Discounts Available</span>
               </div>
-              <div className="flex gap-4">
+              <div className="flex flex-col xs:flex-row gap-3 sm:gap-4">
                 <div className="flex-1">
                   <label className="font-label-caps text-[10px] text-on-surface-variant mb-1 block">Quantity (Pairs)</label>
                   <input
@@ -445,7 +445,7 @@ export const ProductDetail: React.FC = () => {
                     min={50}
                     value={quantity}
                     onChange={e => setQuantity(parseInt(e.target.value) || 50)}
-                    className="w-full bg-surface industrial-border rounded px-4 py-3 focus:border-primary outline-none text-on-surface"
+                    className="w-full bg-surface industrial-border rounded px-4 py-3 focus:border-primary outline-none text-on-surface min-h-[44px]"
                   />
                 </div>
                 <div className="flex-1">
@@ -453,7 +453,7 @@ export const ProductDetail: React.FC = () => {
                   <select
                     value={selectedSizeRange}
                     onChange={e => handleSelectSize(e.target.value)}
-                    className="w-full bg-surface industrial-border rounded px-4 py-3 focus:border-primary outline-none text-on-surface appearance-none cursor-pointer"
+                    className="w-full bg-surface industrial-border rounded px-4 py-3 focus:border-primary outline-none text-on-surface appearance-none cursor-pointer min-h-[44px]"
                   >
                     {sizeOptionsList.map((opt, i) => (
                       <option key={i} value={opt}>

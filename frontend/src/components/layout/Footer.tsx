@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 export const Footer: React.FC = () => {
   return (
     <footer className="w-full bg-surface border-t border-outline-variant/60 py-8 text-on-surface-variant font-body-sm relative z-10">
-      <div className="max-w-container-max mx-auto px-gutter flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
+      <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6 text-xs">
         {/* Left: Brand Name & Copyright */}
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left flex-shrink-0">
           <span className="font-headline-lg text-lg font-bold text-on-surface whitespace-nowrap cursor-default">

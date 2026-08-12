@@ -23,6 +23,18 @@ export const Catalog: React.FC = () => {
   // Mobile Filter Drawer Toggle State
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
+  // Lock background body scroll when mobile filter drawer is open
+  useEffect(() => {
+    if (isMobileFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileFilterOpen]);
+
   useEffect(() => {
     setSearchQuery(urlSearch);
     setCurrentPage(1);
@@ -238,13 +250,13 @@ export const Catalog: React.FC = () => {
               <Loader size="lg" />
             </div>
           ) : products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {products.map(product => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
-            <div className="bg-surface-container border border-outline-variant p-12 text-center rounded-xs space-y-4">
+            <div className="bg-surface-container border border-outline-variant p-8 sm:p-12 text-center rounded-xs space-y-4">
               <span className="material-symbols-outlined text-primary text-5xl">inventory_2</span>
               <h3 className="font-headline-lg text-xl text-on-surface font-bold">
                 {selectedCategories.length > 0
@@ -253,7 +265,7 @@ export const Catalog: React.FC = () => {
                     ? `No Products Found for "${searchQuery}"`
                     : 'No Products Available'}
               </h3>
-              <p className="font-body-sm text-on-surface-variant max-w-md mx-auto leading-relaxed">
+              <p className="font-body-sm text-on-surface-variant max-w-md mx-auto leading-relaxed text-sm">
                 {selectedCategories.length > 0
                   ? 'Currently, there are no active safety products listed in this specific category. New industrial-grade inventory will be added soon!'
                   : searchQuery
@@ -262,7 +274,7 @@ export const Catalog: React.FC = () => {
               </p>
               <button
                 onClick={handleReset}
-                className="font-label-caps text-primary underline text-sm cursor-pointer font-bold uppercase tracking-wider inline-flex items-center gap-2"
+                className="font-label-caps text-primary underline text-xs sm:text-sm cursor-pointer font-bold uppercase tracking-wider inline-flex items-center gap-2 py-2"
               >
                 <span className="material-symbols-outlined text-[18px]">refresh</span>
                 Explore All Products & Clear Filters
@@ -316,16 +328,16 @@ export const Catalog: React.FC = () => {
             className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
           />
 
-          {/* Drawer Container */}
-          <div className="relative ml-auto w-full max-w-xs bg-surface-container border-l border-outline-variant h-full flex flex-col p-6 overflow-y-auto shadow-2xl z-10">
-            <div className="flex items-center justify-between pb-4 border-b border-outline-variant mb-6">
+          {/* Drawer Container with iOS Safe-Area Support */}
+          <div className="relative ml-auto w-full max-w-xs bg-surface-container border-l border-outline-variant h-full flex flex-col p-6 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))] overflow-y-auto shadow-2xl z-10">
+            <div className="flex items-center justify-between pb-4 border-b border-outline-variant mb-6 shrink-0">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary">tune</span>
                 <h3 className="font-title-md text-title-md font-bold uppercase tracking-wider text-on-surface">Filter Catalog</h3>
               </div>
               <button
                 onClick={() => setIsMobileFilterOpen(false)}
-                className="p-2 text-on-surface-variant hover:text-primary font-bold text-xl cursor-pointer"
+                className="p-2 text-on-surface-variant hover:text-primary font-bold text-xl cursor-pointer min-h-[44px] min-w-[44px] flex items-center justify-center"
               >
                 ✕
               </button>

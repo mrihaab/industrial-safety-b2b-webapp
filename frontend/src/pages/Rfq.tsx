@@ -109,7 +109,7 @@ export const Rfq: React.FC = () => {
       {/* 2. Bento Grid Benefits Section matching HTML Mockup */}
       <section className="mb-20">
         <h2 className="font-headline-lg text-headline-lg mb-8 font-extrabold">Factory Direct Benefits</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-auto md:h-[500px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-auto">
           {/* Bento Item 1 */}
           <div className="md:col-span-2 md:row-span-2 bg-surface-container/70 backdrop-blur-md p-8 flex flex-col justify-end border border-outline-variant/60 rounded-sm">
             <span className="material-symbols-outlined text-primary mb-4" style={{ fontSize: '48px' }}>

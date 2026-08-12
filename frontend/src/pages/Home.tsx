@@ -73,18 +73,18 @@ export const Home: React.FC = () => {
   return (
     <div className="w-full space-y-0">
       {/* 1. Hero Section matching HTML Mockup */}
-      <section className="relative min-h-[85vh] w-screen left-1/2 -translate-x-1/2 flex items-center overflow-hidden industrial-grid border-b border-outline-variant -mt-stack-lg px-gutter">
+      <section className="relative min-h-[75vh] lg:min-h-[85vh] w-full flex items-center overflow-hidden industrial-grid border-b border-outline-variant py-12 lg:py-16">
         <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10" />
         <img
           src={HERO_IMG}
           alt="A high-contrast cinematic photograph of professional heavy-duty safety gloves resting on a brushed steel industrial workbench."
-          className="absolute right-0 top-0 h-full w-full lg:w-2/3 object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 opacity-60 lg:opacity-100"
+          className="absolute right-0 top-0 h-full w-full lg:w-2/3 object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 opacity-50 lg:opacity-100"
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80';
           }}
         />
 
-        <div className="relative z-20 max-w-container-max mx-auto w-full py-16">
+        <div className="relative z-20 max-w-container-max mx-auto w-full px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-surface-container-high border border-outline-variant px-3 py-1 mb-6">
               <span className="w-2 h-2 rounded-full bg-primary-container animate-pulse" />
@@ -93,28 +93,28 @@ export const Home: React.FC = () => {
               </span>
             </div>
 
-            <h1 className="font-display-lg text-display-lg text-on-surface mb-6 leading-tight">
+            <h1 className="font-display-lg text-3xl sm:text-4xl lg:text-5xl text-on-surface mb-6 leading-tight font-extrabold tracking-tight">
               Industrial Safety, <br />
               <span className="text-primary-container">Engineered</span> for the <br />
               Global Standard.
             </h1>
 
-            <p className="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-lg">
+            <p className="font-body-lg text-sm sm:text-base text-on-surface-variant mb-10 max-w-lg leading-relaxed">
               Providing Tier-1 protective equipment and safety logistics for manufacturing giants across six continents. ISO-certified reliability in every fiber.
             </p>
 
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/products"
-                className="bg-primary-container text-on-primary-container px-8 py-4 font-title-md rounded-sm orange-glow-hover flex items-center gap-2 font-bold transition-all"
+                className="bg-primary-container text-on-primary-container px-6 sm:px-8 py-3.5 sm:py-4 font-title-md text-sm sm:text-base rounded-sm orange-glow-hover flex items-center justify-center gap-2 font-bold transition-all min-h-[48px]"
               >
                 Explore Catalog
-                <span className="material-symbols-outlined">arrow_forward</span>
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
               </Link>
 
               <Link
                 to="/about"
-                className="border border-outline px-8 py-4 font-title-md text-on-surface hover:bg-surface-variant transition-colors font-bold"
+                className="border border-outline px-6 sm:px-8 py-3.5 sm:py-4 font-title-md text-sm sm:text-base text-on-surface hover:bg-surface-variant transition-colors font-bold flex items-center justify-center min-h-[48px]"
               >
                 View Certifications
               </Link>
@@ -124,33 +124,33 @@ export const Home: React.FC = () => {
       </section>
 
       {/* 2. Stats / Export Expertise Bar matching HTML Mockup */}
-      <section className="py-20 bg-surface-container-low border-b border-outline-variant -mx-gutter px-gutter">
-        <div className="max-w-container-max mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
-            <div className="border-l-2 border-primary-container pl-6">
-              <div className="font-display-lg text-[40px] text-on-surface font-bold mb-1">45+</div>
-              <div className="font-label-caps text-on-surface-variant uppercase tracking-tighter">
+      <section className="py-12 sm:py-16 bg-surface-container-low border-b border-outline-variant w-full">
+        <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+            <div className="border-l-2 border-primary-container pl-4 sm:pl-6">
+              <div className="font-display-lg text-2xl sm:text-4xl text-on-surface font-bold mb-1">45+</div>
+              <div className="font-label-caps text-xs text-on-surface-variant uppercase tracking-tighter">
                 Countries Reached
               </div>
             </div>
 
-            <div className="border-l-2 border-primary-container pl-6">
-              <div className="font-display-lg text-[40px] text-on-surface font-bold mb-1">12M</div>
-              <div className="font-label-caps text-on-surface-variant uppercase tracking-tighter">
+            <div className="border-l-2 border-primary-container pl-4 sm:pl-6">
+              <div className="font-display-lg text-2xl sm:text-4xl text-on-surface font-bold mb-1">12M</div>
+              <div className="font-label-caps text-xs text-on-surface-variant uppercase tracking-tighter">
                 Units Shipped
               </div>
             </div>
 
-            <div className="border-l-2 border-primary-container pl-6">
-              <div className="font-display-lg text-[40px] text-on-surface font-bold mb-1">100%</div>
-              <div className="font-label-caps text-on-surface-variant uppercase tracking-tighter">
+            <div className="border-l-2 border-primary-container pl-4 sm:pl-6">
+              <div className="font-display-lg text-2xl sm:text-4xl text-on-surface font-bold mb-1">100%</div>
+              <div className="font-label-caps text-xs text-on-surface-variant uppercase tracking-tighter">
                 CE Compliance
               </div>
             </div>
 
-            <div className="border-l-2 border-primary-container pl-6">
-              <div className="font-display-lg text-[40px] text-on-surface font-bold mb-1">24/7</div>
-              <div className="font-label-caps text-on-surface-variant uppercase tracking-tighter">
+            <div className="border-l-2 border-primary-container pl-4 sm:pl-6">
+              <div className="font-display-lg text-2xl sm:text-4xl text-on-surface font-bold mb-1">24/7</div>
+              <div className="font-label-caps text-xs text-on-surface-variant uppercase tracking-tighter">
                 Safety Monitoring
               </div>
             </div>
@@ -305,8 +305,8 @@ export const Home: React.FC = () => {
       </section>
 
       {/* 4. Export Expertise Section matching HTML Mockup */}
-      <section className="py-24 bg-surface-container-lowest overflow-hidden -mx-gutter px-gutter">
-        <div className="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <section className="py-16 sm:py-24 bg-surface-container-lowest overflow-hidden w-full">
+        <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <div className="relative group overflow-hidden border border-outline-variant hover:border-primary transition-all duration-500 rounded-sm shadow-2xl cursor-pointer">
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-primary-container/10 rounded-full blur-3xl group-hover:bg-primary-container/30 transition-all duration-500" />
             <img
@@ -321,10 +321,10 @@ export const Home: React.FC = () => {
           </div>
           <div>
             <span className="font-label-caps text-primary mb-4 block">GLOBAL LOGISTICS</span>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-6 font-extrabold">
+            <h2 className="font-headline-lg text-2xl sm:text-3xl lg:text-4xl text-on-surface mb-6 font-extrabold">
               Our Export Expertise
             </h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mb-8">
+            <p className="font-body-lg text-sm sm:text-base text-on-surface-variant mb-8 leading-relaxed">
               Ghulam Safety Hub manages the end-to-end supply chain for high-consequence industries. From regional factory floors to international refineries, we ensure your safety gear arrives compliant, tested, and ready for action.
             </p>
             <ul className="space-y-6">
@@ -361,39 +361,39 @@ export const Home: React.FC = () => {
       </section>
 
       {/* 5. Global Compliance Section matching HTML Mockup */}
-      <section className="py-24 border-t border-outline-variant">
-        <div className="max-w-container-max mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4 font-bold">
+      <section className="py-16 sm:py-24 border-t border-outline-variant w-full">
+        <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="font-headline-lg text-2xl sm:text-3xl lg:text-4xl text-on-surface mb-4 font-bold">
               Certified for Excellence
             </h2>
-            <p className="text-on-surface-variant max-w-2xl mx-auto font-body-sm">
+            <p className="text-on-surface-variant max-w-2xl mx-auto font-body-sm text-sm sm:text-base leading-relaxed">
               We don't just meet standards; we define them. Our products undergo rigorous testing in independent laboratories to ensure maximum human protection.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 opacity-70">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 sm:gap-8 opacity-70">
             <div className="flex flex-col items-center gap-4 grayscale hover:grayscale-0 transition-all cursor-default">
-              <span className="material-symbols-outlined text-5xl text-primary">award_star</span>
+              <span className="material-symbols-outlined text-4xl sm:text-5xl text-primary">award_star</span>
               <span className="font-label-caps text-xs">ISO 9001</span>
             </div>
             <div className="flex flex-col items-center gap-4 grayscale hover:grayscale-0 transition-all cursor-default">
-              <span className="material-symbols-outlined text-5xl text-primary">shield_with_heart</span>
+              <span className="material-symbols-outlined text-4xl sm:text-5xl text-primary">shield_with_heart</span>
               <span className="font-label-caps text-xs">CE MARKED</span>
             </div>
             <div className="flex flex-col items-center gap-4 grayscale hover:grayscale-0 transition-all cursor-default">
-              <span className="material-symbols-outlined text-5xl text-primary">security</span>
+              <span className="material-symbols-outlined text-4xl sm:text-5xl text-primary">security</span>
               <span className="font-label-caps text-xs">ANSI / ISEA</span>
             </div>
             <div className="flex flex-col items-center gap-4 grayscale hover:grayscale-0 transition-all cursor-default">
-              <span className="material-symbols-outlined text-5xl text-primary">factory</span>
+              <span className="material-symbols-outlined text-4xl sm:text-5xl text-primary">factory</span>
               <span className="font-label-caps text-xs">OSHA READY</span>
             </div>
             <div className="flex flex-col items-center gap-4 grayscale hover:grayscale-0 transition-all cursor-default">
-              <span className="material-symbols-outlined text-5xl text-primary">eco</span>
+              <span className="material-symbols-outlined text-4xl sm:text-5xl text-primary">eco</span>
               <span className="font-label-caps text-xs">REACH COMPLIANT</span>
             </div>
             <div className="flex flex-col items-center gap-4 grayscale hover:grayscale-0 transition-all cursor-default">
-              <span className="material-symbols-outlined text-5xl text-primary">workspace_premium</span>
+              <span className="material-symbols-outlined text-4xl sm:text-5xl text-primary">workspace_premium</span>
               <span className="font-label-caps text-xs">UKCA</span>
             </div>
           </div>
@@ -401,13 +401,13 @@ export const Home: React.FC = () => {
       </section>
 
       {/* 6. Newsletter / Contact Sales CTA matching HTML Mockup */}
-      <section className="py-20 bg-primary-container -mx-gutter px-gutter rounded-sm shadow-2xl">
-        <div className="max-w-container-max mx-auto flex flex-col lg:flex-row items-center justify-between gap-12">
+      <section className="py-16 sm:py-20 bg-primary-container rounded-sm shadow-2xl w-full">
+        <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-8 sm:gap-12">
           <div className="text-on-primary-container text-center lg:text-left">
-            <h2 className="font-headline-lg text-headline-lg font-extrabold mb-2">
+            <h2 className="font-headline-lg text-2xl sm:text-3xl lg:text-4xl font-extrabold mb-2">
               Ready to Secure Your Workforce?
             </h2>
-            <p className="font-body-lg text-on-primary-container/90">
+            <p className="font-body-lg text-sm sm:text-base text-on-primary-container/90">
               Get a custom quote for industrial-scale safety equipment.
             </p>
           </div>
@@ -421,7 +421,7 @@ export const Home: React.FC = () => {
             />
             <button
               type="submit"
-              className="bg-on-primary-container text-primary-container px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-on-primary transition-colors whitespace-nowrap font-mono text-xs cursor-pointer"
+              className="bg-on-primary-container text-primary-container px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-on-primary transition-colors whitespace-nowrap font-mono text-xs cursor-pointer min-h-[48px]"
             >
               Contact Sales
             </button>
