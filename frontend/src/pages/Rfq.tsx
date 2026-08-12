@@ -324,9 +324,9 @@ export const Rfq: React.FC = () => {
         {/* Hub Maps & Direct Support */}
         <div className="lg:col-span-5 flex flex-col gap-8">
           <div className="bg-surface-container border border-outline-variant overflow-hidden group rounded-sm">
-            <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-high">
-              <h3 className="font-title-md text-title-md font-bold">Primary Distribution Hubs</h3>
-              <span className="font-label-caps text-label-caps text-primary font-bold">Live Status</span>
+            <div className="p-6 border-b border-outline-variant flex justify-between items-center bg-surface-container-high gap-2">
+              <h3 className="font-title-md text-title-md font-bold truncate">Primary Distribution Hubs</h3>
+              <span className="font-label-caps text-label-caps text-primary font-bold whitespace-nowrap flex-shrink-0">Live Status</span>
             </div>
             <div className="relative h-64 grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-500">
               <img

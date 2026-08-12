@@ -36,9 +36,11 @@ Thumbs.db
 *.sln
 *.swp
 
-# Temporary Scripts, Documentation & Vite Timestamps
+# Temporary Scripts, Documentation & Screenshots
 *.timestamp-*.mjs
 take_screenshots.js
 docs/
 prompts/
 references/
+iosandrioidpics.zip
+scratch/

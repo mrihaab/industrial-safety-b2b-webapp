@@ -285,15 +285,20 @@ export const Home: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="bg-surface-container border border-outline-variant p-12 text-center rounded-xs space-y-4">
-              <span className="material-symbols-outlined text-primary text-5xl">grade</span>
-              <h3 className="font-headline-lg text-xl text-on-surface font-bold">No Featured Products Selected</h3>
-              <p className="font-body-sm text-on-surface-variant max-w-md mx-auto">
-                No items are currently set as Featured. In Admin Panel, check the "⭐ Feature this Product on Home Page" option on any product to display it here.
+            <div className="bg-surface-container border border-outline-variant p-10 text-center rounded-xs space-y-4">
+              <span className="material-symbols-outlined text-primary text-5xl">inventory_2</span>
+              <h3 className="font-headline-lg text-xl text-on-surface font-bold">Industrial PPE & Safety Solutions</h3>
+              <p className="font-body-sm text-on-surface-variant max-w-md mx-auto leading-relaxed">
+                Explore our comprehensive wholesale catalog featuring high-grade protective gloves, workwear, and ISO/CE certified equipment for enterprise procurement.
               </p>
-              <Link to="/products" className="inline-block font-label-caps text-primary underline text-sm">
-                Browse Full Catalog →
-              </Link>
+              <div className="pt-2">
+                <Link
+                  to="/products"
+                  className="inline-flex items-center gap-2 bg-primary-container text-on-primary-container px-6 py-3 font-label-caps text-xs font-bold uppercase tracking-wider rounded-xs orange-glow hover:scale-105 transition-all cursor-pointer"
+                >
+                  Browse Full Catalog →
+                </Link>
+              </div>
             </div>
           )}
         </div>
