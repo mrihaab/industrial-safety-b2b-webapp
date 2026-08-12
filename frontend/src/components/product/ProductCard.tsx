@@ -56,8 +56,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   return (
     <div className="group bg-surface-container border border-outline-variant relative overflow-hidden transition-all duration-300 hover:border-primary flex flex-col justify-between h-full rounded-xs">
       {/* LED Active Status Tag Top Right */}
-      <div className="absolute top-2.5 right-2.5 z-10">
-        <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-2 py-1 uppercase font-bold led-active tracking-wider rounded-xs shadow-md">
+      <div className="absolute top-2.5 right-2.5 z-10 max-w-[85%]">
+        <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-2 py-1 uppercase font-bold led-active tracking-wider rounded-xs shadow-md truncate block">
           {statusBadge}
         </span>
       </div>

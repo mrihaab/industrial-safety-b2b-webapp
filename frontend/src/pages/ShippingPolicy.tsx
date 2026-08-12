@@ -9,7 +9,7 @@ export const ShippingPolicy: React.FC = () => {
         <span className="font-label-caps text-label-caps text-primary uppercase tracking-widest block mb-2">
           Global Logistics & Fulfillment
         </span>
-        <h1 className="font-display-lg text-4xl font-extrabold text-on-surface mb-4">
+        <h1 className="font-display-lg text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface mb-4">
           International Shipping & Freight Policy
         </h1>
         <p className="font-body-lg text-on-surface-variant max-w-2xl">

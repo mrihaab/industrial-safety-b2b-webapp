@@ -19,7 +19,7 @@ export const Logo: React.FC<LogoProps> = ({ className, showText = true }) => {
       </div>
 
       {showText && (
-        <span className="font-headline-lg text-xl sm:text-2xl lg:text-[26px] font-extrabold text-[#ff8d6b] tracking-tight whitespace-nowrap">
+        <span className="font-headline-lg text-base xs:text-lg sm:text-2xl lg:text-[26px] font-extrabold text-[#ff8d6b] tracking-tight whitespace-nowrap">
           Ghulam Safety Hub
         </span>
       )}

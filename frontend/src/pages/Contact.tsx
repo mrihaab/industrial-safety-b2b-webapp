@@ -67,7 +67,7 @@ export const Contact: React.FC = () => {
           <p className="font-body-sm text-on-surface-variant">
             Direct wholesale quotes and enterprise contract inquiries:
           </p>
-          <a href="mailto:ghulamsafehub@gmail.com" className="font-mono text-primary text-sm font-bold block hover:underline">
+          <a href="mailto:ghulamsafehub@gmail.com" className="font-mono text-primary text-sm font-bold block hover:underline break-all">
             ghulamsafehub@gmail.com
           </a>
           <span className="text-xs text-on-surface-variant block">Response within 4 business hours</span>

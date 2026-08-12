@@ -15,7 +15,7 @@ export const About: React.FC = () => {
       <Breadcrumb items={breadcrumbItems} />
 
       {/* 1. HERO BANNER - Clean Top Alignment matching Contact Page */}
-      <section className="relative overflow-hidden industrial-grid border-b border-outline-variant/60 -mx-gutter px-gutter py-6 md:py-8 rounded-b-lg">
+      <section className="relative overflow-hidden industrial-grid border-b border-outline-variant/60 w-full px-4 sm:px-6 lg:px-8 py-6 md:py-8 rounded-b-lg">
         <div className="max-w-container-max mx-auto space-y-2">
           <SectionHeader
             badge="COMPANY BACKGROUND"

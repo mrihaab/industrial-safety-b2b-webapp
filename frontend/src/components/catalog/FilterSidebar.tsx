@@ -250,7 +250,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
       </div>
 
       {onCloseMobileDrawer ? (
-        <div className="pt-stack-md sticky bottom-0 bg-surface-container pb-safe">
+        <div className="pt-stack-md sticky bottom-0 bg-surface-container pb-[max(1rem,env(safe-area-inset-bottom))]">
           <button
             onClick={onCloseMobileDrawer}
             className="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-3.5 orange-glow uppercase tracking-widest cursor-pointer font-bold rounded-xs min-h-[44px]"
