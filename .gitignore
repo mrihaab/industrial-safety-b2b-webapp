@@ -36,6 +36,9 @@ Thumbs.db
 *.sln
 *.swp
 
-# Temporary Scripts & Vite Timestamps
+# Temporary Scripts, Documentation & Vite Timestamps
 *.timestamp-*.mjs
 take_screenshots.js
+docs/
+prompts/
+references/
