@@ -418,7 +418,7 @@ export const ProductDetail: React.FC = () => {
                   <span className="material-symbols-outlined text-primary text-[20px] flex-shrink-0">
                     {iconName}
                   </span>
-                  <span className="font-mono text-xs text-primary font-extrabold tracking-widest uppercase whitespace-nowrap">
+                  <span className="font-mono text-xs text-primary font-extrabold tracking-widest uppercase truncate max-w-full">
                     {cert}
                   </span>
                 </div>

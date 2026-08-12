@@ -92,17 +92,17 @@ export const Cart: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.productId, Math.max(50, item.quantity - 50))}
-                        className="px-3 py-1 text-on-surface-variant hover:text-primary transition-colors font-mono font-bold"
+                        className="px-3.5 py-2.5 min-h-[44px] min-w-[44px] text-on-surface-variant hover:text-primary transition-colors font-mono font-bold flex items-center justify-center cursor-pointer"
                       >
                         -
                       </button>
-                      <span className="px-3 py-1 font-mono text-xs font-bold text-on-surface min-w-[50px] text-center">
+                      <span className="px-3 py-2 font-mono text-xs font-bold text-on-surface min-w-[50px] text-center">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.productId, item.quantity + 50)}
-                        className="px-3 py-1 text-on-surface-variant hover:text-primary transition-colors font-mono font-bold"
+                        className="px-3.5 py-2.5 min-h-[44px] min-w-[44px] text-on-surface-variant hover:text-primary transition-colors font-mono font-bold flex items-center justify-center cursor-pointer"
                       >
                         +
                       </button>

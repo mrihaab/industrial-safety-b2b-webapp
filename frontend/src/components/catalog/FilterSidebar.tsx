@@ -11,6 +11,7 @@ interface FilterSidebarProps {
   onToggleCertification: (cert: string) => void;
   onSelectAllCertifications: () => void;
   onReset: () => void;
+  onCloseMobileDrawer?: () => void;
 }
 
 const SIDEBAR_CERTIFICATIONS = [
@@ -33,6 +34,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   onToggleCertification,
   onSelectAllCertifications,
   onReset,
+  onCloseMobileDrawer,
 }) => {
   const [categories, setCategories] = useState<CategoryTreeDto[]>([]);
 
@@ -55,16 +57,16 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
   const isAllCertificationsSelected = selectedCertifications.length === 0;
 
   return (
-    <aside className="w-full md:w-64 flex-shrink-0 space-y-stack-lg">
+    <div className="space-y-stack-lg">
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">filter_list</span>
-          <h2 className="font-title-md text-title-md uppercase tracking-widest text-on-surface font-bold">Filters</h2>
+          <h2 className="font-title-md text-title-md uppercase tracking-widest text-on-surface font-bold">Filter Options</h2>
         </div>
         {(!isAllCategoriesSelected || stockFilter !== 'all' || !isAllCertificationsSelected) && (
           <button
             onClick={onReset}
-            className="text-[11px] font-label-caps text-primary hover:underline cursor-pointer font-bold"
+            className="text-[11px] font-label-caps text-primary hover:underline cursor-pointer font-bold py-1 px-2"
           >
             Clear All
           </button>
@@ -77,7 +79,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           Product Categories
         </h3>
         <div className="space-y-2.5">
-          <label className="flex items-center gap-3 group cursor-pointer">
+          <label className="flex items-center gap-3 group cursor-pointer py-1">
             <input
               type="checkbox"
               checked={isAllCategoriesSelected}
@@ -96,7 +98,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               const isChecked = selectedCategories.includes(cat.slug);
               return (
                 <div key={cat.id} className="space-y-2">
-                  <label className="flex items-center gap-3 group cursor-pointer">
+                  <label className="flex items-center gap-3 group cursor-pointer py-1">
                     <input
                       type="checkbox"
                       checked={isChecked}
@@ -115,7 +117,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                       {cat.children.map((sub: CategoryTreeDto) => {
                         const isSubChecked = selectedCategories.includes(sub.slug);
                         return (
-                          <label key={sub.id} className="flex items-center gap-2.5 group cursor-pointer">
+                          <label key={sub.id} className="flex items-center gap-2.5 group cursor-pointer py-1">
                             <input
                               type="checkbox"
                               checked={isSubChecked}
@@ -137,7 +139,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
             })
           ) : (
             <div className="space-y-2">
-              <label className="flex items-center gap-3 group cursor-pointer">
+              <label className="flex items-center gap-3 group cursor-pointer py-1">
                 <input
                   type="checkbox"
                   checked={selectedCategories.includes('working-gloves')}
@@ -148,7 +150,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   Working Gloves
                 </span>
               </label>
-              <label className="flex items-center gap-3 group cursor-pointer">
+              <label className="flex items-center gap-3 group cursor-pointer py-1">
                 <input
                   type="checkbox"
                   checked={selectedCategories.includes('sports-gloves')}
@@ -170,7 +172,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           Stock Availability
         </h3>
         <div className="space-y-2">
-          <label className="flex items-center gap-3 group cursor-pointer">
+          <label className="flex items-center gap-3 group cursor-pointer py-1">
             <input
               type="checkbox"
               checked={stockFilter === 'all'}
@@ -181,7 +183,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               Show All Stock Items
             </span>
           </label>
-          <label className="flex items-center gap-3 group cursor-pointer">
+          <label className="flex items-center gap-3 group cursor-pointer py-1">
             <input
               type="checkbox"
               checked={stockFilter === 'IN STOCK'}
@@ -192,7 +194,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               In Stock Only
             </span>
           </label>
-          <label className="flex items-center gap-3 group cursor-pointer">
+          <label className="flex items-center gap-3 group cursor-pointer py-1">
             <input
               type="checkbox"
               checked={stockFilter === 'LIMITED STOCK'}
@@ -212,7 +214,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           Certification Standards
         </h3>
         <div className="space-y-2">
-          <label className="flex items-center gap-3 group cursor-pointer">
+          <label className="flex items-center gap-3 group cursor-pointer py-1">
             <input
               type="checkbox"
               checked={isAllCertificationsSelected}
@@ -229,7 +231,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           {SIDEBAR_CERTIFICATIONS.map(cert => {
             const isCertChecked = selectedCertifications.includes(cert);
             return (
-              <label key={cert} className="flex items-center gap-3 group cursor-pointer">
+              <label key={cert} className="flex items-center gap-3 group cursor-pointer py-1">
                 <input
                   type="checkbox"
                   checked={isCertChecked}
@@ -247,15 +249,26 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
         </div>
       </div>
 
-      <div className="pt-stack-lg">
-        <button
-          onClick={onReset}
-          className="w-full font-label-caps text-label-caps py-3 border border-primary text-primary hover:bg-primary-container hover:text-on-primary-container transition-all uppercase tracking-widest cursor-pointer font-bold"
-        >
-          Clear All Filters
-        </button>
-      </div>
-    </aside>
+      {onCloseMobileDrawer ? (
+        <div className="pt-stack-md sticky bottom-0 bg-surface-container pb-safe">
+          <button
+            onClick={onCloseMobileDrawer}
+            className="w-full bg-primary-container text-on-primary-container font-label-caps text-label-caps py-3.5 orange-glow uppercase tracking-widest cursor-pointer font-bold rounded-xs min-h-[44px]"
+          >
+            Apply Filters & View Results
+          </button>
+        </div>
+      ) : (
+        <div className="pt-stack-lg">
+          <button
+            onClick={onReset}
+            className="w-full font-label-caps text-label-caps py-3 border border-primary text-primary hover:bg-primary-container hover:text-on-primary-container transition-all uppercase tracking-widest cursor-pointer font-bold rounded-xs min-h-[44px]"
+          >
+            Clear All Filters
+          </button>
+        </div>
+      )}
+    </div>
   );
 };
 

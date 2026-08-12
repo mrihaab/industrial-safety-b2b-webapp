@@ -5,7 +5,7 @@ export const WhatsAppButton: React.FC = () => {
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hello Ghulam Safety Hub Engineering Team, I am inquiring about wholesale safety gear procurement.')}`;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 group pointer-events-none">
+    <div className="fixed bottom-[calc(1.5rem+env(safe-area-inset-bottom))] right-4 sm:right-6 z-40 flex items-center gap-3 group pointer-events-none">
       {/* Floating Tooltip Label (Desktop) - Only captures mouse when hovered directly over button */}
       <span className="hidden sm:inline-block bg-surface-container border border-outline-variant text-on-surface font-label-caps text-xs px-3 py-1.5 rounded-xs shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
         Chat with Key Account Desk
