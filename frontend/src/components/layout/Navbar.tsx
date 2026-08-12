@@ -57,22 +57,22 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <header className="w-full top-0 border-b border-outline-variant bg-surface sticky z-50">
-        <nav className="flex justify-between items-center px-gutter w-full max-w-container-max mx-auto h-20 gap-4">
+        <nav className="flex justify-between items-center px-gutter w-full max-w-container-max mx-auto h-20 gap-2 sm:gap-4">
           {/* Left: Brand Logo & Navigation Links Container */}
-          <div className="flex items-center gap-6 lg:gap-10 min-w-0 flex-shrink-0">
-            {/* Brand Logo (Non-clickable static header emblem) */}
+          <div className="flex items-center gap-4 lg:gap-10 min-w-0 flex-shrink-0">
+            {/* Brand Logo */}
             <div className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap cursor-default">
               <Logo />
             </div>
 
-            {/* Nav Links (Desktop) */}
+            {/* Desktop Navigation Links */}
             <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-shrink-0 whitespace-nowrap font-body-lg">
               <Link
                 to="/products"
                 className={cn(
-                  'whitespace-nowrap transition-colors duration-200 pb-1 font-semibold text-sm lg:text-base',
+                  'whitespace-nowrap transition-colors duration-200 pb-1 font-semibold text-sm lg:text-base py-2',
                   isNavActive('/products')
-                    ? 'text-primary border-b-2 border-primary'
+                    ? 'text-primary border-b-2 border-primary font-bold'
                     : 'text-on-surface-variant hover:text-primary'
                 )}
               >
@@ -81,9 +81,9 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/about"
                 className={cn(
-                  'whitespace-nowrap transition-colors duration-200 pb-1 font-semibold text-sm lg:text-base',
+                  'whitespace-nowrap transition-colors duration-200 pb-1 font-semibold text-sm lg:text-base py-2',
                   isNavActive('/about')
-                    ? 'text-primary border-b-2 border-primary'
+                    ? 'text-primary border-b-2 border-primary font-bold'
                     : 'text-on-surface-variant hover:text-primary'
                 )}
               >
@@ -92,9 +92,9 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/contact"
                 className={cn(
-                  'whitespace-nowrap transition-colors duration-200 pb-1 font-semibold text-sm lg:text-base',
+                  'whitespace-nowrap transition-colors duration-200 pb-1 font-semibold text-sm lg:text-base py-2',
                   isNavActive('/contact')
-                    ? 'text-primary border-b-2 border-primary'
+                    ? 'text-primary border-b-2 border-primary font-bold'
                     : 'text-on-surface-variant hover:text-primary'
                 )}
               >
@@ -104,8 +104,8 @@ export const Navbar: React.FC = () => {
           </div>
 
           {/* Center / Right Controls Container */}
-          <div className="flex items-center gap-3 lg:gap-5 flex-shrink-0 whitespace-nowrap">
-            {/* Search Input (Displayed ONLY on Products Catalog & Detail Pages) */}
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0 whitespace-nowrap">
+            {/* Desktop Search Bar */}
             {isSearchPage && (
               <form
                 onSubmit={handleSearchSubmit}
@@ -123,7 +123,7 @@ export const Navbar: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleClearSearch}
-                    className="text-on-surface-variant hover:text-primary text-xs ml-1 cursor-pointer"
+                    className="text-on-surface-variant hover:text-primary text-xs ml-1 cursor-pointer p-1"
                   >
                     ✕
                   </button>
@@ -131,33 +131,34 @@ export const Navbar: React.FC = () => {
               </form>
             )}
 
-            {/* Shopping Cart Icon Link -> Opens Dedicated /cart Page */}
+            {/* Shopping Cart Link */}
             <Link
               to="/cart"
-              className="relative p-2 text-on-surface-variant hover:text-primary transition-colors flex items-center flex-shrink-0"
+              className="relative p-2 min-h-[44px] min-w-[44px] text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center flex-shrink-0 cursor-pointer"
               title="View Wholesale Cart"
             >
               <span className="material-symbols-outlined text-[24px]">shopping_cart</span>
               {totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary-container text-on-primary-container text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-pulse">
+                <span className="absolute top-0 right-0 bg-primary-container text-on-primary-container text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center animate-pulse">
                   {totalItems}
                 </span>
               )}
             </Link>
 
-            {/* Bulk Quote Button -> Opens Official Wholesale RFQ Page (/rfq) */}
+            {/* Bulk Quote CTA Button (Responsive Sizing) */}
             <Link
               to="/rfq"
-              className="bg-primary-container text-on-primary-container font-label-caps text-xs px-5 py-2.5 rounded-xs font-bold orange-glow transition-all active:opacity-80 uppercase tracking-wider whitespace-nowrap flex-shrink-0 inline-flex items-center justify-center"
+              className="bg-primary-container text-on-primary-container font-label-caps text-[11px] sm:text-xs px-3 sm:px-5 py-2 sm:py-2.5 rounded-xs font-bold orange-glow transition-all active:opacity-80 uppercase tracking-wider whitespace-nowrap flex-shrink-0 inline-flex items-center justify-center min-h-[40px] sm:min-h-[44px]"
             >
               Bulk Quote
             </Link>
 
-            {/* Mobile Menu Burger Toggle */}
+            {/* Mobile Menu Hamburger Toggle */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(true)}
-              className="md:hidden p-2 text-on-surface-variant hover:text-primary transition-colors cursor-pointer flex-shrink-0"
+              aria-label="Open Mobile Menu Navigation"
+              className="md:hidden p-2 text-on-surface-variant hover:text-primary transition-colors cursor-pointer flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center"
             >
               <span className="material-symbols-outlined text-3xl">menu</span>
             </button>
@@ -165,7 +166,7 @@ export const Navbar: React.FC = () => {
         </nav>
       </header>
 
-      {/* Mobile Drawer */}
+      {/* Mobile Menu Navigation Drawer */}
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   );
