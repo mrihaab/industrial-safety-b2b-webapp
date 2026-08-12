@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ProductService } from '@/services/productService';
 import { ProductCardData } from '@/components/product/ProductCard';
 
-const HERO_IMG = "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1200&q=80";
-const FALLBACK_TITAN_X = "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=800&q=80";
+const HERO_IMG = "https://images.unsplash.com/photo-1622445268121-da11ed28a38a?auto=format&fit=crop&w=1200&q=80";
+const FALLBACK_TITAN_X = "https://images.unsplash.com/photo-1622445268121-da11ed28a38a?auto=format&fit=crop&w=800&q=80";
 const MAP_IMG = "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1000&q=80";
 
 const getImageUrl = (url?: string) => {
