@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ProductService } from '@/services/productService';
 import { ProductCardData } from '@/components/product/ProductCard';
 
-const HERO_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuD8GK08yQJcOjxafEsZTZrH9RUknWBXayS4Hb4lJv06QTs5HAR_BfsWNs1pxSmUyUXouN3hv3UXoyTcSJ1FCfaKqr6YOgLa9iaEWeiP8m77pQ_ea3-QFAQ6z66GnhmViZVE6K7Wfk8yFOGBqj5YSh7yRRB1Wgyj1dQbcDllZi2PMeLJ4tHSiXl7YXabCKwvsU8qN2WXFXYUGqc6QgvBkPyTnooiOCCEryPxJ9yd3Nw1D6zy9apNtAf9XMrWolUS0IzwaGaSkK-cRD4";
-const FALLBACK_TITAN_X = "https://lh3.googleusercontent.com/aida-public/AB6AXuCGKdrJ_ZE3KYkKmWECvfIkfSOiSPR4_H6Lqxq6dSyfy2YmYY7dZBgxZ4lYDcxh8UzAlRBQ9HSxBQsVGpzt-x4Z4E24tYQD7tiQGjxEpyP-CFj2bH2iOj1Cl4J_0VGdZdcPDw3sN0_uX0Lwzdc3ms6cH7dGHtd9XtqeG9-_LW-v5ndOwte6VLmwyoUpjYqZKuu1OyUHlSR7OaQWDgiq1vwAkY0srLg13XV1i41Wk_yhxhRJbGMf-YMzgIDBmX7duLbCy6mOxJSlCvc";
-const MAP_IMG = "https://lh3.googleusercontent.com/aida-public/AB6AXuChT9-yQ6kh7fkUmoeib05VnFZmKupzkbl-uHGuV2H0ab2D0AZwZYvt4XXgzT6Bt2aS0K0NYYnTVmgD5NSKVB66EBtYZJGQD1TQFl8cNf5DXyw3Yq-MoGL_AoIFA-wFPTU1TwNQvdeC5TcS_tDuYjNPYSFCcPqdFgR69zj0-4h05poO1zqce-hyGR0clWoxsmYTFOKlW5_1ycmfzVuiXeqJwJBJdOykEEs07bWgZgdqsE-nPbS4_49hJ_tFqooM0z8lHL19jZKhYF4";
+const HERO_IMG = "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=1200&q=80";
+const FALLBACK_TITAN_X = "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80";
+const MAP_IMG = "https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?auto=format&fit=crop&w=1000&q=80";
 
 const getImageUrl = (url?: string) => {
   if (!url) return FALLBACK_TITAN_X;

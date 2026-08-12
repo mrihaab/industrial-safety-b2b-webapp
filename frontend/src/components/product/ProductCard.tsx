@@ -26,8 +26,10 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const DEFAULT_SAFETY_IMAGE = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=800&q=80';
+
   const getImageUrl = (url?: string) => {
-    if (!url) return 'https://lh3.googleusercontent.com/aida-public/AB6AXuBcxW-JBzpn977rn1IhHg-x0oBELAiNoAQKlnPpgVkxlgienmXVezWj3pQkOWmkBKY2auB7H1l0QFCDRYORkbrB6OnEuUIfEQeb4lpbuQBB7ZqDZVixsCw9GHM3T7GP214LnQt7fW-rkR3R5Ewa8_Tp3OQMHBzJs3LBkasF2q5YKeNzyk5yXbJxPvrrHeRjkiCqwJSXbpcods-hxbvleRjHNMAEJe3-yKbXITx0cDCnOEpU17RBA2odRQ5_xKw_aykL4Lol2mN4CTQ';
+    if (!url) return DEFAULT_SAFETY_IMAGE;
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
       return url;
     }
@@ -67,7 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             src={imageUrl}
             alt={product.title}
             onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://lh3.googleusercontent.com/aida-public/AB6AXuBcxW-JBzpn977rn1IhHg-x0oBELAiNoAQKlnPpgVkxlgienmXVezWj3pQkOWmkBKY2auB7H1l0QFCDRYORkbrB6OnEuUIfEQeb4lpbuQBB7ZqDZVixsCw9GHM3T7GP214LnQt7fW-rkR3R5Ewa8_Tp3OQMHBzJs3LBkasF2q5YKeNzyk5yXbJxPvrrHeRjkiCqwJSXbpcods-hxbvleRjHNMAEJe3-yKbXITx0cDCnOEpU17RBA2odRQ5_xKw_aykL4Lol2mN4CTQ';
+              (e.target as HTMLImageElement).src = DEFAULT_SAFETY_IMAGE;
             }}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
           />
