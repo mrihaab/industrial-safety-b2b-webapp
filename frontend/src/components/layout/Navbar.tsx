@@ -55,20 +55,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header
-        className="sticky top-0 z-50 w-full bg-surface border-b border-outline-variant"
-        style={{
-          background: 'red',
-          color: 'white',
-          border: '5px solid lime',
-          opacity: 1,
-          visibility: 'visible',
-          display: 'flex',
-          position: 'sticky',
-          top: 0,
-          zIndex: 2147483647,
-        }}
-      >
+      <header className="sticky top-0 z-50 w-full bg-[#051424] border-b border-[#2a3647]">
         <nav className="flex justify-between items-center px-4 sm:px-gutter w-full max-w-container-max mx-auto h-16 sm:h-20 gap-2">
           {/* Left: Brand Logo & Desktop Nav */}
           <div className="flex items-center gap-4 lg:gap-10 shrink-0 min-w-0">
