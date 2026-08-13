@@ -78,6 +78,8 @@ export const Home: React.FC = () => {
         <img
           src={HERO_IMG}
           alt="A high-contrast cinematic photograph of professional heavy-duty safety gloves resting on a brushed steel industrial workbench."
+          fetchPriority="high"
+          decoding="async"
           className="absolute right-0 top-0 h-full w-full lg:w-2/3 object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 opacity-50 lg:opacity-100"
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80';

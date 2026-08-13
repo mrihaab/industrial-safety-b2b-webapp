@@ -68,6 +68,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <img
             src={imageUrl}
             alt={product.title}
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               (e.target as HTMLImageElement).src = DEFAULT_SAFETY_IMAGE;
             }}
