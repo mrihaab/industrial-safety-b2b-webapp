@@ -55,7 +55,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header className="w-full top-0 border-b border-outline-variant bg-surface sticky z-50">
+      <header className="w-full top-0 border-b border-outline-variant bg-surface sticky z-50 transform-gpu isolate [will-change:transform] [-webkit-transform:translateZ(0)]">
         <nav className="flex justify-between items-center px-4 sm:px-gutter w-full max-w-container-max mx-auto h-16 sm:h-20 gap-2">
           {/* Left: Brand Logo & Desktop Nav */}
           <div className="flex items-center gap-4 lg:gap-10 shrink-0 min-w-0">
