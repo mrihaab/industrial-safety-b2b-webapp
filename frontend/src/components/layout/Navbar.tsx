@@ -55,17 +55,7 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      <header
-        className="sticky top-0 w-full bg-[#051424] border-b border-[#2a3647]"
-        style={{
-          background: '#051424',
-          borderBottom: '1px solid #2a3647',
-          display: 'flex',
-          position: 'sticky',
-          top: 0,
-          zIndex: 2147483647,
-        }}
-      >
+      <header className="sticky top-0 z-50 w-full bg-[#051424] border-b border-[#2a3647]">
         <nav className="flex justify-between items-center px-4 sm:px-gutter w-full max-w-container-max mx-auto h-16 sm:h-20 gap-2">
           {/* Left: Brand Logo & Desktop Nav */}
           <div className="flex items-center gap-4 lg:gap-10 shrink-0 min-w-0">
@@ -178,7 +168,7 @@ export const Navbar: React.FC = () => {
               aria-label="Open Navigation Menu"
               className="md:hidden p-2 text-on-surface hover:text-primary min-h-[44px] min-w-[44px] flex items-center justify-center shrink-0 cursor-pointer transition-colors"
             >
-              <svg className="w-6.5 h-6.5 text-on-surface hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-7 h-7 text-on-surface hover:text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
