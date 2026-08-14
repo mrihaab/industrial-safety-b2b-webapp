@@ -12,6 +12,7 @@
     "db:init": "ts-node -r tsconfig-paths/register src/config/initDb.ts",
     "db:test": "ts-node -r tsconfig-paths/register src/config/testDb.ts",
     "db:seed": "ts-node -r tsconfig-paths/register src/config/seedDb.ts",
+    "admin:create": "ts-node -r tsconfig-paths/register src/scripts/createAdmin.ts",
     "test:products": "ts-node -r tsconfig-paths/register src/config/testProductsApi.ts",
     "test:categories": "ts-node -r tsconfig-paths/register src/config/testCategoriesApi.ts",
     "test:rfq": "ts-node -r tsconfig-paths/register src/config/testRfqApi.ts",

@@ -27,7 +27,11 @@ export class AuthService {
       role: user.role,
     };
 
-    const jwtSecret = process.env.JWT_SECRET || 'ghulam_safety_hub_jwt_super_secret_key_2026';
+    if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+      throw new Error('CRITICAL SECURITY ERROR: JWT_SECRET environment variable is missing in production.');
+    }
+
+    const jwtSecret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'development' ? 'ghulam_safety_hub_jwt_super_secret_key_2026' : '');
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '24h' });
 
     return {

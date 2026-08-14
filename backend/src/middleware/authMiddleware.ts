@@ -14,7 +14,17 @@ export function authenticateAdmin(req: AuthenticatedRequest, res: Response, next
   }
 
   const token = authHeader.split(' ')[1];
-  const jwtSecret = process.env.JWT_SECRET || 'ghulam_safety_hub_jwt_super_secret_key_2026';
+
+  if (process.env.NODE_ENV === 'production' && !process.env.JWT_SECRET) {
+    console.error('[CRITICAL SECURITY ERROR]: JWT_SECRET environment variable is missing in production!');
+    res.status(500).json({
+      success: false,
+      message: 'Server security configuration error. Mandatory authentication secret missing.',
+    });
+    return;
+  }
+
+  const jwtSecret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'development' ? 'ghulam_safety_hub_jwt_super_secret_key_2026' : '');
 
   try {
     const decoded = jwt.verify(token, jwtSecret) as JwtPayload;
