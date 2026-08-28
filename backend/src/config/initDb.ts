@@ -116,19 +116,33 @@ export async function initializeDatabase(): Promise<void> {
 
   console.log(`[Database Init]: Connecting to MySQL Server at ${host}:${port}...`);
 
-  const connection = await mysql.createConnection({
-    host,
-    port,
-    user,
-    password,
-  });
+  let connection: mysql.Connection;
+  try {
+    connection = await mysql.createConnection({
+      host,
+      port,
+      user,
+      password,
+    });
+    try {
+      await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
+      console.log(`[Database Init]: Database '${database}' verified/created successfully.`);
+    } catch (dbErr: any) {
+      console.log(`[Database Init Notice]: Global CREATE DATABASE skipped or restricted on cloud host: ${dbErr.message}`);
+    }
+    await connection.changeUser({ database });
+  } catch (connErr: any) {
+    console.log(`[Database Init Notice]: Initializing direct connection to database '${database}'...`);
+    connection = await mysql.createConnection({
+      host,
+      port,
+      user,
+      password,
+      database,
+    });
+  }
 
   try {
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-    console.log(`[Database Init]: Database '${database}' verified/created successfully.`);
-
-    await connection.changeUser({ database });
-
     for (let i = 0; i < DDL_STATEMENTS.length; i++) {
       await connection.query(DDL_STATEMENTS[i]);
     }
@@ -154,7 +168,9 @@ export async function initializeDatabase(): Promise<void> {
     console.error('[Database Init Error]:', error);
     throw error;
   } finally {
-    await connection.end();
+    if (connection) {
+      await connection.end();
+    }
   }
 }
 

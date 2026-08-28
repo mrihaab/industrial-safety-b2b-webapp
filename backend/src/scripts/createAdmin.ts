@@ -14,37 +14,52 @@ function askQuestion(query: string): Promise<string> {
 
 export async function createAdminCli() {
   console.log('\n==================================================');
-  console.log('  Ghulam Safety Hub - Production Admin Seed CLI');
+  console.log('  Ghulam Safety Hub - Production Admin Seed Utility');
   console.log('==================================================\n');
 
   try {
-    const usernameInput = await askQuestion('Enter Admin Username (default: admin): ');
-    const username = usernameInput.trim() || 'admin';
+    let username = (process.env.ADMIN_USERNAME || '').trim();
+    let email = (process.env.ADMIN_EMAIL || '').trim().toLowerCase();
+    let password = process.env.ADMIN_PASSWORD || '';
 
-    const emailInput = await askQuestion('Enter Admin Email: ');
-    const email = emailInput.trim().toLowerCase();
+    if (!email || !password) {
+      const usernameInput = await askQuestion('Enter Admin Username (default: admin): ');
+      username = usernameInput.trim() || 'admin';
 
-    if (!email || !email.includes('@')) {
-      console.error('\n[Error]: Valid email address is required.');
-      process.exit(1);
-    }
+      const emailInput = await askQuestion('Enter Admin Email: ');
+      email = emailInput.trim().toLowerCase();
 
-    const existingUser = await AuthModel.findUserByEmail(email);
-    if (existingUser) {
-      console.error(`\n[Error]: User with email '${email}' already exists in database (ID: ${existingUser.id}). Duplicate admin creation aborted.`);
-      process.exit(1);
-    }
+      if (!email || !email.includes('@')) {
+        console.error('\n[Error]: Valid email address is required.');
+        process.exit(1);
+      }
 
-    const password = await askQuestion('Enter Master Admin Password (min 8 chars): ');
-    if (!password || password.length < 8) {
-      console.error('\n[Error]: Password must be at least 8 characters long.');
-      process.exit(1);
-    }
+      const existingUser = await AuthModel.findUserByEmail(email);
+      if (existingUser) {
+        console.error(`\n[Notice]: User with email '${email}' already exists in database (ID: ${existingUser.id}). Creation skipped.`);
+        process.exit(0);
+      }
 
-    const confirmPassword = await askQuestion('Confirm Master Admin Password: ');
-    if (password !== confirmPassword) {
-      console.error('\n[Error]: Passwords do not match. Aborting.');
-      process.exit(1);
+      password = await askQuestion('Enter Master Admin Password (min 8 chars): ');
+      if (!password || password.length < 8) {
+        console.error('\n[Error]: Password must be at least 8 characters long.');
+        process.exit(1);
+      }
+
+      const confirmPassword = await askQuestion('Confirm Master Admin Password: ');
+      if (password !== confirmPassword) {
+        console.error('\n[Error]: Passwords do not match. Aborting.');
+        process.exit(1);
+      }
+    } else {
+      username = username || 'admin';
+      const existingUser = await AuthModel.findUserByEmail(email);
+      if (existingUser) {
+        console.log(`\n[Notice]: User with email '${email}' already exists in database (ID: ${existingUser.id}). Creation skipped.`);
+        rl.close();
+        await dbPool.end();
+        process.exit(0);
+      }
     }
 
     console.log('\n[Processing]: Hashing password with bcrypt...');
