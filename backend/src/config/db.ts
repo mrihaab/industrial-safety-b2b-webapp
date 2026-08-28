@@ -15,4 +15,5 @@ export const dbPool = mysql.createPool({
   queueLimit: 0,
   enableKeepAlive: true,
   keepAliveInitialDelay: 0,
+  ssl: process.env.DB_SSL === 'true' || (process.env.NODE_ENV === 'production' && process.env.DB_HOST !== '127.0.0.1') ? { rejectUnauthorized: false } : undefined,
 });
