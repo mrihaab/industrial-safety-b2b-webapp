@@ -47,4 +47,20 @@ export class AdminRfqController {
       next(err);
     }
   }
+
+  static async deleteRfq(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await AdminRfqService.deleteRfq(id);
+      if (!success) {
+        return res.status(404).json({ success: false, message: 'RFQ inquiry not found' });
+      }
+      res.json({
+        success: true,
+        message: 'RFQ inquiry deleted successfully',
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
 }

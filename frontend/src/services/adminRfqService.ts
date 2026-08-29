@@ -37,4 +37,8 @@ export class AdminRfqService {
   static async updateStatus(id: number, status: string): Promise<ApiResponse<AdminRfqItem>> {
     return api.put<AdminRfqItem>(`/admin/rfqs/${id}/status`, { status });
   }
+
+  static async deleteRfq(id: number): Promise<ApiResponse<void>> {
+    return api.delete<void>(`/admin/rfqs/${id}`);
+  }
 }

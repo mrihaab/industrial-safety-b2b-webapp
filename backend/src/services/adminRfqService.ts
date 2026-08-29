@@ -90,4 +90,12 @@ export class AdminRfqService {
 
     return this.getRfqDetails(id);
   }
+
+  static async deleteRfq(id: number) {
+    const [result] = await dbPool.query<RowDataPacket[]>(
+      `DELETE FROM rfq_inquiries WHERE id = ?`,
+      [id]
+    );
+    return (result as any).affectedRows > 0;
+  }
 }

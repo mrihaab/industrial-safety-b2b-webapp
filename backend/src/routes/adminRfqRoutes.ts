@@ -9,5 +9,6 @@ router.use(authenticateAdmin);
 router.get('/', AdminRfqController.getAll);
 router.get('/:id', AdminRfqController.getById);
 router.put('/:id/status', AdminRfqController.updateStatus);
+router.delete('/:id', AdminRfqController.deleteRfq);
 
 export default router;

@@ -78,6 +78,24 @@ export const AdminInquiries: React.FC = () => {
     }
   };
 
+  const handleDeleteRfq = async (id: number, companyName: string) => {
+    if (!window.confirm(`Are you sure you want to delete RFQ Inquiry #${id} from "${companyName}"? This action cannot be undone.`)) {
+      return;
+    }
+    try {
+      const response = await AdminRfqService.deleteRfq(id);
+      if (response.success) {
+        setInquiries(prev => prev.filter(inq => inq.id !== id));
+        if (selectedInquiry && selectedInquiry.id === id) {
+          setIsDetailOpen(false);
+          setSelectedInquiry(null);
+        }
+      }
+    } catch (err: unknown) {
+      console.error('Failed to delete RFQ inquiry:', err);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -173,9 +191,17 @@ export const AdminInquiries: React.FC = () => {
                         <option value="rejected" className="bg-[#1e293b] text-rose-400 font-bold py-2">REJECTED</option>
                       </select>
                     </td>
-                    <td className="py-4 px-6 text-right whitespace-nowrap">
+                    <td className="py-4 px-6 text-right whitespace-nowrap space-x-2">
                       <Button variant="outline" size="sm" onClick={() => openDetailModal(inq)}>
                         Inspect RFQ
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-error hover:bg-error/10"
+                        onClick={() => handleDeleteRfq(inq.id, inq.company_name)}
+                      >
+                        Delete
                       </Button>
                     </td>
                   </tr>
@@ -271,7 +297,14 @@ export const AdminInquiries: React.FC = () => {
               </p>
             </div>
 
-            <div className="pt-4 flex justify-end gap-3 border-t border-outline-variant">
+            <div className="pt-4 flex justify-between items-center border-t border-outline-variant">
+              <Button
+                variant="ghost"
+                className="text-error hover:bg-error/10"
+                onClick={() => handleDeleteRfq(selectedInquiry.id, selectedInquiry.company_name)}
+              >
+                Delete RFQ
+              </Button>
               <Button variant="outline" onClick={() => setIsDetailOpen(false)}>
                 Close Window
               </Button>
