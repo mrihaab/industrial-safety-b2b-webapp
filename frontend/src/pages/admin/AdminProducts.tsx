@@ -472,7 +472,7 @@ export const AdminProducts: React.FC = () => {
               return true;
             }).length;
 
-            const isLimitReached = !isFeatured && currentFeaturedCount >= 3;
+            const isLimitReached = !isFeatured && currentFeaturedCount >= 1;
 
             return (
               <div className="bg-surface-container-high border border-outline-variant p-4 rounded-xs space-y-1">
@@ -483,8 +483,8 @@ export const AdminProducts: React.FC = () => {
                       checked={isFeatured}
                       disabled={isLimitReached}
                       onChange={e => {
-                        if (e.target.checked && currentFeaturedCount >= 3) {
-                          alert('Limit Reached: Only 3 products can be featured on the home page at a time. Please unfeature another product first.');
+                        if (e.target.checked && currentFeaturedCount >= 1) {
+                          alert('Limit Reached: Only 1 product can be featured on the home page at a time. Please unfeature the currently featured product first.');
                           return;
                         }
                         setIsFeatured(e.target.checked);
@@ -496,12 +496,12 @@ export const AdminProducts: React.FC = () => {
                     </span>
                   </label>
                   <span className="font-mono text-xs font-bold text-amber-400">
-                    ({currentFeaturedCount + (isFeatured ? 1 : 0)} / 3 Featured Max)
+                    ({isFeatured ? 1 : 0} / 1 Featured Max)
                   </span>
                 </div>
                 {isLimitReached && (
                   <p className="text-[11px] text-amber-400 font-mono pl-7">
-                    ⚠️ Maximum 3 products limit reached. Unfeature a product to feature this one.
+                    ⚠️ Maximum 1 product limit reached. Unfeature the currently featured product to feature this one.
                   </p>
                 )}
               </div>
