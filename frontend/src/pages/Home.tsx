@@ -182,38 +182,46 @@ export const Home: React.FC = () => {
 
           {featuredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 min-h-[500px]">
-              {/* Main Hero Card for Featured Product (Framed Photo + Information Layout) */}
-              <div className={`${featuredProducts.length > 1 ? 'md:col-span-8' : 'md:col-span-12'} group relative overflow-hidden bg-surface-container border border-outline-variant p-6 sm:p-8 rounded-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center shadow-xl`}>
-                
-                {/* Left Info Column */}
-                <div className="lg:col-span-7 space-y-4 flex flex-col justify-between h-full z-10">
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="bg-primary-container text-on-primary-container px-3 py-1 font-label-caps text-xs rounded-xs font-bold uppercase tracking-wider">
-                        {mainFeatured?.statusTag || 'FEATURED GEAR'}
-                      </span>
-                      {mainFeatured?.price && (
-                        <span className="bg-surface-container-high border border-outline-variant text-primary px-3 py-1 font-mono font-bold text-sm rounded-xs">
-                          ${Number(mainFeatured.price).toFixed(2)}
-                        </span>
-                      )}
-                    </div>
+              {/* Main Hero Card for Featured Product matching HTML Mockup */}
+              <div className={`${featuredProducts.length > 1 ? 'md:col-span-8' : 'md:col-span-12'} group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[480px] flex flex-col justify-between p-8 shadow-xl`}>
+                <img
+                  src={mainImageToShow}
+                  alt={mainFeatured?.title || 'Featured Product'}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/70 to-transparent" />
 
-                    <h3 className="font-headline-lg text-2xl sm:text-3xl text-on-surface font-extrabold leading-tight">
-                      {mainFeatured?.title}
-                    </h3>
-                    <p className="text-on-surface-variant font-body-sm text-sm line-clamp-3 leading-relaxed">
-                      {mainFeatured?.description || 'Industrial precision engineered safety solution.'}
-                    </p>
+                {/* Top Badges */}
+                <div className="relative z-10 flex justify-between items-start">
+                  <div className="bg-primary-container text-on-primary-container px-3 py-1 font-label-caps rounded-xs font-bold uppercase tracking-wider text-xs">
+                    {mainFeatured?.statusTag || 'FEATURED GEAR'}
                   </div>
+                  {mainFeatured?.price && (
+                    <div className="bg-surface/80 backdrop-blur-sm border border-outline-variant text-primary px-4 py-1.5 font-mono font-bold text-lg rounded-xs">
+                      ${Number(mainFeatured.price).toFixed(2)}
+                    </div>
+                  )}
+                </div>
+
+                {/* Content & Action */}
+                <div className="relative z-10 space-y-4 max-w-xl">
+                  <h3 className="font-headline-lg text-2xl sm:text-3xl lg:text-4xl text-on-surface font-extrabold leading-tight">
+                    {mainFeatured?.title}
+                  </h3>
+                  <p className="text-on-surface-variant font-body-sm text-sm line-clamp-3 leading-relaxed">
+                    {mainFeatured?.description || 'Industrial precision engineered safety solution.'}
+                  </p>
 
                   {/* Dynamic Gallery Thumbnails Strip */}
                   {featuredGallery.length > 1 && (
-                    <div className="pt-2">
+                    <div className="pt-2 pb-1">
                       <span className="text-[11px] font-label-caps text-primary uppercase block mb-2 font-bold tracking-wider">
-                        📸 Product Photos ({featuredGallery.length} Available):
+                        📸 PRODUCT PHOTOS ({featuredGallery.length} AVAILABLE):
                       </span>
-                      <div className="flex flex-wrap gap-2.5">
+                      <div className="flex flex-wrap gap-3">
                         {featuredGallery.map((imgUrl, idx) => (
                           <button
                             key={idx}
@@ -239,28 +247,15 @@ export const Home: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="pt-2">
+                  <div className="pt-3">
                     <Link
                       to={`/products/${cleanMainSlug}`}
-                      className="bg-white text-surface px-6 py-3 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary hover:text-on-primary transition-all rounded-xs cursor-pointer orange-glow text-sm"
+                      className="bg-white text-surface px-8 py-3.5 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary hover:text-on-primary transition-all rounded-xs cursor-pointer orange-glow text-sm"
                     >
                       View Specs <span className="material-symbols-outlined text-sm">open_in_new</span>
                     </Link>
                   </div>
                 </div>
-
-                {/* Right Framed Product Photo Container */}
-                <div className="lg:col-span-5 relative w-full aspect-square bg-surface-container-lowest border border-outline-variant/60 rounded-xs overflow-hidden flex items-center justify-center p-4 group-hover:border-primary/50 transition-colors">
-                  <img
-                    src={mainImageToShow}
-                    alt={mainFeatured?.title || 'Featured Product'}
-                    className="w-full h-full object-contain object-center transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
-                    }}
-                  />
-                </div>
-
               </div>
 
               {/* Additional Featured Products (Only rendered if Admin marked 2nd or 3rd product as featured) */}
