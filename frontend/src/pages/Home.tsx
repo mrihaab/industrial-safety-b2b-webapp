@@ -181,76 +181,33 @@ export const Home: React.FC = () => {
           </div>
 
           {featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 min-h-[500px]">
-              {/* Main Hero Card for Featured Product matching HTML Mockup */}
-              <div className={`${featuredProducts.length > 1 ? 'md:col-span-8' : 'md:col-span-12'} group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[480px] flex flex-col justify-between p-8 shadow-xl`}>
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 min-h-[520px]">
+              {/* Box 1: Left Tall Hero Card (50% Width / col-span-6) */}
+              <div className="md:col-span-6 group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[500px] flex flex-col justify-end p-8 shadow-2xl rounded-sm">
                 <img
-                  src={mainImageToShow}
-                  alt={mainFeatured?.title || 'Featured Product'}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  src={featuredGallery[0] || getImageUrl(mainFeatured?.primaryImage)}
+                  alt={mainFeatured?.title || 'Featured PPE Product'}
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
                   }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/70 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/60 to-transparent" />
 
-                {/* Top Badges */}
-                <div className="relative z-10 flex justify-between items-start">
-                  <div className="bg-primary-container text-on-primary-container px-3 py-1 font-label-caps rounded-xs font-bold uppercase tracking-wider text-xs">
-                    {mainFeatured?.statusTag || 'FEATURED GEAR'}
+                <div className="relative z-10 space-y-4 max-w-md">
+                  <div className="inline-block bg-primary-container text-on-primary-container px-3 py-1 font-label-caps text-xs font-bold uppercase tracking-wider rounded-xs orange-glow">
+                    {mainFeatured?.statusTag || 'NEW RELEASE'}
                   </div>
-                  {mainFeatured?.price && (
-                    <div className="bg-surface/80 backdrop-blur-sm border border-outline-variant text-primary px-4 py-1.5 font-mono font-bold text-lg rounded-xs">
-                      ${Number(mainFeatured.price).toFixed(2)}
-                    </div>
-                  )}
-                </div>
-
-                {/* Content & Action */}
-                <div className="relative z-10 space-y-4 max-w-xl">
-                  <h3 className="font-headline-lg text-2xl sm:text-3xl lg:text-4xl text-on-surface font-extrabold leading-tight">
-                    {mainFeatured?.title}
+                  <h3 className="font-headline-lg text-2xl sm:text-3xl text-on-surface font-extrabold leading-tight">
+                    {mainFeatured?.title || 'Titan-X Safety System'}
                   </h3>
-                  <p className="text-on-surface-variant font-body-sm text-sm line-clamp-3 leading-relaxed">
-                    {mainFeatured?.description || 'Industrial precision engineered safety solution.'}
+                  <p className="text-on-surface-variant font-body-sm text-xs sm:text-sm line-clamp-3 leading-relaxed">
+                    {mainFeatured?.description || 'Impact resistant carbon composite shells for extreme environments.'}
                   </p>
-
-                  {/* Dynamic Gallery Thumbnails Strip */}
-                  {featuredGallery.length > 1 && (
-                    <div className="pt-2 pb-1">
-                      <span className="text-[11px] font-label-caps text-primary uppercase block mb-2 font-bold tracking-wider">
-                        📸 PRODUCT PHOTOS ({featuredGallery.length} AVAILABLE):
-                      </span>
-                      <div className="flex flex-wrap gap-3">
-                        {featuredGallery.map((imgUrl, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setActiveGalleryIndex(idx)}
-                            className={`w-14 h-14 rounded-xs border-2 overflow-hidden transition-all cursor-pointer ${
-                              activeGalleryIndex === idx
-                                ? 'border-primary shadow-lg scale-105'
-                                : 'border-outline-variant/60 opacity-70 hover:opacity-100'
-                            }`}
-                          >
-                            <img
-                              src={imgUrl}
-                              alt={`Thumbnail ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
-                              }}
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="pt-3">
+                  <div className="pt-2">
                     <Link
                       to={`/products/${cleanMainSlug}`}
-                      className="bg-white text-surface px-8 py-3.5 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary hover:text-on-primary transition-all rounded-xs cursor-pointer orange-glow text-sm"
+                      className="bg-white text-surface px-6 py-3 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary hover:text-on-primary transition-all rounded-xs cursor-pointer orange-glow text-xs sm:text-sm"
                     >
                       View Specs <span className="material-symbols-outlined text-sm">open_in_new</span>
                     </Link>
@@ -258,44 +215,88 @@ export const Home: React.FC = () => {
                 </div>
               </div>
 
-              {/* Additional Featured Products (Only rendered if Admin marked 2nd or 3rd product as featured) */}
-              {featuredProducts.length > 1 && (
-                <div className="md:col-span-4 flex flex-col gap-6">
-                  {featuredProducts.slice(1, 3).map((item, index) => (
-                    <div
-                      key={item.id || index}
-                      className="group relative overflow-hidden bg-surface-container border border-outline-variant min-h-[220px] flex-1 flex flex-col justify-end p-6"
-                    >
+              {/* Right Side Container (50% Width / col-span-6 - 3-Item Sub-Grid) */}
+              <div className="md:col-span-6 flex flex-col gap-6">
+                
+                {/* Box 2: Right Top Wide Card */}
+                <div className="group relative overflow-hidden bg-surface-container border border-outline-variant h-[240px] flex flex-col justify-between p-6 shadow-xl rounded-sm">
+                  <img
+                    src={
+                      featuredGallery[1] ||
+                      (featuredProducts[1] ? getImageUrl(featuredProducts[1].primaryImage) : 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80')
+                    }
+                    alt={featuredProducts[1]?.title || 'Pro-Utility Series'}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/40 to-transparent" />
+                  <div className="relative z-10">
+                    <span className="font-label-caps text-xs text-primary font-bold uppercase tracking-wider block mb-1">
+                      {featuredProducts[1]?.seriesName || 'Pro-Utility Series'}
+                    </span>
+                    <h4 className="font-title-md text-on-surface font-bold text-base truncate">
+                      {featuredProducts[1]?.title || 'EN ISO 20471 Certified High-Vis'}
+                    </h4>
+                  </div>
+                </div>
+
+                {/* Bottom Row: 2 Equal Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 flex-1">
+                  
+                  {/* Box 3: Bottom-Left Card */}
+                  <div className="group relative overflow-hidden bg-surface-container border border-outline-variant h-[235px] flex flex-col justify-end p-5 shadow-xl rounded-sm">
+                    <img
+                      src={
+                        featuredGallery[2] ||
+                        (featuredProducts[2] ? getImageUrl(featuredProducts[2].primaryImage) : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80')
+                      }
+                      alt={featuredProducts[2]?.title || 'Safety Footwear'}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
+                    <div className="relative z-10">
+                      <h4 className="font-title-md text-on-surface font-bold text-sm truncate">
+                        {featuredProducts[2]?.title || 'Heavy-Duty Safety Boots'}
+                      </h4>
+                    </div>
+                  </div>
+
+                  {/* Box 4: Bottom-Right Card (Photo 4 or Custom Fitting CTA Box) */}
+                  {featuredGallery[3] ? (
+                    <div className="group relative overflow-hidden bg-surface-container border border-outline-variant h-[235px] flex flex-col justify-end p-5 shadow-xl rounded-sm">
                       <img
-                        src={getImageUrl(item.primaryImage)}
-                        alt={item.title}
-                        className="absolute inset-0 w-full h-full object-cover grayscale transition-all duration-500 group-hover:grayscale-0 group-hover:scale-105"
+                        src={featuredGallery[3]}
+                        alt="Featured Photo 4"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = FALLBACK_TITAN_X;
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/70 to-transparent" />
-                      <div className="relative z-10">
-                        <span className="font-label-caps text-primary text-xs uppercase block mb-1 font-bold">
-                          ⭐ FEATURED GEAR #{index + 2}
-                        </span>
-                        <h4 className="font-title-md text-on-surface font-bold text-lg mb-1 truncate">
-                          {item.title}
-                        </h4>
-                        <p className="text-on-surface-variant text-xs line-clamp-1 mb-3">
-                          {item.description}
-                        </p>
-                        <Link
-                          to={`/products/${item.slug}`}
-                          className="text-primary font-label-caps hover:underline text-xs inline-flex items-center gap-1 font-bold"
-                        >
-                          View Specs →
-                        </Link>
-                      </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
                     </div>
-                  ))}
+                  ) : (
+                    <div className="bg-surface-container-high border border-outline-variant/80 h-[235px] flex flex-col justify-center items-center text-center p-6 rounded-sm space-y-3 hover:border-primary/60 transition-colors">
+                      <span className="material-symbols-outlined text-primary text-3xl">tune</span>
+                      <h4 className="font-title-md text-on-surface font-bold text-sm">Custom Fitting</h4>
+                      <p className="text-on-surface-variant text-[11px] leading-relaxed">
+                        Tailored safety solutions for your entire workforce.
+                      </p>
+                      <Link
+                        to="/rfq"
+                        className="text-primary font-label-caps text-xs font-bold hover:underline inline-flex items-center gap-1"
+                      >
+                        Get Started →
+                      </Link>
+                    </div>
+                  )}
+
                 </div>
-              )}
+              </div>
             </div>
           ) : (
             <div className="bg-surface-container border border-outline-variant p-10 text-center rounded-xs space-y-4">
