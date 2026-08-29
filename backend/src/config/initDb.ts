@@ -201,6 +201,14 @@ export async function initializeDatabase(): Promise<void> {
       await connection.query(`ALTER TABLE rfq_inquiries MODIFY COLUMN notes TEXT NULL DEFAULT NULL;`);
     } catch (migErr: any) {}
 
+    // Make rfq_items product_title & sku columns NULL DEFAULT
+    try {
+      await connection.query(`ALTER TABLE rfq_items MODIFY COLUMN product_title VARCHAR(255) NULL DEFAULT 'Industrial Safety Product';`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_items MODIFY COLUMN sku VARCHAR(64) NULL DEFAULT 'GSH-ITEM';`);
+    } catch (migErr: any) {}
+
     console.log(`[Database Init]: Executed ${DDL_STATEMENTS.length} DDL statements. All 8 tables created/verified.`);
   } catch (error) {
     console.error('[Database Init Error]:', error);

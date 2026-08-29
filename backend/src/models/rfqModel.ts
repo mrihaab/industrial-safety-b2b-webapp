@@ -34,14 +34,35 @@ export class RfqModel {
 
       // 2. Insert items into rfq_items
       const insertItemSql = `
-        INSERT INTO rfq_items (rfq_id, product_id, quantity, size_range)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO rfq_items (rfq_id, product_id, product_title, sku, quantity, size_range)
+        VALUES (?, ?, ?, ?, ?, ?)
       `;
 
       for (const item of input.items) {
+        // Fetch product title/sku if product_id exists
+        let productTitle = (item as any).product_title || 'Industrial Safety Product';
+        let productSku = (item as any).sku || 'GSH-ITEM';
+
+        if (item.product_id && (!productTitle || productTitle === 'Industrial Safety Product')) {
+          try {
+            const [pRows] = await connection.query<RowDataPacket[]>(
+              `SELECT title, sku FROM products WHERE id = ? LIMIT 1`,
+              [item.product_id]
+            );
+            if (pRows.length > 0) {
+              productTitle = pRows[0].title;
+              productSku = pRows[0].sku;
+            }
+          } catch (pErr) {
+            // Ignore error
+          }
+        }
+
         const itemParams = [
           rfqId,
-          item.product_id,
+          item.product_id || null,
+          productTitle,
+          productSku,
           item.quantity,
           item.size_range || 'Assorted S/M/L/XL',
         ];
