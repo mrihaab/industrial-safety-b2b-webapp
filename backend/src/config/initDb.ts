@@ -181,6 +181,26 @@ export async function initializeDatabase(): Promise<void> {
       await connection.query(`ALTER TABLE rfq_inquiries ADD COLUMN detailed_requirements TEXT DEFAULT NULL;`);
     } catch (migErr: any) {}
 
+    // Make all columns NULL DEFAULT NULL to fix 'Field contact_person doesn't have a default value'
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries MODIFY COLUMN contact_person VARCHAR(128) NULL DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries MODIFY COLUMN email VARCHAR(128) NULL DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries MODIFY COLUMN phone VARCHAR(64) NULL DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries MODIFY COLUMN industry VARCHAR(64) NULL DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries MODIFY COLUMN estimated_monthly_volume VARCHAR(64) NULL DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries MODIFY COLUMN notes TEXT NULL DEFAULT NULL;`);
+    } catch (migErr: any) {}
+
     console.log(`[Database Init]: Executed ${DDL_STATEMENTS.length} DDL statements. All 8 tables created/verified.`);
   } catch (error) {
     console.error('[Database Init Error]:', error);

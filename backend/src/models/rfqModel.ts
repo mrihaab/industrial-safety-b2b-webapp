@@ -11,18 +11,22 @@ export class RfqModel {
     try {
       await connection.beginTransaction();
 
-      // 1. Insert into rfq_inquiries
+      // 1. Insert into rfq_inquiries with backward-compatible column mappings
       const insertInquirySql = `
         INSERT INTO rfq_inquiries (
-          company_name, business_email, industry_segment, monthly_volume, detailed_requirements, status
-        ) VALUES (?, ?, ?, ?, ?, 'pending')
+          company_name, contact_person, email, business_email, industry, industry_segment, estimated_monthly_volume, monthly_volume, detailed_requirements, status
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
       `;
       const inquiryParams = [
         input.company_name,
-        input.business_email,
-        input.industry_segment,
-        input.monthly_volume,
-        input.detailed_requirements,
+        input.contact_person || input.company_name || 'Enterprise Client',
+        input.business_email || 'client@company.com',
+        input.business_email || 'client@company.com',
+        input.industry_segment || 'Industrial Safety',
+        input.industry_segment || 'Industrial Safety',
+        input.monthly_volume || '$50k - $250k',
+        input.monthly_volume || '$50k - $250k',
+        input.detailed_requirements || '',
       ];
 
       const [inquiryResult] = await connection.query<ResultSetHeader>(insertInquirySql, inquiryParams);
