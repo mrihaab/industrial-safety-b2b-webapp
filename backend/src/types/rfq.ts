@@ -25,6 +25,8 @@ export interface CreateRfqItemInput {
 
 export interface CreateRfqInput {
   company_name: string;
+  contact_person?: string;
+  email?: string;
   business_email: string;
   industry_segment: string;
   monthly_volume: string;
