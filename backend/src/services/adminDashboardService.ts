@@ -20,9 +20,12 @@ export class AdminDashboardService {
       LIMIT 5
     `);
 
-    // Latest inquiries
+    // Latest inquiries with COALESCE fallback for column names
     const [latestInquiries] = await dbPool.query<RowDataPacket[]>(`
-      SELECT id, company_name, business_email, industry_segment, status, created_at
+      SELECT id, company_name,
+             COALESCE(business_email, email, '') AS business_email,
+             COALESCE(industry_segment, industry, 'Industrial Safety') AS industry_segment,
+             status, created_at
       FROM rfq_inquiries
       ORDER BY created_at DESC
       LIMIT 5

@@ -83,12 +83,16 @@ const DDL_STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS rfq_inquiries (
       id INT AUTO_INCREMENT PRIMARY KEY,
       company_name VARCHAR(128) NOT NULL,
-      contact_person VARCHAR(128) NOT NULL,
-      email VARCHAR(128) NOT NULL,
-      phone VARCHAR(64) NOT NULL,
-      industry VARCHAR(64),
-      estimated_monthly_volume VARCHAR(64),
+      contact_person VARCHAR(128) DEFAULT NULL,
+      email VARCHAR(128) DEFAULT NULL,
+      business_email VARCHAR(128) DEFAULT NULL,
+      phone VARCHAR(64) DEFAULT NULL,
+      industry VARCHAR(64) DEFAULT NULL,
+      industry_segment VARCHAR(64) DEFAULT NULL,
+      estimated_monthly_volume VARCHAR(64) DEFAULT NULL,
+      monthly_volume VARCHAR(64) DEFAULT NULL,
       notes TEXT,
+      detailed_requirements TEXT,
       status VARCHAR(32) DEFAULT 'pending',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;`,
@@ -162,6 +166,20 @@ export async function initializeDatabase(): Promise<void> {
     } catch (migErr: any) {
       // Ignore if already exists
     }
+
+    // Safety column migrations for rfq_inquiries
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries ADD COLUMN business_email VARCHAR(128) DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries ADD COLUMN industry_segment VARCHAR(64) DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries ADD COLUMN monthly_volume VARCHAR(64) DEFAULT NULL;`);
+    } catch (migErr: any) {}
+    try {
+      await connection.query(`ALTER TABLE rfq_inquiries ADD COLUMN detailed_requirements TEXT DEFAULT NULL;`);
+    } catch (migErr: any) {}
 
     console.log(`[Database Init]: Executed ${DDL_STATEMENTS.length} DDL statements. All 8 tables created/verified.`);
   } catch (error) {

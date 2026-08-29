@@ -7,7 +7,13 @@ export class AdminRfqService {
     const limit = query.limit || 10;
     const offset = (page - 1) * limit;
 
-    let sql = `SELECT * FROM rfq_inquiries WHERE 1=1`;
+    let sql = `SELECT id, company_name, 
+                      COALESCE(business_email, email, '') AS business_email, 
+                      COALESCE(industry_segment, industry, 'Industrial Safety') AS industry_segment, 
+                      COALESCE(monthly_volume, estimated_monthly_volume, '') AS monthly_volume,
+                      COALESCE(detailed_requirements, notes, '') AS detailed_requirements,
+                      status, created_at 
+               FROM rfq_inquiries WHERE 1=1`;
     const params: (string | number)[] = [];
 
     if (query.status && query.status !== 'all') {
@@ -16,7 +22,7 @@ export class AdminRfqService {
     }
 
     if (query.search) {
-      sql += ` AND (company_name LIKE ? OR business_email LIKE ? OR industry_segment LIKE ?)`;
+      sql += ` AND (company_name LIKE ? OR COALESCE(business_email, email, '') LIKE ? OR COALESCE(industry_segment, industry, '') LIKE ?)`;
       const pattern = `%${query.search}%`;
       params.push(pattern, pattern, pattern);
     }
@@ -34,7 +40,7 @@ export class AdminRfqService {
       countParams.push(query.status);
     }
     if (query.search) {
-      countSql += ` AND (company_name LIKE ? OR business_email LIKE ? OR industry_segment LIKE ?)`;
+      countSql += ` AND (company_name LIKE ? OR COALESCE(business_email, email, '') LIKE ? OR COALESCE(industry_segment, industry, '') LIKE ?)`;
       const pattern = `%${query.search}%`;
       countParams.push(pattern, pattern, pattern);
     }
@@ -53,7 +59,13 @@ export class AdminRfqService {
 
   static async getRfqDetails(id: number) {
     const [[rfq]] = await dbPool.query<RowDataPacket[]>(
-      `SELECT * FROM rfq_inquiries WHERE id = ?`,
+      `SELECT id, company_name, 
+              COALESCE(business_email, email, '') AS business_email, 
+              COALESCE(industry_segment, industry, 'Industrial Safety') AS industry_segment, 
+              COALESCE(monthly_volume, estimated_monthly_volume, '') AS monthly_volume,
+              COALESCE(detailed_requirements, notes, '') AS detailed_requirements,
+              status, created_at 
+       FROM rfq_inquiries WHERE id = ?`,
       [id]
     );
 
