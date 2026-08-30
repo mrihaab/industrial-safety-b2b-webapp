@@ -125,5 +125,7 @@ npm run dev
 
 ---
 
-## 📜 License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## 📜 License & Author
+
+Developed by **M.RIHAAB SAEED** for **Ghulam Safety Hub**.  
+All Rights Reserved. See the [LICENSE](LICENSE) file for details.
