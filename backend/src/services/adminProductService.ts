@@ -55,7 +55,9 @@ export class AdminProductService {
     if (files && files.length > 0) {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const imageUrl = `/uploads/${file.filename}`;
+        const imageUrl = (file.path && (file.path.startsWith('http://') || file.path.startsWith('https://')))
+          ? file.path
+          : `/uploads/${file.filename}`;
         const isPrimary = i === 0;
         const sizeCode = sizeMappings[i] || null;
         await AdminProductModel.insertProductImage(productId, imageUrl, isPrimary, false, sizeCode);
@@ -166,7 +168,9 @@ export class AdminProductService {
       if (files && files.length > 0) {
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
-          const imageUrl = `/uploads/${file.filename}`;
+          const imageUrl = (file.path && (file.path.startsWith('http://') || file.path.startsWith('https://')))
+            ? file.path
+            : `/uploads/${file.filename}`;
           const isPrimary = isFirst;
           isFirst = false;
           const sizeCode = sizeMappings[i] || null;
