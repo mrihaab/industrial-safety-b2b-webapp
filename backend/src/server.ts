@@ -19,7 +19,13 @@ const PORT = process.env.PORT || 5000;
 // Production-safe CORS Configuration
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(o => o.trim())
-  : ['https://industrial-safety-b2b-webapp.vercel.app', 'http://localhost:5173', 'http://localhost:3000'];
+  : [
+      'https://ghulamsafetyhub.com',
+      'https://www.ghulamsafetyhub.com',
+      'https://industrial-safety-b2b-webapp.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:3000',
+    ];
 
 app.use(
   cors({
