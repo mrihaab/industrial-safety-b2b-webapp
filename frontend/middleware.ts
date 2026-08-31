@@ -44,7 +44,11 @@ export default async function middleware(request: Request) {
             title = `${target.title} | Ghulam Safety Hub`;
           }
           if (target.description) {
-            description = target.description.replace(/<[^>]*>?/gm, '').slice(0, 160);
+            let cleanDesc = target.description.replace(/<[^>]*>?/gm, '').trim();
+            if (cleanDesc.length < 100) {
+              cleanDesc = `${cleanDesc} Premium industrial PPE protective equipment, safety gloves, workwear, and global logistics by Ghulam Safety Hub. ISO 9001:2015 and CE certified safety solutions.`;
+            }
+            description = cleanDesc.slice(0, 250);
           }
         }
       }
@@ -62,6 +66,7 @@ export default async function middleware(request: Request) {
   <meta name="title" content="${title}" />
   <meta name="description" content="${description}" />
   <meta name="image" content="${image}" />
+  <meta name="author" content="Ghulam Safety Hub & M.RIHAAB SAEED" />
 
   <!-- Open Graph / LinkedIn / Facebook -->
   <meta property="og:type" content="website" />
@@ -73,6 +78,7 @@ export default async function middleware(request: Request) {
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="627" />
+  <meta property="og:image" content="https://www.ghulamsafetyhub.com/og-image.jpg" />
   <meta property="og:site_name" content="Ghulam Safety Hub" />
 
   <!-- Twitter -->
