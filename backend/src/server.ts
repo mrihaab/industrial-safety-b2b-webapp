@@ -59,7 +59,17 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static uploaded files
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Health Check Route
+// Root & Health Check Routes
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: 'Welcome to Ghulam Safety Hub B2B API Server',
+    status: 'ONLINE',
+    docs: 'https://www.ghulamsafetyhub.com',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get('/api/v1/health', (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
