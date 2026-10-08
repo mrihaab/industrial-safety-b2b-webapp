@@ -74,7 +74,7 @@ export const Navbar: React.FC = () => {
                     : 'text-on-surface-variant hover:text-primary'
                 )}
               >
-                PPE & Safety Gear
+                Product Catalog
               </Link>
               <Link
                 to="/about"

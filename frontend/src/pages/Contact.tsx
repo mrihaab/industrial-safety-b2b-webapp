@@ -51,11 +51,10 @@ export const Contact: React.FC = () => {
             <h4 className="font-title-md text-xl text-on-surface font-bold">Global Headquarters</h4>
           </div>
           <p className="font-body-sm text-on-surface-variant leading-relaxed">
-            Sialkot Industrial Zone, Punjab, Pakistan<br />
-            Dubai Logistics City Hub, UAE
+            Sialkot Industrial Zone, Punjab, Pakistan
           </p>
           <div className="pt-2 text-xs text-on-surface-variant font-mono">
-            Mon - Sat: 8:00 AM - 6:00 PM PST
+            Mon - Sat: 8:00 AM - 6:00 PM PKT
           </div>
         </Card>
 
@@ -81,8 +80,8 @@ export const Contact: React.FC = () => {
           <p className="font-body-sm text-on-surface-variant">
             Direct helpline for urgent dispatch and order status tracking:
           </p>
-          <a href="tel:03267249998" className="font-mono text-primary text-sm font-bold block hover:underline">
-            03267249998
+          <a href="tel:+923267249998" className="font-mono text-primary text-sm font-bold block hover:underline">
+            +92 326 7249998
           </a>
           <span className="text-xs text-on-surface-variant block">24/7 International Customer Line</span>
         </Card>
@@ -159,12 +158,12 @@ export const Contact: React.FC = () => {
 
         {/* Right Google Maps & Social Links (5-Columns) */}
         <div className="lg:col-span-5 space-y-6">
-          {/* Responsive Google Maps Embed */}
+          {/* Responsive Google Maps Embed (Sialkot, Pakistan) */}
           <div className="bg-surface-container industrial-border p-2 rounded-sm overflow-hidden h-72 relative">
             <iframe
-              title="Ghulam Safety Hub Global Logistics Park"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d115682.49386343516!2d55.150000!3d25.050000!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f6b5b5b5b5b5b%3A0x5b5b5b5b5b5b5b5b!2sDubai%20Logistics%20City!5e0!3m2!1sen!2sae!4v1600000000000!5m2!1sen!2sae"
-              className="w-full h-full border-0 rounded-xs grayscale hover:grayscale-0 transition-all duration-500"
+              title="Ghulam Safety Hub Manufacturing & Headquarters - Sialkot, Pakistan"
+              src="https://maps.google.com/maps?q=Sialkot+Industrial+Estate,+Sialkot,+Punjab,+Pakistan&t=&z=13&ie=UTF8&iwloc=&output=embed"
+              className="w-full h-full border-0 rounded-xs transition-all duration-500"
               allowFullScreen
               loading="lazy"
             />

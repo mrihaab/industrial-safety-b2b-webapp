@@ -213,16 +213,17 @@ export const Home: React.FC = () => {
       {/* 3. Featured PPE Gear Section with Scroll Reveal & Crisp Contrast Cards */}
       <section className="py-24 bg-surface">
         <div className="max-w-container-max mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 sm:mb-12 gap-3 sm:gap-6">
             <div>
-              <span className="font-label-caps text-primary mb-4 block font-bold">PREMIUM SELECTION</span>
-              <h2 className="font-headline-lg text-headline-lg text-on-surface">Featured PPE Gear</h2>
+              <span className="font-label-caps text-primary mb-2 sm:mb-3 block font-bold text-xs">PREMIUM SELECTION</span>
+              <h2 className="font-headline-lg text-2xl sm:text-3xl lg:text-headline-lg text-on-surface font-extrabold">Featured PPE Gear</h2>
             </div>
             <Link
               to="/products"
-              className="text-on-surface-variant hover:text-primary flex items-center gap-2 transition-colors font-label-caps font-bold"
+              className="text-primary hover:text-primary-container flex items-center gap-1.5 transition-colors font-label-caps font-bold text-xs sm:text-sm group"
             >
-              View Full Inventory <span className="material-symbols-outlined">north_east</span>
+              <span>View Full Inventory</span>
+              <span className="material-symbols-outlined text-[18px] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">north_east</span>
             </Link>
           </div>
 

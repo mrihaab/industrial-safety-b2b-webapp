@@ -343,17 +343,17 @@ export const Rfq: React.FC = () => {
               <div className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-primary mt-1">location_on</span>
                 <div>
-                  <p className="font-bold">Dubai Logistics City (HQ)</p>
-                  <p className="text-body-sm text-on-surface-variant">Plot B-24, Free Zone Area, UAE</p>
-                  <p className="text-body-sm font-label-caps text-primary mt-1 font-bold">Status: Operational</p>
+                  <p className="font-bold">Sialkot Headquarters & Factory</p>
+                  <p className="text-body-sm text-on-surface-variant">Sialkot Industrial Zone, Punjab, Pakistan</p>
+                  <p className="text-body-sm font-label-caps text-primary mt-1 font-bold">Status: Active Manufacturing</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
                 <span className="material-symbols-outlined text-primary mt-1">location_on</span>
                 <div>
-                  <p className="font-bold">Singapore Maritime Hub</p>
-                  <p className="text-body-sm text-on-surface-variant">Jurong West, Gateway Drive</p>
-                  <p className="text-body-sm font-label-caps text-primary mt-1 font-bold">Status: High Volume</p>
+                  <p className="font-bold">Global Freight Hub</p>
+                  <p className="text-body-sm text-on-surface-variant">Dry Port & International Air Cargo Terminal</p>
+                  <p className="text-body-sm font-label-caps text-primary mt-1 font-bold">Status: Export Ready</p>
                 </div>
               </div>
             </div>
@@ -367,7 +367,7 @@ export const Rfq: React.FC = () => {
               </div>
               <div>
                 <p className="font-bold">Global Sales Hotline</p>
-                <p className="text-body-sm text-on-surface-variant font-mono">03267249998</p>
+                <p className="text-body-sm text-on-surface-variant font-mono">+92 326 7249998</p>
               </div>
             </div>
             <div className="flex items-center gap-4">

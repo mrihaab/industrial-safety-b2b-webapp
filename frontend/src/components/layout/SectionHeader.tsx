@@ -34,12 +34,9 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
           </span>
         </div>
       )}
-      <div className={cn('flex items-center gap-3', align === 'center' && 'justify-center')}>
-        <span className="w-12 h-[2px] bg-primary flex-shrink-0" />
-        <h2 className="font-headline-lg text-headline-lg font-bold text-on-surface">
-          {title}
-        </h2>
-      </div>
+      <h2 className={cn('font-headline-lg text-2xl sm:text-3xl lg:text-4xl font-extrabold text-on-surface leading-tight', align === 'center' && 'text-center')}>
+        {title}
+      </h2>
       {subtitle && (
         <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-1">
           {subtitle}
