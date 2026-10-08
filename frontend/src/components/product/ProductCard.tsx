@@ -54,10 +54,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const descText = product.description || 'Reinforced Kevlar stitching with anti-vibration padding for high-impact industrial operations.';
 
   return (
-    <div className="group bg-surface-container border border-outline-variant relative overflow-hidden transition-all duration-300 hover:border-primary flex flex-col justify-between h-full rounded-xs">
+    <div className="group bg-surface-container border border-outline-variant relative overflow-hidden transition-all duration-300 hover:border-primary flex flex-col justify-between h-full rounded-xs shadow-xs hover:shadow-md">
       {/* LED Active Status Tag Top Right */}
       <div className="absolute top-2.5 right-2.5 z-10 max-w-[85%]">
-        <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-2 py-1 uppercase font-bold led-active tracking-wider rounded-xs shadow-md truncate block">
+        <span className="bg-primary-container text-on-primary-container font-label-caps text-[10px] px-2 py-1 uppercase font-bold led-active tracking-wider rounded-xs shadow-sm truncate block">
           {statusBadge}
         </span>
       </div>
@@ -73,10 +73,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             onError={(e) => {
               (e.target as HTMLImageElement).src = DEFAULT_SAFETY_IMAGE;
             }}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 grayscale group-hover:grayscale-0"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </Link>
-        <div className="absolute inset-0 bg-gradient-to-t from-surface to-transparent opacity-60 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface/20 to-transparent pointer-events-none" />
       </div>
 
       {/* Card Content Body */}
@@ -107,15 +107,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   key={idx}
                   className={`px-2 py-0.5 border text-[10px] font-mono uppercase font-bold rounded-xs ${
                     idx === 0
-                      ? 'border-emerald-500/40 text-emerald-400 bg-emerald-950/20'
-                      : 'border-outline-variant text-on-surface-variant'
+                      ? 'border-emerald-600/30 text-emerald-700 bg-emerald-50'
+                      : 'border-outline-variant text-on-surface-variant bg-surface-container-high'
                   }`}
                 >
                   {cert}
                 </span>
               ))
             ) : (
-              <span className="text-[10px] font-mono text-on-surface-variant/40 uppercase">
+              <span className="text-[10px] font-mono text-on-surface-variant/60 uppercase">
                 ISO 9001 • CE Standard
               </span>
             )}

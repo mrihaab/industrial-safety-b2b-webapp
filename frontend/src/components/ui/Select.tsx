@@ -34,7 +34,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           {...props}
         >
           {options.map(opt => (
-            <option key={opt.value} value={opt.value} className="bg-[#1e293b] text-[#f8fafc] py-2 font-semibold">
+            <option key={opt.value} value={opt.value} className="bg-white text-slate-900 py-2 font-semibold">
               {opt.label}
             </option>
           ))}

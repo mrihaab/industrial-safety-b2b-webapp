@@ -177,18 +177,18 @@ export const AdminInquiries: React.FC = () => {
                         value={inq.status}
                         disabled={updatingId === inq.id}
                         onChange={e => handleStatusChange(inq.id, e.target.value)}
-                        className={`text-xs font-label-caps font-bold rounded-xs px-3 py-1.5 border transition-all cursor-pointer bg-[#1e293b] ${
+                        className={`text-xs font-label-caps font-bold rounded-xs px-3 py-1.5 border transition-all cursor-pointer ${
                           inq.status === 'pending'
-                            ? 'text-amber-400 border-amber-500/50'
+                            ? 'text-amber-700 border-amber-300 bg-amber-50'
                             : inq.status === 'approved' || inq.status === 'completed'
-                            ? 'text-emerald-400 border-emerald-500/50'
-                            : 'text-rose-400 border-rose-500/50'
+                            ? 'text-emerald-700 border-emerald-300 bg-emerald-50'
+                            : 'text-rose-700 border-rose-300 bg-rose-50'
                         }`}
                       >
-                        <option value="pending" className="bg-[#1e293b] text-amber-400 font-bold py-2">PENDING</option>
-                        <option value="approved" className="bg-[#1e293b] text-emerald-400 font-bold py-2">APPROVED</option>
-                        <option value="completed" className="bg-[#1e293b] text-emerald-400 font-bold py-2">COMPLETED</option>
-                        <option value="rejected" className="bg-[#1e293b] text-rose-400 font-bold py-2">REJECTED</option>
+                        <option value="pending" className="bg-white text-amber-700 font-bold py-2">PENDING</option>
+                        <option value="approved" className="bg-white text-emerald-700 font-bold py-2">APPROVED</option>
+                        <option value="completed" className="bg-white text-emerald-700 font-bold py-2">COMPLETED</option>
+                        <option value="rejected" className="bg-white text-rose-700 font-bold py-2">REJECTED</option>
                       </select>
                     </td>
                     <td className="py-4 px-6 text-right whitespace-nowrap space-x-2">

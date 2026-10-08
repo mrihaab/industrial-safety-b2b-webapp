@@ -78,13 +78,13 @@ export const Home: React.FC = () => {
     <div className="w-full space-y-0">
       {/* 1. Hero Section matching HTML Mockup */}
       <section className="relative min-h-[75vh] lg:min-h-[85vh] w-full flex items-center overflow-hidden industrial-grid border-b border-outline-variant py-12 lg:py-16">
-        <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/80 to-transparent z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/90 to-surface/20 z-10" />
         <img
           src={HERO_IMG}
           alt="A high-contrast cinematic photograph of professional heavy-duty safety gloves resting on a brushed steel industrial workbench."
           fetchPriority="high"
           decoding="async"
-          className="absolute right-0 top-0 h-full w-full lg:w-2/3 object-cover object-center grayscale hover:grayscale-0 transition-all duration-700 opacity-50 lg:opacity-100"
+          className="absolute right-0 top-0 h-full w-full lg:w-2/3 object-cover object-center transition-all duration-700 opacity-60 lg:opacity-90"
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=1920&q=80';
           }}
@@ -207,7 +207,7 @@ export const Home: React.FC = () => {
                   <div className="pt-2">
                     <Link
                       to={`/products/${cleanMainSlug}`}
-                      className="bg-white text-surface px-6 py-3 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary hover:text-on-primary transition-all rounded-xs cursor-pointer orange-glow text-xs sm:text-sm"
+                      className="bg-slate-900 text-white px-6 py-3 font-title-md inline-flex items-center gap-2 font-bold hover:bg-primary hover:text-white transition-all rounded-xs cursor-pointer orange-glow text-xs sm:text-sm"
                     >
                       View Specs <span className="material-symbols-outlined text-sm">open_in_new</span>
                     </Link>
@@ -430,12 +430,12 @@ export const Home: React.FC = () => {
               type="email"
               value={emailInput}
               onChange={e => setEmailInput(e.target.value)}
-              className="bg-surface/10 border border-on-primary-container/30 text-on-primary-container placeholder:text-on-primary-container/60 px-6 py-4 rounded-sm w-full lg:w-80 focus:ring-on-primary-container focus:border-on-primary-container font-mono text-sm"
+              className="bg-white border border-white/80 text-slate-900 placeholder:text-slate-400 px-6 py-4 rounded-sm w-full lg:w-80 focus:ring-2 focus:ring-white font-mono text-sm shadow-sm"
               placeholder="Corporate Email Address"
             />
             <button
               type="submit"
-              className="bg-on-primary-container text-primary-container px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-on-primary transition-colors whitespace-nowrap font-mono text-xs cursor-pointer min-h-[48px]"
+              className="bg-slate-900 text-white px-8 py-4 font-bold rounded-sm uppercase tracking-wider hover:bg-slate-800 transition-colors whitespace-nowrap font-mono text-xs cursor-pointer min-h-[48px] shadow-md"
             >
               Contact Sales
             </button>

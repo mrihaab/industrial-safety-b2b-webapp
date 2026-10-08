@@ -190,7 +190,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
               onChange={() => onSelectStockFilter(stockFilter === 'IN STOCK' ? 'all' : 'IN STOCK')}
               className="rounded-none border-outline-variant bg-surface-container-low text-primary-container focus:ring-primary-container accent-primary w-4 h-4 cursor-pointer"
             />
-            <span className="font-body-sm text-body-sm text-[#4ade80] font-bold group-hover:text-on-surface transition-colors">
+            <span className="font-body-sm text-body-sm text-in-stock font-bold group-hover:text-on-surface transition-colors">
               In Stock Only
             </span>
           </label>

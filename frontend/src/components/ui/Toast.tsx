@@ -10,9 +10,9 @@ export interface ToastProps {
 
 export const Toast: React.FC<ToastProps> = ({ message, type = 'info', onClose, className }) => {
   const typeStyles = {
-    success: 'bg-surface-container border-[#4ade80]/50 text-[#4ade80] led-active',
-    error: 'bg-surface-container border-error/50 text-error',
-    info: 'bg-surface-container border-primary-container/50 text-primary',
+    success: 'bg-white border-emerald-500 text-emerald-800 shadow-xl',
+    error: 'bg-white border-red-500 text-red-800 shadow-xl',
+    info: 'bg-white border-primary-container text-slate-900 shadow-xl',
   };
 
   return (

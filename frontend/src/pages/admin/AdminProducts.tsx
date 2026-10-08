@@ -369,7 +369,7 @@ export const AdminProducts: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <span>{prod.title}</span>
                           {isProdFeatured && (
-                            <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 border border-amber-500/40 text-[10px] font-mono font-bold rounded-xs">
+                            <span className="px-2 py-0.5 bg-amber-50 text-amber-700 border border-amber-300 text-[10px] font-mono font-bold rounded-xs">
                               ⭐ Featured
                             </span>
                           )}
@@ -379,7 +379,7 @@ export const AdminProducts: React.FC = () => {
                         {certsToShow && certsToShow.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
                             {certsToShow.slice(0, 2).map((c, i) => (
-                              <span key={i} className="px-2 py-0.5 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono font-bold rounded-xs bg-emerald-950/30">
+                              <span key={i} className="px-2 py-0.5 border border-emerald-300 text-emerald-700 text-[10px] font-mono font-bold rounded-xs bg-emerald-50">
                                 {c}
                               </span>
                             ))}
@@ -500,7 +500,7 @@ export const AdminProducts: React.FC = () => {
                   </span>
                 </div>
                 {isLimitReached && (
-                  <p className="text-[11px] text-amber-400 font-mono pl-7">
+                  <p className="text-[11px] text-amber-700 font-mono pl-7">
                     ⚠️ Maximum 1 product limit reached. Unfeature the currently featured product to feature this one.
                   </p>
                 )}
@@ -579,12 +579,12 @@ export const AdminProducts: React.FC = () => {
                   📸 Product Photos Gallery ({totalImageCount} / 4 Max Photos)
                 </label>
                 {totalImageCount >= 4 ? (
-                  <span className="text-[11px] text-amber-400 font-mono font-bold">
+                  <span className="text-[11px] text-amber-700 font-mono font-bold">
                     ⚠️ Maximum 4 Photos Limit Reached
                   </span>
                 ) : (
                   totalImageCount > 0 && (
-                    <span className="text-[11px] text-emerald-400 font-mono font-bold">
+                    <span className="text-[11px] text-emerald-700 font-mono font-bold">
                       ✓ {totalImageCount} Image(s) Attached
                     </span>
                   )
@@ -614,7 +614,7 @@ export const AdminProducts: React.FC = () => {
                           <span className="font-bold text-on-surface block truncate">
                             {img.is_primary ? '★ Primary Photo' : `Photo ${idx + 1}`}
                           </span>
-                          <span className="text-emerald-400 text-[10px] font-mono block">Saved in Database</span>
+                          <span className="text-emerald-700 text-[10px] font-mono block">Saved in Database</span>
                         </div>
                       </div>
 

@@ -374,7 +374,7 @@ export const ProductDetail: React.FC = () => {
                 ({product.reviewCount || 124} Global Reviews)
               </span>
               <div className="h-4 w-[1px] bg-outline-variant"></div>
-              <span className="font-label-caps text-label-caps text-[#4ade80]">
+              <span className="font-label-caps text-label-caps text-in-stock font-bold">
                 {product.stockStatus || 'IN STOCK'}
               </span>
             </div>
