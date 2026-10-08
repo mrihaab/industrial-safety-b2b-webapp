@@ -99,17 +99,17 @@ export const About: React.FC = () => {
       </section>
 
       {/* 5. CTA SECTION */}
-      <section className="max-w-container-max mx-auto bg-primary-container text-on-primary-container p-12 rounded-sm orange-glow flex flex-col md:flex-row items-center justify-between gap-8">
+      <section className="max-w-container-max mx-auto bg-primary-container text-on-primary-container p-6 sm:p-10 lg:p-12 rounded-2xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8">
         <div className="space-y-2 text-center md:text-left">
-          <h3 className="font-display-lg text-3xl font-extrabold">Partner with Ghulam Safety Hub</h3>
-          <p className="font-body-lg text-on-primary-container/90">
+          <h3 className="font-display-lg text-2xl sm:text-3xl font-extrabold">Partner with Ghulam Safety Hub</h3>
+          <p className="font-body-lg text-on-primary-container/90 text-sm sm:text-base">
             Request sample kits or consult our industrial safety engineering team today.
           </p>
         </div>
-        <Link to="/rfq">
-          <Button variant="secondary" size="lg" className="whitespace-nowrap">
+        <Link to="/rfq" className="w-full sm:w-auto shrink-0">
+          <button className="w-full sm:w-auto bg-slate-900 text-white hover:bg-slate-800 font-title-md font-bold text-xs sm:text-sm px-8 py-3.5 sm:py-4 rounded-sm uppercase tracking-wider transition-all shadow-md active:scale-95">
             REQUEST WHOLESALE QUOTE
-          </Button>
+          </button>
         </Link>
       </section>
     </div>
