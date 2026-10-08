@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '@/components/ui/Logo';
 import { Button } from '@/components/ui/Button';
+import { SocialLinksRow } from '@/components/ui/SocialLinks';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -146,13 +147,22 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({ isOpen, onClose }) => {
           </Link>
         </nav>
 
-        {/* Prominent Action Button Section */}
-        <div className="mt-auto space-y-3 pt-6 border-t border-outline-variant/80 shrink-0">
+        {/* Prominent Action Button Section & Social Channels */}
+        <div className="mt-auto space-y-4 pt-6 border-t border-outline-variant/80 shrink-0">
           <Link to="/rfq" onClick={onClose} className="block w-full">
             <Button variant="primary" className="w-full min-h-[48px] uppercase tracking-wider font-bold orange-glow">
               Request Bulk Quote
             </Button>
           </Link>
+
+          {/* Official Social Links in Mobile Drawer */}
+          <div className="flex flex-col items-center gap-2 pt-1">
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant/70">
+              Connect With Us
+            </span>
+            <SocialLinksRow />
+          </div>
+
           <p className="text-center font-mono text-[11px] text-on-surface-variant/70">
             Ghulam Safety Hub • Sialkot Industrial Zone, Pakistan
           </p>
